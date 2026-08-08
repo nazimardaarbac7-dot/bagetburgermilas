@@ -7,7 +7,7 @@ const reviews = [
   { quote: "Milasta yediğim açık ara en iyii burger", name: 'YAVUZ YAVUZER', rotation: 5, tone: 'sand' },
 ]
 
-export default function MilasSection() {
+export default function MilasSection({ onOpenMenu }) {
   return (
     <section id="milas" className="milas-section">
       <div className="milas-rule" />
@@ -34,10 +34,10 @@ export default function MilasSection() {
             src="/assets/burgers/baldicanli-burger-bitten.png"
             alt="Yarısı yenmiş Baldıcanlı Burger"
           />
-          <a className="menu-cta" href="#tray">
+          <button className="menu-cta" type="button" onClick={onOpenMenu}>
             <span>TÜM MENÜYÜ GÖR</span>
             <i aria-hidden="true">↗</i>
-          </a>
+          </button>
         </div>
       </div>
       <div className="milas-details">

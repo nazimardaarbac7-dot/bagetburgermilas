@@ -1,7 +1,8 @@
-import React, { useLayoutEffect, useRef, useState } from 'react'
+import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Navbar from './components/Navbar'
+import MenuOverlay from './components/MenuOverlay'
 import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
@@ -24,6 +25,10 @@ export default function App() {
   const [showcaseActive, setShowcaseActive] = useState(false)
   const [sceneReady, setSceneReady] = useState(false)
   const [navbarOnYellow, setNavbarOnYellow] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const openMenu = useCallback(() => setMenuOpen(true), [])
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
 
   useLayoutEffect(() => {
     const media = gsap.matchMedia()
@@ -216,7 +221,8 @@ export default function App() {
       <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} />
       <Hero ref={heroRef} />
       <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} trayDragOffset={trayDragOffset} onTraySwipe={handleTraySwipe} onBurgerTap={handleBurgerTap} />
-      <MilasSection />
+      <MilasSection onOpenMenu={openMenu} />
+      <MenuOverlay open={menuOpen} onClose={closeMenu} />
     </main>
   )
 }
