@@ -17,7 +17,7 @@ function SceneReady({ onReady }) {
   return null
 }
 
-function World({ heroExitProgress, scrollProgress, activeIndex, trayDragOffset, burgerInteraction, onReady }) {
+function World({ heroExitProgress, scrollProgress, finalTransitionProgress, activeIndex, trayDragOffset, burgerInteraction, onReady }) {
   return <>
     <color attach="background" args={['#1d4042']} />
     <fog attach="fog" args={['#1d4042', 13, 28]} />
@@ -27,17 +27,17 @@ function World({ heroExitProgress, scrollProgress, activeIndex, trayDragOffset, 
     <pointLight intensity={17} distance={16} color="#f2a42b" position={[0, 3, 5]} />
     <Environment preset="city" environmentIntensity={0.3} />
     <FloatingBurgers heroExitProgress={heroExitProgress} />
-    <Tray scrollProgress={scrollProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} />
+    <Tray scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} />
     <CameraRig scrollProgress={scrollProgress} />
     <SceneReady onReady={onReady} />
   </>
 }
 
-export default function Experience({ heroExitProgress, scrollProgress, activeIndex, trayDragOffset, burgerInteraction, onReady }) {
+export default function Experience({ heroExitProgress, scrollProgress, finalTransitionProgress, activeIndex, trayDragOffset, burgerInteraction, onReady }) {
   return (
     <div className="canvas-wrap" aria-hidden="true">
       <Canvas dpr={[1, 1.5]} shadows camera={{ position: [0, 0.3, 13.4], fov: 38 }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
-        <World heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} onReady={onReady} />
+        <World heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} onReady={onReady} />
       </Canvas>
     </div>
   )

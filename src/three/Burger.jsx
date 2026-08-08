@@ -145,20 +145,18 @@ function HandPickup({ scrollProgress }) {
     texture.needsUpdate = true
   }, [texture])
 
-  useFrame((_, delta) => {
+  useFrame(() => {
     if (!hand.current || !material.current || !scrollProgress) return
     const pickup = getHandPickupProgress(scrollProgress.current)
-    const reach = THREE.MathUtils.smootherstep(pickup, 0, 0.48)
+    const reach = THREE.MathUtils.smootherstep(pickup, 0, 0.6)
     const appear = THREE.MathUtils.smoothstep(pickup, 0, 0.1)
-    const movementSpeed = 4
 
     hand.current.visible = pickup > 0.001
-    hand.current.position.x = THREE.MathUtils.damp(hand.current.position.x, THREE.MathUtils.lerp(0.42, 0, reach), movementSpeed, delta)
-    hand.current.position.y = THREE.MathUtils.damp(hand.current.position.y, THREE.MathUtils.lerp(6.25, 1.15, reach), movementSpeed, delta)
-    hand.current.rotation.z = THREE.MathUtils.damp(hand.current.rotation.z, THREE.MathUtils.lerp(-0.065, 0, reach), movementSpeed, delta)
-    const nextScale = THREE.MathUtils.damp(hand.current.scale.x, THREE.MathUtils.lerp(0.97, 1, reach), movementSpeed, delta)
-    hand.current.scale.setScalar(nextScale)
-    material.current.opacity = THREE.MathUtils.damp(material.current.opacity, appear, movementSpeed, delta)
+    hand.current.position.x = THREE.MathUtils.lerp(0.42, 0, reach)
+    hand.current.position.y = THREE.MathUtils.lerp(6.25, 1.15, reach)
+    hand.current.rotation.z = THREE.MathUtils.lerp(-0.065, 0, reach)
+    hand.current.scale.setScalar(THREE.MathUtils.lerp(0.97, 1, reach))
+    material.current.opacity = appear
   })
 
   return (
@@ -470,7 +468,7 @@ function HeroBurgerDepth() {
   )
 }
 
-export default function Burger({ index, activeIndex, isFloating = false, floatingScale = 0.72, pickupTarget = false, pickupProgress, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
+export default function Burger({ index, activeIndex, isFloating = false, floatingScale = 0.72, pickupTarget = false, pickupProgress, finalTransitionProgress, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
   const group = useRef()
   const lastInteraction = useRef(0)
   const tapEnergy = useRef(0)
@@ -487,7 +485,9 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
     tapEnergy.current = THREE.MathUtils.damp(tapEnergy.current, 0, 7, delta)
 
     const pickup = pickupTarget && pickupProgress ? getHandPickupProgress(pickupProgress.current) : 0
-    const lift = THREE.MathUtils.smootherstep(pickup, 0.48, 1)
+    const lift = pickupTarget && finalTransitionProgress
+      ? THREE.MathUtils.smootherstep(finalTransitionProgress.current, 0, 0.78)
+      : 0
 
     const targetScale = isFloating ? floatingScale : isActive ? 1.12 + tapEnergy.current * 0.1 + lift * 0.045 : 0.84
     const nextScale = THREE.MathUtils.damp(group.current.scale.x, targetScale, 4, delta)

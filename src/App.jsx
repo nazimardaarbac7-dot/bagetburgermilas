@@ -14,6 +14,7 @@ gsap.registerPlugin(ScrollTrigger)
 export default function App() {
   const heroExitProgress = useRef(0)
   const scrollProgress = useRef(0)
+  const finalTransitionProgress = useRef(0)
   const trayTriggerRef = useRef(null)
   const trayDragOffset = useRef(0)
   const burgerInteraction = useRef({ index: -1, token: 0 })
@@ -73,6 +74,16 @@ export default function App() {
           const isActive = self.progress > 0 && self.progress < 1
           setShowcaseReady((current) => current === isReady ? current : isReady)
           setShowcaseActive((current) => current === isActive ? current : isActive)
+        },
+      })
+
+      ScrollTrigger.create({
+        trigger: '#milas',
+        start: 'top bottom',
+        end: 'top top',
+        scrub: 0.7,
+        onUpdate: (self) => {
+          finalTransitionProgress.current = self.progress
         },
       })
 
@@ -141,7 +152,7 @@ export default function App() {
 
   return (
     <main>
-      <Experience heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} onReady={() => setSceneReady(true)} />
+      <Experience heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} onReady={() => setSceneReady(true)} />
       <div className={`scene-curtain${sceneReady ? ' is-hidden' : ''}`} aria-hidden="true" />
       <div className="grain" />
       <Navbar hiddenOnShowcase={showcaseActive} />

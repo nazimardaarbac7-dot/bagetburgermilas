@@ -5,7 +5,7 @@ import Burger from './Burger'
 import { burgers } from '../data/burgers'
 import { getTrayRotationProgress } from '../utils/scrollProgress'
 
-export default function Tray({ scrollProgress, activeIndex, trayDragOffset, burgerInteraction }) {
+export default function Tray({ scrollProgress, finalTransitionProgress, activeIndex, trayDragOffset, burgerInteraction }) {
   const tray = useRef()
   const trayVisual = useRef()
   const { size } = useThree()
@@ -60,6 +60,7 @@ export default function Tray({ scrollProgress, activeIndex, trayDragOffset, burg
             interactionPulse={burgerInteraction}
             pickupTarget={index === burgers.length - 1}
             pickupProgress={scrollProgress}
+            finalTransitionProgress={finalTransitionProgress}
             position={[Math.sin(angle) * radius, 0.5, Math.cos(angle) * radius]}
             facingAngle={angle}
           />
