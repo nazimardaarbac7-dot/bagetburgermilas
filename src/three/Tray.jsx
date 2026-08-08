@@ -22,7 +22,7 @@ export default function Tray({ scrollProgress, finalTransitionProgress, activeIn
     }
 
     const intro = THREE.MathUtils.smoothstep(progress, 0, isMobile ? 0.065 : 0.11)
-    const rotationProgress = getTrayRotationProgress(progress)
+    const rotationProgress = getTrayRotationProgress(progress, isMobile)
     const targetRotation = -rotationProgress * (burgers.length - 1) * ((Math.PI * 2) / burgers.length) + trayDragOffset.current
     const targetScale = 0.08 + intro * 0.92
     const settleSpeed = isMobile ? 4.2 : 2.8

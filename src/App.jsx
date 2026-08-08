@@ -67,7 +67,7 @@ export default function App() {
         scrub: 0.7,
         onUpdate: (self) => {
           scrollProgress.current = self.progress
-          const rotationProgress = getTrayRotationProgress(self.progress)
+          const rotationProgress = getTrayRotationProgress(self.progress, mobileTray)
           const nextIndex = Math.min(burgers.length - 1, Math.round(rotationProgress * (burgers.length - 1)))
           setActiveIndex((current) => current === nextIndex ? current : nextIndex)
           const isReady = self.progress >= (mobileTray ? MOBILE_TRAY_SETTLE_END : TRAY_SETTLE_END)
