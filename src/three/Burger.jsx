@@ -510,10 +510,12 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
     const nextScale = THREE.MathUtils.damp(group.current.scale.x, targetScale, 4, smoothDelta)
     group.current.scale.setScalar(nextScale)
     if (isFloating) {
+      const heroMotion = motionProgress?.current ?? 0
+      const idleStrength = 1 - THREE.MathUtils.smootherstep(heroMotion, 0, 0.055)
       floatingTime.current += smoothDelta
-      group.current.position.y = baseY + Math.sin(floatingTime.current * 0.8 + floatingPhase) * 0.23
-      group.current.rotation.y += smoothDelta * (0.14 + index * 0.012)
-      group.current.rotation.x = Math.sin(floatingTime.current * 0.42 + floatingPhase) * 0.08
+      group.current.position.y = baseY + Math.sin(floatingTime.current * 0.8 + floatingPhase) * 0.23 * idleStrength
+      group.current.rotation.y += smoothDelta * (0.14 + index * 0.012) * idleStrength
+      group.current.rotation.x = Math.sin(floatingTime.current * 0.42 + floatingPhase) * 0.08 * idleStrength
     } else {
       const movementSpeed = pickup > 0 ? 4 : 5
       group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, facingAngle, 5, smoothDelta)

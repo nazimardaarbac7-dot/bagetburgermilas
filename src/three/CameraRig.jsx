@@ -8,6 +8,11 @@ export default function CameraRig({ heroExitProgress, scrollProgress }) {
   const target = useRef(new THREE.Vector3(0, 0.25, 0))
   const desired = useRef(new THREE.Vector3())
   const desiredTarget = useRef(new THREE.Vector3(0, 0.25, 0))
+  const transitionStartPosition = useRef(new THREE.Vector3())
+  const transitionStartTarget = useRef(new THREE.Vector3())
+  const previousHeroProgress = useRef(0)
+  const heroTransitionWasActive = useRef(false)
+  const heroTransitionDirection = useRef(1)
 
   useFrame((state, delta) => {
     const smoothDelta = Math.min(delta, 1 / 30)
@@ -31,17 +36,27 @@ export default function CameraRig({ heroExitProgress, scrollProgress }) {
     const cameraEase = 1 - Math.exp(-smoothDelta * (isMobile ? 3.1 : 1.9))
     const targetEase = 1 - Math.exp(-smoothDelta * (isMobile ? 4.4 : 3.2))
 
+    if (heroTransitionActive && !heroTransitionWasActive.current) {
+      transitionStartPosition.current.copy(camera.position)
+      transitionStartTarget.current.copy(target.current)
+      heroTransitionDirection.current = heroProgress >= previousHeroProgress.current ? 1 : -1
+    }
+
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, desired.current.x, cameraEase)
     if (heroTransitionActive) {
-      camera.position.y = desired.current.y
-      camera.position.z = desired.current.z
-      target.current.copy(desiredTarget.current)
+      const transitionDistance = heroTransitionDirection.current > 0 ? heroProgress : 1 - heroProgress
+      const continuity = THREE.MathUtils.smootherstep(transitionDistance, 0, 0.1)
+      camera.position.y = THREE.MathUtils.lerp(transitionStartPosition.current.y, desired.current.y, continuity)
+      camera.position.z = THREE.MathUtils.lerp(transitionStartPosition.current.z, desired.current.z, continuity)
+      target.current.copy(transitionStartTarget.current).lerp(desiredTarget.current, continuity)
     } else {
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, desired.current.y, cameraEase)
       camera.position.z = THREE.MathUtils.lerp(camera.position.z, desired.current.z, cameraEase)
       target.current.lerp(desiredTarget.current, targetEase)
     }
     camera.lookAt(target.current)
+    previousHeroProgress.current = heroProgress
+    heroTransitionWasActive.current = heroTransitionActive
   })
   return null
 }
