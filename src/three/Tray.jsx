@@ -32,8 +32,9 @@ export default function Tray({ heroExitProgress, scrollProgress, finalTransition
     const targetRotation = -rotationProgress * (burgers.length - 1) * ((Math.PI * 2) / burgers.length) + trayDragOffset.current
     const targetScale = THREE.MathUtils.lerp(0.001, 1, intro)
     const settleSpeed = isMobile ? 4.2 : 2.8
+    const rotationSpeed = isMobile ? 8.5 : 5.5
     const currentScale = THREE.MathUtils.damp(trayVisual.current.scale.x, targetScale, settleSpeed, smoothDelta)
-    tray.current.rotation.y = THREE.MathUtils.damp(tray.current.rotation.y, targetRotation, 4.2, smoothDelta)
+    tray.current.rotation.y = THREE.MathUtils.damp(tray.current.rotation.y, targetRotation, rotationSpeed, smoothDelta)
     trayVisual.current.scale.setScalar(currentScale)
     const settledY = isMobile ? -0.48 : -0.95
     const entryY = isMobile ? -6.4 : -7

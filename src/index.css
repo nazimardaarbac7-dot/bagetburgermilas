@@ -187,7 +187,7 @@ main { position: relative; isolation: isolate; }
   .rotate-prompt { bottom: 28px; font-size: .46rem; }
   .rotate-copy-desktop { display: none; }
   .rotate-copy-mobile { display: inline; }
-  .showcase.is-ready .tray-touch-zone { pointer-events: auto; touch-action: pan-y; }
+  .showcase.is-active .tray-touch-zone { pointer-events: auto; touch-action: pan-y; }
   .tray-markers { right: 20px; top: 112px; bottom: auto; }
   .tray-markers span { width: 13px; }
   .tray-markers span.active { width: 25px; }

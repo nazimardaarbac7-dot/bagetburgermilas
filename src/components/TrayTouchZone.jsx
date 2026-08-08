@@ -31,9 +31,16 @@ export default function TrayTouchZone({ enabled, dragOffset, onGestureStart, onS
     const deltaX = event.clientX - current.startX
     const deltaY = event.clientY - current.startY
 
-    if (!current.axis && Math.hypot(deltaX, deltaY) > 8) {
-      current.axis = Math.abs(deltaX) > Math.abs(deltaY) * 1.15 ? 'horizontal' : 'vertical'
-      if (current.axis === 'horizontal') event.currentTarget.setPointerCapture(event.pointerId)
+    const absX = Math.abs(deltaX)
+    const absY = Math.abs(deltaY)
+
+    if (!current.axis && Math.hypot(deltaX, deltaY) > 7) {
+      if (absX >= absY * 0.85) {
+        current.axis = 'horizontal'
+        event.currentTarget.setPointerCapture(event.pointerId)
+      } else if (absY > 14 && absY > absX * 1.25) {
+        current.axis = 'vertical'
+      }
     }
 
     if (current.axis !== 'horizontal') return
@@ -48,16 +55,25 @@ export default function TrayTouchZone({ enabled, dragOffset, onGestureStart, onS
     if (!current || current.pointerId !== event.pointerId) return
 
     const deltaX = event.clientX - current.startX
-    let transitionAccepted = false
-    if (current.axis === 'horizontal' && Math.abs(deltaX) > 42) {
-      suppressClick.current = true
-      transitionAccepted = onSwipe(deltaX < 0 ? 1 : -1) === true
+    if (current.axis === 'horizontal') {
+      const swipeThreshold = Math.max(24, Math.min(34, event.currentTarget.clientWidth * 0.075))
+      suppressClick.current = Math.abs(deltaX) > 10
+      onSwipe(Math.abs(deltaX) >= swipeThreshold ? (deltaX < 0 ? 1 : -1) : 0)
     }
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
-    resetGesture(transitionAccepted)
+    resetGesture(current.axis === 'horizontal')
+  }
+
+  const handlePointerCancel = () => {
+    if (gesture.current?.axis === 'horizontal') {
+      onSwipe(0)
+      resetGesture(true)
+      return
+    }
+    resetGesture()
   }
 
   const handleClick = () => {
@@ -77,7 +93,7 @@ export default function TrayTouchZone({ enabled, dragOffset, onGestureStart, onS
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerCancel={() => resetGesture()}
+      onPointerCancel={handlePointerCancel}
       onClick={handleClick}
     />
   )

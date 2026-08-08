@@ -11,7 +11,7 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
           <span className="progress-count">0{activeIndex + 1} — 05</span>
         </div>
         <BurgerInfo burger={burger} />
-        <TrayTouchZone enabled={isReady} dragOffset={trayDragOffset} onGestureStart={onTrayGestureStart} onSwipe={onTraySwipe} onTap={onBurgerTap} />
+        <TrayTouchZone enabled={isActive} dragOffset={trayDragOffset} onGestureStart={onTrayGestureStart} onSwipe={onTraySwipe} onTap={onBurgerTap} />
         <p className="rotate-prompt"><i /><span className="rotate-copy-desktop">TEPSİYİ DÖNDÜRMEK İÇİN KAYDIR</span><span className="rotate-copy-mobile">KAYDIR / TEPSİYİ SÜRÜKLE</span></p>
         <div className="tray-markers" aria-hidden="true">
           {Array.from({ length: 5 }, (_, index) => <span className={index === activeIndex ? 'active' : ''} key={index} />)}

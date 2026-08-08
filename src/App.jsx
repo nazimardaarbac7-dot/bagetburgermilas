@@ -8,7 +8,7 @@ import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
 import Experience from './three/Experience'
 import { burgers } from './data/burgers'
-import { getTrayRotationProgress, MOBILE_TRAY_SETTLE_END, TRAY_ROTATION_END, TRAY_ROTATION_START, TRAY_SETTLE_END } from './utils/scrollProgress'
+import { getTrayProgressForBurger, getTrayRotationProgress, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
@@ -36,6 +36,7 @@ export default function App() {
   const trayTriggerRef = useRef(null)
   const trayDragOffset = useRef(0)
   const traySnapTween = useRef(null)
+  const traySnapTargetIndex = useRef(null)
   const burgerInteraction = useRef({ index: -1, token: 0 })
   const heroRef = useRef(null)
   const activeIndexValue = useRef(0)
@@ -98,7 +99,7 @@ export default function App() {
         onUpdate: (self) => {
           scrollProgress.current = self.progress
           const rotationProgress = getTrayRotationProgress(self.progress, mobileTray)
-          const nextIndex = getStableBurgerIndex(rotationProgress, activeIndexValue.current)
+          const nextIndex = traySnapTargetIndex.current ?? getStableBurgerIndex(rotationProgress, activeIndexValue.current)
           const isReady = self.progress >= (mobileTray ? MOBILE_TRAY_SETTLE_END : TRAY_SETTLE_END)
           const isActive = self.progress > 0 && self.progress < 1
 
@@ -223,6 +224,7 @@ export default function App() {
     return () => {
       traySnapTween.current?.kill()
       traySnapTween.current = null
+      traySnapTargetIndex.current = null
       trayTriggerRef.current = null
       media.revert()
       context.revert()
@@ -230,26 +232,69 @@ export default function App() {
   }, [])
 
   const handleTraySwipe = (direction) => {
-    const targetIndex = Math.max(0, Math.min(burgers.length - 1, activeIndex + direction))
-    if (targetIndex === activeIndex) {
-      burgerInteraction.current = { index: activeIndex, token: burgerInteraction.current.token + 1 }
+    const settleDragOffset = () => {
+      traySnapTween.current?.kill()
+      traySnapTargetIndex.current = null
+
+      if (Math.abs(trayDragOffset.current) < 0.001) {
+        trayDragOffset.current = 0
+        traySnapTween.current = null
+        return
+      }
+
+      const settleMotion = { drag: trayDragOffset.current }
+      traySnapTween.current = gsap.to(settleMotion, {
+        drag: 0,
+        duration: 0.24,
+        ease: 'power3.out',
+        overwrite: true,
+        onUpdate: () => {
+          trayDragOffset.current = settleMotion.drag
+        },
+        onComplete: () => {
+          trayDragOffset.current = 0
+          traySnapTween.current = null
+        },
+      })
+    }
+
+    if (direction === 0) {
+      settleDragOffset()
+      return false
+    }
+
+    const currentIndex = activeIndexValue.current
+    const targetIndex = Math.max(0, Math.min(burgers.length - 1, currentIndex + direction))
+    if (targetIndex === currentIndex) {
+      burgerInteraction.current = { index: currentIndex, token: burgerInteraction.current.token + 1 }
+      settleDragOffset()
       return false
     }
 
     const trayTrigger = trayTriggerRef.current
-    if (!trayTrigger) return false
-    const rotationProgress = targetIndex / (burgers.length - 1)
-    const triggerProgress = TRAY_ROTATION_START + rotationProgress * (TRAY_ROTATION_END - TRAY_ROTATION_START)
+    if (!trayTrigger) {
+      settleDragOffset()
+      return false
+    }
+    const mobileTray = window.matchMedia('(max-width: 720px)').matches
+    const triggerProgress = getTrayProgressForBurger(targetIndex, burgers.length, mobileTray)
     const targetScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * triggerProgress
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const scrollingElement = document.scrollingElement ?? document.documentElement
 
     traySnapTween.current?.kill()
+    traySnapTargetIndex.current = targetIndex
+    activeIndexValue.current = targetIndex
+    setActiveIndex(targetIndex)
 
     if (reducedMotion) {
+      const previousScrollBehavior = scrollingElement.style.scrollBehavior
+      scrollingElement.style.scrollBehavior = 'auto'
       trayDragOffset.current = 0
       scrollingElement.scrollTop = targetScroll
+      scrollingElement.style.scrollBehavior = previousScrollBehavior
       traySnapTween.current = null
+      traySnapTargetIndex.current = null
       return true
     }
 
@@ -257,11 +302,19 @@ export default function App() {
       scroll: window.scrollY,
       drag: trayDragOffset.current,
     }
+    const previousScrollBehavior = scrollingElement.style.scrollBehavior
+    let scrollBehaviorRestored = false
+    const restoreScrollBehavior = () => {
+      if (scrollBehaviorRestored) return
+      scrollingElement.style.scrollBehavior = previousScrollBehavior
+      scrollBehaviorRestored = true
+    }
+    scrollingElement.style.scrollBehavior = 'auto'
 
     traySnapTween.current = gsap.to(snapMotion, {
       scroll: targetScroll,
       drag: 0,
-      duration: 0.64,
+      duration: 0.48,
       ease: 'power3.out',
       overwrite: true,
       onUpdate: () => {
@@ -271,6 +324,13 @@ export default function App() {
       onComplete: () => {
         trayDragOffset.current = 0
         traySnapTween.current = null
+        traySnapTargetIndex.current = null
+        restoreScrollBehavior()
+      },
+      onInterrupt: () => {
+        traySnapTween.current = null
+        traySnapTargetIndex.current = null
+        restoreScrollBehavior()
       },
     })
 
@@ -278,8 +338,8 @@ export default function App() {
   }
 
   const handleTrayGestureStart = () => {
-    traySnapTween.current?.kill()
-    traySnapTween.current = null
+    if (!traySnapTween.current) return
+    traySnapTween.current.progress(1)
   }
 
   const handleBurgerTap = () => {
