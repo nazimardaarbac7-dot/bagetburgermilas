@@ -29,6 +29,11 @@ export default function MilasSection() {
         <div className="milas-copy">
           <p className="eyebrow">A LOCAL OBSESSION</p>
           <h2>MADE<br />IN MİLAS</h2>
+          <img
+            className="bitten-burger"
+            src="/assets/burgers/baldicanli-burger-bitten.png"
+            alt="Yarısı yenmiş Baldıcanlı Burger"
+          />
           <a className="menu-cta" href="#tray">
             <span>TÜM MENÜYÜ GÖR</span>
             <i aria-hidden="true">↗</i>
