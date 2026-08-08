@@ -28,7 +28,7 @@ export default function MilasSection() {
         </div>
         <div className="milas-copy">
           <p className="eyebrow">YEREL BİR TUTKU</p>
-          <h2>MİLAS'TA<br />EL<br />YAPIMI</h2>
+          <h2>MADE<br />IN MİLAS</h2>
           <img
             className="bitten-burger"
             src="/assets/burgers/baldicanli-burger-bitten.png"

@@ -7,7 +7,7 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
     <section id="tray" className={`showcase${isReady ? ' is-ready' : ''}${isActive ? ' is-active' : ''}`} aria-label="Burger menüsü">
       <div className="showcase-panel">
         <div className="showcase-topline">
-          <span>BAGET SEÇKİSİ</span>
+          <span>BURGER SEÇİCİ</span>
           <span className="progress-count">0{activeIndex + 1} — 05</span>
         </div>
         <BurgerInfo burger={burger} />
