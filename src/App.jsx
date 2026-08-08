@@ -23,6 +23,7 @@ export default function App() {
   const [showcaseReady, setShowcaseReady] = useState(false)
   const [showcaseActive, setShowcaseActive] = useState(false)
   const [sceneReady, setSceneReady] = useState(false)
+  const [navbarOnYellow, setNavbarOnYellow] = useState(false)
 
   useLayoutEffect(() => {
     const media = gsap.matchMedia()
@@ -85,6 +86,13 @@ export default function App() {
         onUpdate: (self) => {
           finalTransitionProgress.current = self.progress
         },
+      })
+
+      ScrollTrigger.create({
+        trigger: '#milas',
+        start: 'top 20px',
+        end: 'bottom top',
+        onToggle: (self) => setNavbarOnYellow(self.isActive),
       })
 
       const reviewCards = gsap.utils.toArray('.review-card')
@@ -205,7 +213,7 @@ export default function App() {
       <Experience heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} onReady={() => setSceneReady(true)} />
       <div className={`scene-curtain${sceneReady ? ' is-hidden' : ''}`} aria-hidden="true" />
       <div className="grain" />
-      <Navbar hiddenOnShowcase={showcaseActive} />
+      <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} />
       <Hero ref={heroRef} />
       <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} trayDragOffset={trayDragOffset} onTraySwipe={handleTraySwipe} onBurgerTap={handleBurgerTap} />
       <MilasSection />
