@@ -145,18 +145,20 @@ function HandPickup({ scrollProgress }) {
     texture.needsUpdate = true
   }, [texture])
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (!hand.current || !material.current || !scrollProgress) return
     const pickup = getHandPickupProgress(scrollProgress.current)
     const reach = THREE.MathUtils.smootherstep(pickup, 0, 0.48)
     const appear = THREE.MathUtils.smoothstep(pickup, 0, 0.1)
+    const movementSpeed = 4
 
     hand.current.visible = pickup > 0.001
-    hand.current.position.x = THREE.MathUtils.lerp(0.42, 0, reach)
-    hand.current.position.y = THREE.MathUtils.lerp(6.25, 1.15, reach)
-    hand.current.rotation.z = THREE.MathUtils.lerp(-0.065, 0, reach)
-    hand.current.scale.setScalar(THREE.MathUtils.lerp(0.97, 1, reach))
-    material.current.opacity = appear
+    hand.current.position.x = THREE.MathUtils.damp(hand.current.position.x, THREE.MathUtils.lerp(0.42, 0, reach), movementSpeed, delta)
+    hand.current.position.y = THREE.MathUtils.damp(hand.current.position.y, THREE.MathUtils.lerp(6.25, 1.15, reach), movementSpeed, delta)
+    hand.current.rotation.z = THREE.MathUtils.damp(hand.current.rotation.z, THREE.MathUtils.lerp(-0.065, 0, reach), movementSpeed, delta)
+    const nextScale = THREE.MathUtils.damp(hand.current.scale.x, THREE.MathUtils.lerp(0.97, 1, reach), movementSpeed, delta)
+    hand.current.scale.setScalar(nextScale)
+    material.current.opacity = THREE.MathUtils.damp(material.current.opacity, appear, movementSpeed, delta)
   })
 
   return (
@@ -495,10 +497,11 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
       group.current.rotation.y += delta * (0.14 + index * 0.012)
       group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.42 + floatingPhase) * 0.08
     } else {
+      const movementSpeed = pickup > 0 ? 4 : 5
       group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, facingAngle, 5, delta)
-      group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, lift * -0.035, 5, delta)
-      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, baseY + (isActive ? 0.19 : 0) + tapEnergy.current * 0.22 + lift * 4.65, 5, delta)
-      group.current.position.z = THREE.MathUtils.damp(group.current.position.z, baseZ + lift * 0.32, 5, delta)
+      group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, lift * -0.035, movementSpeed, delta)
+      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, baseY + (isActive ? 0.19 : 0) + tapEnergy.current * 0.22 + lift * 4.65, movementSpeed, delta)
+      group.current.position.z = THREE.MathUtils.damp(group.current.position.z, baseZ + lift * 0.32, movementSpeed, delta)
     }
   })
 
