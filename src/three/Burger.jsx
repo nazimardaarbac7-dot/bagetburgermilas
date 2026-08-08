@@ -1,6 +1,15 @@
 import React, { useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
+
+const burgerPhotoPaths = [
+  '/assets/burgers/hamburger-classic-cutout.png',
+  '/assets/burgers/cheeseburger-cutout.png',
+  '/assets/burgers/koz-burger-cutout.png',
+  '/assets/burgers/karisik-burger-cutout.png',
+  '/assets/burgers/baldicanli-burger-cutout.png',
+]
 
 const matte = {
   bun: '#a94f1d',
@@ -17,11 +26,22 @@ function SesameSeeds() {
 
   useLayoutEffect(() => {
     const seed = new THREE.Object3D()
-    for (let index = 0; index < 13; index += 1) {
-      const angle = (index / 13) * Math.PI * 2.7
-      const radius = 0.55 + (index % 3) * 0.22
-      seed.position.set(Math.cos(angle) * radius, 0.99 + (index % 2) * 0.06, Math.sin(angle) * radius)
-      seed.rotation.set(0.4, -angle, 0.3)
+    const up = new THREE.Vector3(0, 1, 0)
+    const normal = new THREE.Vector3()
+    const goldenAngle = Math.PI * (3 - Math.sqrt(5))
+    const count = 28
+    for (let index = 0; index < count; index += 1) {
+      const radius = Math.sqrt((index + 0.5) / count) * 0.88
+      const angle = index * goldenAngle
+      const x = Math.cos(angle) * radius * 1.08
+      const z = Math.sin(angle) * radius
+      const dome = Math.sqrt(Math.max(0, 1 - (x * x) / (1.1 * 1.1) - (z * z) / (1.02 * 1.02)))
+      const y = 0.47 + dome * 0.6
+      seed.position.set(x, y + 0.025, z)
+      normal.set(x / 1.1, dome / 0.6, z / 1.02).normalize()
+      seed.quaternion.setFromUnitVectors(up, normal)
+      seed.rotateY(angle * 0.37)
+      seed.scale.set(0.055, 0.018, 0.095)
       seed.updateMatrix()
       seeds.current.setMatrixAt(index, seed.matrix)
     }
@@ -29,9 +49,9 @@ function SesameSeeds() {
   }, [])
 
   return (
-    <instancedMesh ref={seeds} args={[null, null, 13]} castShadow>
-      <sphereGeometry args={[0.055, 7, 7]} />
-      <meshStandardMaterial color={matte.cream} roughness={0.85} />
+    <instancedMesh ref={seeds} args={[null, null, 28]} castShadow>
+      <sphereGeometry args={[1, 8, 6]} />
+      <meshStandardMaterial color="#f0d5a0" roughness={0.9} />
     </instancedMesh>
   )
 }
@@ -90,7 +110,141 @@ function ClassicBunSpeckles() {
   )
 }
 
-function ClassicBurger() {
+function BurgerPhoto({ index }) {
+  const texture = useTexture(burgerPhotoPaths[index])
+
+  useLayoutEffect(() => {
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.anisotropy = 8
+    texture.needsUpdate = true
+  }, [texture])
+
+  return (
+    <mesh position={[0, 0.65, 0.72]} renderOrder={2} castShadow>
+      <planeGeometry args={[2.52, 1.895]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        alphaTest={0.015}
+        toneMapped={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  )
+}
+
+function CheddarSlice() {
+  const cheddarTexture = useMemo(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 128
+    canvas.height = 128
+    const context = canvas.getContext('2d')
+    const gradient = context.createLinearGradient(0, 0, 128, 128)
+    gradient.addColorStop(0, '#ffc331')
+    gradient.addColorStop(0.5, '#f2a313')
+    gradient.addColorStop(1, '#d97908')
+    context.fillStyle = gradient
+    context.fillRect(0, 0, 128, 128)
+
+    let randomState = 7812
+    for (let index = 0; index < 180; index += 1) {
+      randomState = (Math.imul(randomState, 1664525) + 1013904223) >>> 0
+      const x = (randomState / 4294967296) * 128
+      randomState = (Math.imul(randomState, 1664525) + 1013904223) >>> 0
+      const y = (randomState / 4294967296) * 128
+      context.fillStyle = index % 3 ? 'rgba(255, 224, 106, .13)' : 'rgba(139, 65, 4, .1)'
+      context.beginPath()
+      context.arc(x, y, 0.5 + (index % 4) * 0.25, 0, Math.PI * 2)
+      context.fill()
+    }
+
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.wrapS = THREE.RepeatWrapping
+    texture.wrapT = THREE.RepeatWrapping
+    texture.repeat.set(1.35, 1.1)
+    return texture
+  }, [])
+
+  return (
+    <mesh position={[0, 0.265, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+      <boxGeometry args={[1.62, 0.055, 1.62]} />
+      <meshPhysicalMaterial map={cheddarTexture} color="#fff0b0" roughness={0.72} clearcoat={0.08} clearcoatRoughness={0.8} />
+    </mesh>
+  )
+}
+
+function RoastedPeppers() {
+  const pepperTexture = useMemo(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 128
+    canvas.height = 128
+    const context = canvas.getContext('2d')
+    const gradient = context.createLinearGradient(0, 0, 128, 0)
+    gradient.addColorStop(0, '#7e1d14')
+    gradient.addColorStop(0.25, '#d34525')
+    gradient.addColorStop(0.62, '#a82418')
+    gradient.addColorStop(1, '#ed5a2b')
+    context.fillStyle = gradient
+    context.fillRect(0, 0, 128, 128)
+    for (let index = 0; index < 24; index += 1) {
+      const x = (index * 47) % 128
+      const y = (index * 29) % 128
+      context.strokeStyle = index % 3 === 0 ? 'rgba(48, 17, 12, .72)' : 'rgba(255, 137, 65, .24)'
+      context.lineWidth = 1.4 + (index % 4) * 0.7
+      context.beginPath()
+      context.moveTo(x - 7, y + 3)
+      context.bezierCurveTo(x - 2, y - 4, x + 4, y + 6, x + 10, y - 2)
+      context.stroke()
+    }
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.wrapS = THREE.RepeatWrapping
+    texture.wrapT = THREE.RepeatWrapping
+    texture.repeat.set(1.8, 1.2)
+    return texture
+  }, [])
+
+  const pepperGeometries = useMemo(() => {
+    const paths = [
+      [[-0.8, 0.4, 0.72], [-0.42, 0.44, 0.91], [0.02, 0.4, 0.81], [0.7, 0.43, 0.91]],
+      [[-0.72, 0.39, 0.59], [-0.28, 0.43, 0.75], [0.22, 0.4, 0.68], [0.8, 0.4, 0.79]],
+      [[-0.5, 0.43, 0.86], [-0.12, 0.46, 0.98], [0.3, 0.42, 0.91], [0.62, 0.44, 1]],
+      [[-0.8, 0.39, 1.02], [-0.52, 0.26, 1.045], [-0.24, 0.37, 1.05], [0.05, 0.29, 1.04]],
+      [[0.02, 0.38, 1.03], [0.3, 0.25, 1.05], [0.55, 0.37, 1.04], [0.8, 0.29, 1.02]],
+    ]
+    return paths.map((points, index) => {
+      const curve = new THREE.CatmullRomCurve3(points.map(([x, y, z]) => new THREE.Vector3(x, y, z)))
+      const geometry = new THREE.TubeGeometry(curve, 24, index < 3 ? 0.12 : 0.11, 8, false)
+      if (index < 3) {
+        geometry.scale(1, 0.38, 1)
+        geometry.translate(0, 0.26, 0)
+      } else {
+        geometry.scale(1, 0.58, 1)
+        geometry.translate(0, 0.17, 0)
+      }
+      return geometry
+    })
+  }, [])
+
+  return (
+    <group>
+      {pepperGeometries.map((geometry, index) => (
+        <mesh key={index} geometry={geometry} castShadow>
+          <meshPhysicalMaterial
+            map={pepperTexture}
+            color={index === 1 ? '#d98f7b' : '#e7a28d'}
+            roughness={0.72}
+            clearcoat={0.14}
+            clearcoatRoughness={0.68}
+          />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function ClassicBurger({ withCheese = false, withRoastedPepper = false }) {
   const bunTexture = useMemo(() => {
     const canvas = document.createElement('canvas')
     canvas.width = 256
@@ -178,13 +332,30 @@ function ClassicBurger() {
     return geometry
   }, [])
 
+  const tomatoGeometry = useMemo(() => {
+    const geometry = new THREE.CylinderGeometry(0.96, 0.98, 0.105, 48, 2)
+    const positions = geometry.attributes.position
+    for (let index = 0; index < positions.count; index += 1) {
+      const x = positions.getX(index)
+      const y = positions.getY(index)
+      const z = positions.getZ(index)
+      const angle = Math.atan2(z, x)
+      const edge = Math.hypot(x, z) > 0.7 ? 1 + Math.sin(angle * 9) * 0.018 + Math.sin(angle * 5) * 0.012 : 1
+      positions.setXYZ(index, x * edge, y, z * edge)
+    }
+    positions.needsUpdate = true
+    geometry.computeVertexNormals()
+    return geometry
+  }, [])
+
   const pickles = [
     [-0.66, 0.37, 0.64, -0.2],
     [-0.25, 0.36, 0.79, 0.15],
     [0.2, 0.37, 0.82, -0.08],
     [0.62, 0.36, 0.67, 0.22],
+    [-0.42, 0.365, -0.73, -0.15],
+    [0.42, 0.37, -0.72, 0.18],
   ]
-  const sauceDollops = [-0.76, -0.39, 0.02, 0.42, 0.76]
 
   return (
     <>
@@ -193,14 +364,10 @@ function ClassicBurger() {
         <meshPhysicalMaterial map={bunTexture} color="#ffffff" roughness={0.84} clearcoat={0.06} clearcoatRoughness={0.8} />
       </mesh>
       <ClassicBunSpeckles />
+      <SesameSeeds />
 
-      <mesh position={[0, 0.325, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-        <torusGeometry args={[0.84, 0.065, 8, 42]} />
-        <meshStandardMaterial color="#a83322" roughness={0.92} />
-      </mesh>
-      <mesh position={[0, 0.29, 0]} rotation={[Math.PI / 2, 0.08, 0]} castShadow>
-        <torusGeometry args={[0.76, 0.045, 7, 38]} />
-        <meshStandardMaterial color="#e2c99b" roughness={0.9} />
+      <mesh position={[0, 0.335, 0]} geometry={tomatoGeometry} castShadow>
+        <meshPhysicalMaterial color="#b72e21" roughness={0.76} clearcoat={0.12} clearcoatRoughness={0.68} />
       </mesh>
 
       {pickles.map(([x, y, z, rotation], pickleIndex) => (
@@ -216,35 +383,22 @@ function ClassicBurger() {
         </group>
       ))}
 
-      {sauceDollops.map((x, dollopIndex) => (
-        <mesh key={x} position={[x, 0.36 + (dollopIndex % 2) * 0.025, 0.83 - Math.abs(x) * 0.14]} scale={[0.13, 0.075, 0.1]} castShadow>
-          <sphereGeometry args={[1, 9, 7]} />
-          <meshStandardMaterial color={dollopIndex % 2 ? '#e5d2ad' : '#ad3825'} roughness={0.88} />
-        </mesh>
-      ))}
+      {withCheese && <CheddarSlice />}
+      {withRoastedPepper && <RoastedPeppers />}
 
       <mesh position={[0, 0.03, 0]} geometry={pattyGeometry} castShadow>
-        <meshStandardMaterial map={pattyTexture} color="#ffffff" roughness={1} />
+        <meshStandardMaterial map={pattyTexture} bumpMap={pattyTexture} bumpScale={0.055} color="#c58d73" roughness={0.94} />
       </mesh>
 
-      <mesh position={[0, -0.22, 0]} rotation={[Math.PI / 2, 0.05, 0]} castShadow>
-        <torusGeometry args={[0.84, 0.052, 7, 40]} />
-        <meshStandardMaterial color="#c94a2c" roughness={0.92} />
-      </mesh>
-      <mesh position={[0, -0.255, 0]} rotation={[Math.PI / 2, -0.05, 0]} castShadow>
-        <torusGeometry args={[0.73, 0.04, 7, 36]} />
-        <meshStandardMaterial color="#dfc79a" roughness={0.9} />
-      </mesh>
-
-      <mesh position={[0, -0.47, 0]} scale={[1.09, 0.42, 1.02]} castShadow receiveShadow>
+      <mesh position={[0, -0.36, 0]} scale={[1.09, 0.4, 1.02]} castShadow receiveShadow>
         <sphereGeometry args={[1, 36, 18]} />
-        <meshPhysicalMaterial map={bunTexture} color="#f1d0a4" roughness={0.86} clearcoat={0.05} clearcoatRoughness={0.84} />
+        <meshPhysicalMaterial map={bunTexture} color="#ffffff" roughness={0.86} clearcoat={0.05} clearcoatRoughness={0.84} />
       </mesh>
     </>
   )
 }
 
-export default function Burger({ index, activeIndex, isFloating = false, floatingScale = 0.72, pickupTarget = false, position = [0, 0, 0], accent, interactionPulse }) {
+export default function Burger({ index, activeIndex, isFloating = false, floatingScale = 0.72, pickupTarget = false, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
   const group = useRef()
   const lastInteraction = useRef(0)
   const tapEnergy = useRef(0)
@@ -267,7 +421,7 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
       group.current.rotation.y += delta * (0.14 + index * 0.012)
       group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.42 + floatingPhase) * 0.08
     } else {
-      group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, 0, 5, delta)
+      group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, facingAngle, 5, delta)
       group.current.position.y = THREE.MathUtils.damp(group.current.position.y, baseY + (isActive ? 0.19 : 0) + tapEnergy.current * 0.22, 5, delta)
     }
   })
@@ -278,33 +432,9 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
       name={pickupTarget ? 'hand-pickup-target' : isFloating ? 'hero-burger' : `tray-burger-${index + 1}`}
       userData={{ pickupTarget }}
       position={position}
-      rotation={isFloating ? [0.12, index * 1.1, -0.08] : [0, 0, 0]}
+      rotation={isFloating ? [0.12, index * 1.1, -0.08] : [0, facingAngle, 0]}
     >
-      {!isFloating && index === 0 ? <ClassicBurger /> : <><mesh position={[0, 0.83, 0]} castShadow>
-        <sphereGeometry args={[1, 32, 18, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshPhysicalMaterial color={matte.bunHighlight} roughness={0.7} clearcoat={0.12} clearcoatRoughness={0.68} />
-      </mesh>
-      <SesameSeeds />
-      <mesh position={[0, 0.38, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
-        <cylinderGeometry args={[1.08, 1.13, 0.08, 4]} />
-        <meshStandardMaterial color={matte.cheese} roughness={0.72} />
-      </mesh>
-      <mesh position={[0, 0.2, 0]} rotation={[0, index * 0.38, 0]} castShadow>
-        <torusGeometry args={[0.95, 0.16, 7, 16]} />
-        <meshStandardMaterial color={matte.lettuce} roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0.02, 0]} castShadow>
-        <cylinderGeometry args={[0.93, 1.01, 0.29, 18]} />
-        <meshStandardMaterial color={matte.patty} roughness={1} />
-      </mesh>
-      <mesh position={[0, -0.2, 0]} castShadow>
-        <cylinderGeometry args={[0.87, 0.87, 0.09, 20]} />
-        <meshStandardMaterial color={matte.tomato} roughness={0.75} />
-      </mesh>
-      <mesh position={[0, -0.41, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.93, 1.02, 0.28, 28]} />
-        <meshPhysicalMaterial color={matte.bun} roughness={0.78} clearcoat={0.08} clearcoatRoughness={0.75} />
-      </mesh></>}
+      {!isFloating ? <BurgerPhoto index={index} /> : <ClassicBurger withCheese />}
       {!isFloating && <pointLight color={accent} intensity={index === activeIndex ? 2.15 : 0.25} distance={3.2} position={[0, 2.2, 1.5]} />}
     </group>
   )

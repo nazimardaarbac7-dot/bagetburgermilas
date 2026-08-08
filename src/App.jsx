@@ -144,7 +144,7 @@ export default function App() {
       <Experience heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} onReady={() => setSceneReady(true)} />
       <div className={`scene-curtain${sceneReady ? ' is-hidden' : ''}`} aria-hidden="true" />
       <div className="grain" />
-      <Navbar />
+      <Navbar hiddenOnShowcase={showcaseActive} />
       <Hero ref={heroRef} />
       <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} trayDragOffset={trayDragOffset} onTraySwipe={handleTraySwipe} onBurgerTap={handleBurgerTap} />
       <MilasSection />

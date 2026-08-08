@@ -29,7 +29,7 @@ export default function Tray({ scrollProgress, activeIndex, trayDragOffset, burg
     const currentScale = THREE.MathUtils.damp(trayVisual.current.scale.x, targetScale, settleSpeed, delta)
     tray.current.rotation.y = THREE.MathUtils.damp(tray.current.rotation.y, targetRotation, 4.2, delta)
     trayVisual.current.scale.setScalar(currentScale)
-    const settledY = isMobile ? -0.7 : -0.95
+    const settledY = isMobile ? -0.48 : -0.95
     const targetY = THREE.MathUtils.lerp(-8.5, settledY, intro)
     trayVisual.current.position.y = THREE.MathUtils.damp(trayVisual.current.position.y, targetY, settleSpeed, delta)
   })
@@ -60,6 +60,7 @@ export default function Tray({ scrollProgress, activeIndex, trayDragOffset, burg
             interactionPulse={burgerInteraction}
             pickupTarget={index === burgers.length - 1}
             position={[Math.sin(angle) * radius, 0.5, Math.cos(angle) * radius]}
+            facingAngle={angle}
           />
         })}
       </group>
