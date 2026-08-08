@@ -49,7 +49,7 @@ function SesameSeeds() {
   }, [])
 
   return (
-    <instancedMesh ref={seeds} args={[null, null, 28]} castShadow>
+    <instancedMesh ref={seeds} args={[null, null, 28]} castShadow receiveShadow>
       <sphereGeometry args={[1, 8, 6]} />
       <meshStandardMaterial color="#f0d5a0" roughness={0.9} />
     </instancedMesh>
@@ -103,7 +103,7 @@ function ClassicBunSpeckles() {
   }, [])
 
   return (
-    <instancedMesh ref={speckles} args={[null, null, 106]}>
+    <instancedMesh ref={speckles} args={[null, null, 106]} receiveShadow>
       <sphereGeometry args={[1, 6, 5]} />
       <meshStandardMaterial color="#97501f" roughness={1} />
     </instancedMesh>
@@ -167,7 +167,7 @@ function CheddarSlice() {
   }, [])
 
   return (
-    <mesh position={[0, 0.265, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+    <mesh position={[0, 0.265, 0]} rotation={[0, Math.PI / 4, 0]} castShadow receiveShadow>
       <boxGeometry args={[1.62, 0.055, 1.62]} />
       <meshPhysicalMaterial map={cheddarTexture} color="#fff0b0" roughness={0.72} clearcoat={0.08} clearcoatRoughness={0.8} />
     </mesh>
@@ -359,20 +359,20 @@ function ClassicBurger({ withCheese = false, withRoastedPepper = false }) {
 
   return (
     <>
-      <mesh position={[0, 0.46, 0]} scale={[1.12, 0.58, 1.02]} castShadow>
+      <mesh position={[0, 0.46, 0]} scale={[1.12, 0.58, 1.02]} castShadow receiveShadow>
         <sphereGeometry args={[1, 40, 22, 0, Math.PI * 2, 0, Math.PI / 2]} />
         <meshPhysicalMaterial map={bunTexture} color="#ffffff" roughness={0.84} clearcoat={0.06} clearcoatRoughness={0.8} />
       </mesh>
       <ClassicBunSpeckles />
       <SesameSeeds />
 
-      <mesh position={[0, 0.335, 0]} geometry={tomatoGeometry} castShadow>
+      <mesh position={[0, 0.335, 0]} geometry={tomatoGeometry} castShadow receiveShadow>
         <meshPhysicalMaterial color="#b72e21" roughness={0.76} clearcoat={0.12} clearcoatRoughness={0.68} />
       </mesh>
 
       {pickles.map(([x, y, z, rotation], pickleIndex) => (
         <group key={pickleIndex} position={[x, y, z]} rotation={[0, rotation, 0]}>
-          <mesh castShadow>
+          <mesh castShadow receiveShadow>
             <cylinderGeometry args={[0.19, 0.19, 0.075, 18]} />
             <meshStandardMaterial color="#596a2c" roughness={0.92} />
           </mesh>
@@ -386,7 +386,7 @@ function ClassicBurger({ withCheese = false, withRoastedPepper = false }) {
       {withCheese && <CheddarSlice />}
       {withRoastedPepper && <RoastedPeppers />}
 
-      <mesh position={[0, 0.03, 0]} geometry={pattyGeometry} castShadow>
+      <mesh position={[0, 0.03, 0]} geometry={pattyGeometry} castShadow receiveShadow>
         <meshStandardMaterial map={pattyTexture} bumpMap={pattyTexture} bumpScale={0.055} color="#c58d73" roughness={0.94} />
       </mesh>
 
@@ -394,6 +394,33 @@ function ClassicBurger({ withCheese = false, withRoastedPepper = false }) {
         <sphereGeometry args={[1, 36, 18]} />
         <meshPhysicalMaterial map={bunTexture} color="#ffffff" roughness={0.86} clearcoat={0.05} clearcoatRoughness={0.84} />
       </mesh>
+    </>
+  )
+}
+
+function HeroBurgerDepth() {
+  const shadowTexture = useMemo(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 128
+    canvas.height = 128
+    const context = canvas.getContext('2d')
+    const gradient = context.createRadialGradient(64, 61, 5, 64, 64, 62)
+    gradient.addColorStop(0, 'rgba(4, 17, 18, .72)')
+    gradient.addColorStop(0.48, 'rgba(4, 17, 18, .3)')
+    gradient.addColorStop(1, 'rgba(4, 17, 18, 0)')
+    context.fillStyle = gradient
+    context.fillRect(0, 0, 128, 128)
+    return new THREE.CanvasTexture(canvas)
+  }, [])
+
+  return (
+    <>
+      <mesh position={[0, -0.08, -1.16]} scale={[1.48, 0.62, 1]} renderOrder={-1}>
+        <circleGeometry args={[1, 48]} />
+        <meshBasicMaterial map={shadowTexture} transparent opacity={0.78} depthWrite={false} toneMapped={false} />
+      </mesh>
+      <pointLight color="#ffe0ad" intensity={3.2} distance={4.4} decay={2} position={[-1.45, 1.75, 2.3]} />
+      <pointLight color="#de860b" intensity={1.05} distance={3.6} decay={2} position={[1.35, -0.25, 1.5]} />
     </>
   )
 }
@@ -434,6 +461,7 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
       position={position}
       rotation={isFloating ? [0.12, index * 1.1, -0.08] : [0, facingAngle, 0]}
     >
+      {isFloating && <HeroBurgerDepth />}
       {!isFloating ? <BurgerPhoto index={index} /> : <ClassicBurger withCheese />}
       {!isFloating && <pointLight color={accent} intensity={index === activeIndex ? 2.15 : 0.25} distance={3.2} position={[0, 2.2, 1.5]} />}
     </group>
