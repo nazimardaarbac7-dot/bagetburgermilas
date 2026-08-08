@@ -1,6 +1,6 @@
-import React, { useRef } from 'react'
+import React, { memo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Environment } from '@react-three/drei'
+import { Environment, Preload } from '@react-three/drei'
 import CameraRig from './CameraRig'
 import FloatingBurgers from './FloatingBurgers'
 import Tray from './Tray'
@@ -29,11 +29,12 @@ function World({ heroExitProgress, scrollProgress, finalTransitionProgress, acti
     <FloatingBurgers heroExitProgress={heroExitProgress} />
     <Tray scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} />
     <CameraRig scrollProgress={scrollProgress} />
+    <Preload all />
     <SceneReady onReady={onReady} />
   </>
 }
 
-export default function Experience({ heroExitProgress, scrollProgress, finalTransitionProgress, activeIndex, trayDragOffset, burgerInteraction, onReady }) {
+function Experience({ heroExitProgress, scrollProgress, finalTransitionProgress, activeIndex, trayDragOffset, burgerInteraction, onReady }) {
   return (
     <div className="canvas-wrap" aria-hidden="true">
       <Canvas dpr={[1, 1.5]} shadows camera={{ position: [0, 0.3, 13.4], fov: 38 }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
@@ -42,3 +43,5 @@ export default function Experience({ heroExitProgress, scrollProgress, finalTran
     </div>
   )
 }
+
+export default memo(Experience)

@@ -64,7 +64,7 @@ export default function FloatingBurgers({ heroExitProgress }) {
           ref={(node) => { burgerGroups.current[index] = node }}
           position={burger.position}
         >
-          <Burger index={index} isFloating floatingScale={burger.scale * 1.15} position={[0, 0, 0]} accent="#de860b" />
+          <Burger index={index} isFloating floatingScale={burger.scale * 1.15} motionProgress={heroExitProgress} position={[0, 0, 0]} accent="#de860b" />
         </group>
       ))}
     </group>

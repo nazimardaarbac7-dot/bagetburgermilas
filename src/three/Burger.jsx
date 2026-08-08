@@ -468,7 +468,7 @@ function HeroBurgerDepth() {
   )
 }
 
-export default function Burger({ index, activeIndex, isFloating = false, floatingScale = 0.72, pickupTarget = false, pickupProgress, finalTransitionProgress, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
+export default function Burger({ index, activeIndex, isFloating = false, floatingScale = 0.72, pickupTarget = false, pickupProgress, finalTransitionProgress, sceneProgress, motionProgress, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
   const group = useRef()
   const lastInteraction = useRef(0)
   const tapEnergy = useRef(0)
@@ -477,6 +477,10 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
   const floatingPhase = index * 1.7
 
   useFrame((state, delta) => {
+    if (!group.current) return
+    if (isFloating && motionProgress?.current >= 0.999) return
+    if (!isFloating && (sceneProgress?.current <= 0.001 || finalTransitionProgress?.current >= 0.999)) return
+
     const isActive = index === activeIndex
     if (!isFloating && interactionPulse?.current.index === index && interactionPulse.current.token !== lastInteraction.current) {
       lastInteraction.current = interactionPulse.current.token

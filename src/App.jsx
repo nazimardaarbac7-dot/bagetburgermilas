@@ -20,6 +20,9 @@ export default function App() {
   const trayDragOffset = useRef(0)
   const burgerInteraction = useRef({ index: -1, token: 0 })
   const heroRef = useRef(null)
+  const activeIndexValue = useRef(0)
+  const showcaseReadyValue = useRef(false)
+  const showcaseActiveValue = useRef(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const [showcaseReady, setShowcaseReady] = useState(false)
   const [showcaseActive, setShowcaseActive] = useState(false)
@@ -29,6 +32,7 @@ export default function App() {
 
   const openMenu = useCallback(() => setMenuOpen(true), [])
   const closeMenu = useCallback(() => setMenuOpen(false), [])
+  const handleSceneReady = useCallback(() => setSceneReady(true), [])
 
   useLayoutEffect(() => {
     const media = gsap.matchMedia()
@@ -75,11 +79,21 @@ export default function App() {
           scrollProgress.current = self.progress
           const rotationProgress = getTrayRotationProgress(self.progress, mobileTray)
           const nextIndex = Math.min(burgers.length - 1, Math.round(rotationProgress * (burgers.length - 1)))
-          setActiveIndex((current) => current === nextIndex ? current : nextIndex)
           const isReady = self.progress >= (mobileTray ? MOBILE_TRAY_SETTLE_END : TRAY_SETTLE_END)
           const isActive = self.progress > 0 && self.progress < 1
-          setShowcaseReady((current) => current === isReady ? current : isReady)
-          setShowcaseActive((current) => current === isActive ? current : isActive)
+
+          if (activeIndexValue.current !== nextIndex) {
+            activeIndexValue.current = nextIndex
+            setActiveIndex(nextIndex)
+          }
+          if (showcaseReadyValue.current !== isReady) {
+            showcaseReadyValue.current = isReady
+            setShowcaseReady(isReady)
+          }
+          if (showcaseActiveValue.current !== isActive) {
+            showcaseActiveValue.current = isActive
+            setShowcaseActive(isActive)
+          }
         },
       })
 
@@ -215,7 +229,7 @@ export default function App() {
 
   return (
     <main>
-      <Experience heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} onReady={() => setSceneReady(true)} />
+      <Experience heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} onReady={handleSceneReady} />
       <div className={`scene-curtain${sceneReady ? ' is-hidden' : ''}`} aria-hidden="true" />
       <div className="grain" />
       <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} />

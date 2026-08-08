@@ -154,6 +154,7 @@ main { position: relative; isolation: isolate; }
 .menu-dialog-footer a { min-width: 245px; min-height: 50px; padding: 0 8px 0 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; background: #de860b; color: #183d3f; font: 600 .56rem/1 'DM Mono', monospace; letter-spacing: .12em; transition: background .25s ease, transform .25s ease; }
 .menu-dialog-footer a:hover, .menu-dialog-footer a:focus-visible { background: #f2a42b; transform: translateY(-2px); outline: none; }
 .menu-dialog-footer a i { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #183d3f; color: #f2a42b; font: normal 1rem/1 Manrope, sans-serif; }
+.menu-dialog-footer a i svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: square; stroke-linejoin: miter; }
 
 @media (max-width: 720px) {
   .navbar { padding: calc(20px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 20px max(20px, env(safe-area-inset-left)); transition: opacity .22s ease, transform .22s ease, visibility 0s linear; }

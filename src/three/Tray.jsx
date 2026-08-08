@@ -13,11 +13,14 @@ export default function Tray({ scrollProgress, finalTransitionProgress, activeIn
 
   useFrame((state, delta) => {
     const progress = scrollProgress.current
-    trayVisual.current.visible = progress > 0.001
+    const transitionComplete = finalTransitionProgress.current >= 0.999
+    trayVisual.current.visible = progress > 0.001 && !transitionComplete
     if (!trayVisual.current.visible) {
-      trayVisual.current.scale.setScalar(0.001)
-      trayVisual.current.position.y = -8.5
-      tray.current.rotation.y = 0
+      if (progress <= 0.001) {
+        trayVisual.current.scale.setScalar(0.001)
+        trayVisual.current.position.y = -8.5
+        tray.current.rotation.y = 0
+      }
       return
     }
 
@@ -58,6 +61,7 @@ export default function Tray({ scrollProgress, finalTransitionProgress, activeIn
             activeIndex={activeIndex}
             accent={burger.accent}
             interactionPulse={burgerInteraction}
+            sceneProgress={scrollProgress}
             pickupTarget={index === burgers.length - 1}
             pickupProgress={scrollProgress}
             finalTransitionProgress={finalTransitionProgress}
