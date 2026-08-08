@@ -1,18 +1,13 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { GETIR_MENU_URL, menuCategories } from '../data/fullMenu'
-
-const totalItems = menuCategories.reduce((total, category) => total + category.items.length, 0)
 
 export default function MenuOverlay({ open, onClose }) {
   const [activeCategoryId, setActiveCategoryId] = useState(menuCategories[0].id)
   const dialogRef = useRef(null)
   const closeButtonRef = useRef(null)
+  const categoryNavRef = useRef(null)
   const contentRef = useRef(null)
-
-  const activeCategory = useMemo(
-    () => menuCategories.find((category) => category.id === activeCategoryId) ?? menuCategories[0],
-    [activeCategoryId],
-  )
+  const sectionRefs = useRef({})
 
   useEffect(() => {
     if (!open) return undefined
@@ -20,6 +15,8 @@ export default function MenuOverlay({ open, onClose }) {
     const previousOverflow = document.body.style.overflow
     const previouslyFocused = document.activeElement
     document.body.style.overflow = 'hidden'
+    setActiveCategoryId(menuCategories[0].id)
+    contentRef.current?.scrollTo({ top: 0 })
     closeButtonRef.current?.focus({ preventScroll: true })
 
     const handleKeyDown = (event) => {
@@ -51,36 +48,61 @@ export default function MenuOverlay({ open, onClose }) {
     }
   }, [open, onClose])
 
+  useEffect(() => {
+    if (!open) return
+
+    const nav = categoryNavRef.current
+    const activeButton = nav?.querySelector(`[data-category-tab="${activeCategoryId}"]`)
+    if (!nav || !activeButton) return
+
+    nav.scrollTo({
+      left: activeButton.offsetLeft - (nav.clientWidth - activeButton.clientWidth) / 2,
+      behavior: 'smooth',
+    })
+  }, [activeCategoryId, open])
+
   const selectCategory = (categoryId) => {
+    const content = contentRef.current
+    const section = sectionRefs.current[categoryId]
+    if (!content || !section) return
+
     setActiveCategoryId(categoryId)
-    requestAnimationFrame(() => contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' }))
+    content.scrollTo({ top: section.offsetTop - 18, behavior: 'smooth' })
+  }
+
+  const updateActiveCategory = () => {
+    const content = contentRef.current
+    if (!content) return
+
+    const marker = content.scrollTop + 80
+    let nextCategoryId = menuCategories[0].id
+
+    menuCategories.forEach((category) => {
+      const section = sectionRefs.current[category.id]
+      if (section && section.offsetTop <= marker) nextCategoryId = category.id
+    })
+
+    setActiveCategoryId((currentCategoryId) => (
+      currentCategoryId === nextCategoryId ? currentCategoryId : nextCategoryId
+    ))
   }
 
   return (
     <div className={`menu-overlay${open ? ' is-open' : ''}`} aria-hidden={!open}>
       <button className="menu-overlay-backdrop" type="button" aria-label="Menüyü kapat" onClick={onClose} tabIndex={-1} />
-      <section className="menu-dialog" role="dialog" aria-modal="true" aria-labelledby="full-menu-title" ref={dialogRef}>
-        <header className="menu-dialog-header">
-          <div>
-            <p className="menu-dialog-kicker">BAGET BURGER · MİLAS</p>
-            <h2 id="full-menu-title">TAM<br />MENÜ</h2>
-          </div>
-          <div className="menu-dialog-meta">
-            <span>{String(totalItems).padStart(2, '0')} ÜRÜN</span>
-            <span>06 KATEGORİ</span>
-          </div>
-          <button className="menu-close" type="button" onClick={onClose} ref={closeButtonRef}>
-            <span>KAPAT</span><i aria-hidden="true">×</i>
-          </button>
-        </header>
+      <section className="menu-dialog" role="dialog" aria-modal="true" aria-label="Baget Burger tam menü" ref={dialogRef}>
+        <button className="menu-close" type="button" onClick={onClose} ref={closeButtonRef} aria-label="Menüyü kapat">
+          <span>KAPAT</span><i aria-hidden="true">×</i>
+        </button>
 
-        <nav className="menu-category-nav" aria-label="Menü kategorileri">
+        <nav className="menu-category-nav" aria-label="Menü kategorileri" ref={categoryNavRef}>
           {menuCategories.map((category, index) => (
             <button
-              className={category.id === activeCategory.id ? 'is-active' : ''}
+              className={category.id === activeCategoryId ? 'is-active' : ''}
               type="button"
-              aria-pressed={category.id === activeCategory.id}
+              aria-pressed={category.id === activeCategoryId}
               onClick={() => selectCategory(category.id)}
+              data-category-tab={category.id}
               key={category.id}
             >
               <span>0{index + 1}</span>{category.label}
@@ -88,32 +110,40 @@ export default function MenuOverlay({ open, onClose }) {
           ))}
         </nav>
 
-        <div className="menu-dialog-content" ref={contentRef}>
-          <div className="menu-category-heading" key={`${activeCategory.id}-heading`}>
-            <div>
-              <p>SEÇİLİ KATEGORİ</p>
-              <h3>{activeCategory.label}</h3>
-            </div>
-            <p>{activeCategory.note}</p>
-            <span>{String(activeCategory.items.length).padStart(2, '0')} SEÇENEK</span>
-          </div>
-
-          <div className="menu-product-grid" key={activeCategory.id}>
-            {activeCategory.items.map((item, index) => (
-              <article
-                className="menu-product"
-                style={{ '--menu-item-delay': `${Math.min(index, 10) * 32}ms` }}
-                key={item.name}
-              >
-                <span className="menu-product-index">{String(index + 1).padStart(2, '0')}</span>
+        <div className="menu-dialog-content" ref={contentRef} onScroll={updateActiveCategory}>
+          {menuCategories.map((category) => (
+            <section
+              className="menu-category-section"
+              ref={(section) => { sectionRefs.current[category.id] = section }}
+              key={category.id}
+            >
+              <div className="menu-category-heading">
                 <div>
-                  <h4>{item.name}</h4>
-                  {item.description && <p>{item.description}</p>}
+                  <p>KATEGORİ</p>
+                  <h3>{category.label}</h3>
                 </div>
-                <strong><small>₺</small>{item.price}</strong>
-              </article>
-            ))}
-          </div>
+                <p>{category.note}</p>
+                <span>{String(category.items.length).padStart(2, '0')} SEÇENEK</span>
+              </div>
+
+              <div className="menu-product-grid">
+                {category.items.map((item, index) => (
+                  <article
+                    className="menu-product"
+                    style={{ '--menu-item-delay': `${Math.min(index, 10) * 32}ms` }}
+                    key={`${category.id}-${item.name}`}
+                  >
+                    <span className="menu-product-index">{String(index + 1).padStart(2, '0')}</span>
+                    <div>
+                      <h4>{item.name}</h4>
+                      {item.description && <p>{item.description}</p>}
+                    </div>
+                    <strong><small>₺</small>{item.price}</strong>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
 
         <footer className="menu-dialog-footer">
