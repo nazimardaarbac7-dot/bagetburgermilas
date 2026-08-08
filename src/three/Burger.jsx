@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
+import { getHandPickupProgress } from '../utils/scrollProgress'
 
 const burgerPhotoPaths = [
   '/assets/burgers/hamburger-classic-cutout.png',
@@ -126,6 +127,48 @@ function BurgerPhoto({ index }) {
         map={texture}
         transparent
         alphaTest={0.015}
+        toneMapped={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  )
+}
+
+function HandPickup({ scrollProgress }) {
+  const hand = useRef()
+  const material = useRef()
+  const texture = useTexture('/assets/interaction/hand-grab.png')
+
+  useLayoutEffect(() => {
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.anisotropy = 8
+    texture.needsUpdate = true
+  }, [texture])
+
+  useFrame(() => {
+    if (!hand.current || !material.current || !scrollProgress) return
+    const pickup = getHandPickupProgress(scrollProgress.current)
+    const reach = THREE.MathUtils.smootherstep(pickup, 0, 0.48)
+    const appear = THREE.MathUtils.smoothstep(pickup, 0, 0.1)
+
+    hand.current.visible = pickup > 0.001
+    hand.current.position.x = THREE.MathUtils.lerp(0.42, 0, reach)
+    hand.current.position.y = THREE.MathUtils.lerp(6.25, 1.15, reach)
+    hand.current.rotation.z = THREE.MathUtils.lerp(-0.065, 0, reach)
+    hand.current.scale.setScalar(THREE.MathUtils.lerp(0.97, 1, reach))
+    material.current.opacity = appear
+  })
+
+  return (
+    <mesh ref={hand} position={[0.42, 6.25, 1.16]} renderOrder={4} visible={false}>
+      <planeGeometry args={[4, 6]} />
+      <meshBasicMaterial
+        ref={material}
+        map={texture}
+        transparent
+        opacity={0}
+        alphaTest={0.015}
+        depthWrite={false}
         toneMapped={false}
         side={THREE.DoubleSide}
       />
@@ -425,11 +468,12 @@ function HeroBurgerDepth() {
   )
 }
 
-export default function Burger({ index, activeIndex, isFloating = false, floatingScale = 0.72, pickupTarget = false, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
+export default function Burger({ index, activeIndex, isFloating = false, floatingScale = 0.72, pickupTarget = false, pickupProgress, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
   const group = useRef()
   const lastInteraction = useRef(0)
   const tapEnergy = useRef(0)
   const baseY = position[1]
+  const baseZ = position[2]
   const floatingPhase = index * 1.7
 
   useFrame((state, delta) => {
@@ -440,7 +484,10 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
     }
     tapEnergy.current = THREE.MathUtils.damp(tapEnergy.current, 0, 7, delta)
 
-    const targetScale = isFloating ? floatingScale : isActive ? 1.12 + tapEnergy.current * 0.1 : 0.84
+    const pickup = pickupTarget && pickupProgress ? getHandPickupProgress(pickupProgress.current) : 0
+    const lift = THREE.MathUtils.smootherstep(pickup, 0.48, 1)
+
+    const targetScale = isFloating ? floatingScale : isActive ? 1.12 + tapEnergy.current * 0.1 + lift * 0.045 : 0.84
     const nextScale = THREE.MathUtils.damp(group.current.scale.x, targetScale, 4, delta)
     group.current.scale.setScalar(nextScale)
     if (isFloating) {
@@ -449,7 +496,9 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
       group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.42 + floatingPhase) * 0.08
     } else {
       group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, facingAngle, 5, delta)
-      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, baseY + (isActive ? 0.19 : 0) + tapEnergy.current * 0.22, 5, delta)
+      group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, lift * -0.035, 5, delta)
+      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, baseY + (isActive ? 0.19 : 0) + tapEnergy.current * 0.22 + lift * 4.65, 5, delta)
+      group.current.position.z = THREE.MathUtils.damp(group.current.position.z, baseZ + lift * 0.32, 5, delta)
     }
   })
 
@@ -462,6 +511,7 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
       rotation={isFloating ? [0.12, index * 1.1, -0.08] : [0, facingAngle, 0]}
     >
       {isFloating && <HeroBurgerDepth />}
+      {pickupTarget && <HandPickup scrollProgress={pickupProgress} />}
       {!isFloating ? <BurgerPhoto index={index} /> : <ClassicBurger withCheese />}
       {!isFloating && <pointLight color={accent} intensity={index === activeIndex ? 2.15 : 0.25} distance={3.2} position={[0, 2.2, 1.5]} />}
     </group>

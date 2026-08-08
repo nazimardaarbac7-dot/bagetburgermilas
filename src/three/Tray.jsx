@@ -59,6 +59,7 @@ export default function Tray({ scrollProgress, activeIndex, trayDragOffset, burg
             accent={burger.accent}
             interactionPulse={burgerInteraction}
             pickupTarget={index === burgers.length - 1}
+            pickupProgress={scrollProgress}
             position={[Math.sin(angle) * radius, 0.5, Math.cos(angle) * radius]}
             facingAngle={angle}
           />
