@@ -5,7 +5,7 @@ export const burgers = [
     name: ['HAMBURGER'],
     ingredients: ['EL YAPIMI BURGER KÖFTESİ', 'TURŞU', 'ÖZEL SOS', 'MAYONEZ'],
     price: '220',
-    accent: '#e75d36',
+    accent: '#de860b',
   },
   {
     id: 'cheeseburger',
@@ -13,7 +13,7 @@ export const burgers = [
     name: ['CHEESEBURGER'],
     ingredients: ['BURGER EKMEĞİNE', 'EL YAPIMI BURGER KÖFTESİ', 'CHEDDAR PEYNİRİ', 'TURŞU', 'ÖZEL SOS', 'MAYONEZ'],
     price: '230',
-    accent: '#f0a83b',
+    accent: '#f2a42b',
   },
   {
     id: 'koz-burger',
@@ -21,7 +21,7 @@ export const burgers = [
     name: ['KÖZ', 'BURGER'],
     ingredients: ['BURGER EKMEĞİNE', 'EL YAPIMI BURGER KÖFTESİ', 'KÖZLENMİŞ BİBER', 'TURŞU', 'ÖZEL SOS', 'MAYONEZ'],
     price: '230',
-    accent: '#bf3e2f',
+    accent: '#37686a',
   },
   {
     id: 'karisik-burger',
@@ -29,7 +29,7 @@ export const burgers = [
     name: ['KARIŞIK', 'BURGER'],
     ingredients: ['BURGER EKMEĞİNE', 'EL YAPIMI BURGER KÖFTESİ', 'TURŞU', 'ÖZEL SOS', 'MAYONEZ', 'SUCUK', 'SALAM', 'CHEDDAR PEYNİRİ', 'YUMURTA'],
     price: '290',
-    accent: '#d4432f',
+    accent: '#de860b',
   },
   {
     id: 'baldicanli-burger',
@@ -37,6 +37,6 @@ export const burgers = [
     name: ['BALDICANLI', 'BURGER'],
     ingredients: ['BURGER EKMEĞİNE', 'EL YAPIMI BURGER KÖFTESİ', 'KÖZLENMİŞ PATLICAN', 'TURŞU', 'ÖZEL SOS', 'MAYONEZ'],
     price: '230',
-    accent: '#e1b15d',
+    accent: '#f2a42b',
   },
 ]

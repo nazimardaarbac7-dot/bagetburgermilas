@@ -19,12 +19,12 @@ function SceneReady({ onReady }) {
 
 function World({ heroExitProgress, scrollProgress, activeIndex, trayDragOffset, burgerInteraction, onReady }) {
   return <>
-    <color attach="background" args={['#170d0b']} />
-    <fog attach="fog" args={['#170d0b', 13, 28]} />
-    <ambientLight intensity={0.36} color="#f2b38c" />
-    <directionalLight castShadow intensity={3.15} color="#ffc08a" position={[5, 9, 6]} shadow-mapSize={[1024, 1024]} />
-    <spotLight intensity={49} angle={0.48} penumbra={0.82} color="#d84a2d" position={[-8, 7, -4]} target-position={[0, 0, 0]} />
-    <pointLight intensity={17} distance={16} color="#d58a4d" position={[0, 3, 5]} />
+    <color attach="background" args={['#245052']} />
+    <fog attach="fog" args={['#245052', 13, 28]} />
+    <ambientLight intensity={0.36} color="#f5d49b" />
+    <directionalLight castShadow intensity={3.15} color="#ffd18a" position={[5, 9, 6]} shadow-mapSize={[1024, 1024]} />
+    <spotLight intensity={49} angle={0.48} penumbra={0.82} color="#de860b" position={[-8, 7, -4]} target-position={[0, 0, 0]} />
+    <pointLight intensity={17} distance={16} color="#f2a42b" position={[0, 3, 5]} />
     <Environment preset="city" environmentIntensity={0.3} />
     <FloatingBurgers heroExitProgress={heroExitProgress} />
     <Tray scrollProgress={scrollProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} />
