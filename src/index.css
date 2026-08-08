@@ -103,7 +103,6 @@ main { position: relative; isolation: isolate; }
 .review-stars { color: #de860b; font-size: .64rem; letter-spacing: .13em; }
 .ink .review-stars, .clay .review-stars { color: #f2a42b; }
 .review-card blockquote { margin: 0; font-family: Manrope, Arial, sans-serif; font-size: clamp(1rem, 1.27vw, 1.32rem); font-weight: 700; line-height: 1.16; letter-spacing: -.04em; }
-.review-card.compact blockquote { font-size: clamp(.64rem, .74vw, .75rem); line-height: 1.15; letter-spacing: -.025em; }
 .review-card footer { display: flex; justify-content: space-between; gap: 10px; font: 500 .48rem/1 'DM Mono', monospace; letter-spacing: .09em; opacity: .65; }
 .milas-details { position: relative; margin-top: clamp(45px, 7vh, 80px); display: grid; grid-template-columns: 1.5fr 1fr .8fr; align-items: end; gap: 34px; font: 600 clamp(.67rem, .85vw, .86rem)/1.62 'DM Mono', monospace; letter-spacing: .035em; }
 .milas-details p { margin: 0; }
@@ -165,7 +164,6 @@ main { position: relative; isolation: isolate; }
   .review-card-3 { left: 13%; top: 263px; }
   .review-card-4 { right: 1%; bottom: 0; }
   .review-card blockquote { font-size: clamp(.88rem, 4vw, 1.02rem); }
-  .review-card.compact blockquote { font-size: .6rem; line-height: 1.15; }
   .milas-details { margin-top: 65px; display: flex; flex-direction: column; align-items: flex-start; gap: 26px; font-size: .63rem; }
   .milas-details a:not(.directions) { align-self: auto; }
   .directions { width: 100%; margin-top: 13px; }
