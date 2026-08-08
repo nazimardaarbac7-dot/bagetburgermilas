@@ -10,6 +10,7 @@ export default function CameraRig({ heroExitProgress, scrollProgress }) {
   const desiredTarget = useRef(new THREE.Vector3(0, 0.25, 0))
 
   useFrame((state, delta) => {
+    const smoothDelta = Math.min(delta, 1 / 30)
     const progress = scrollProgress.current
     const isMobile = size.width <= 720
     const heroHandoff = THREE.MathUtils.smootherstep(heroExitProgress.current, 0.64, 1)
@@ -25,8 +26,8 @@ export default function CameraRig({ heroExitProgress, scrollProgress }) {
       THREE.MathUtils.lerp(heroZ, trayZ - ending * 1.75, trayAmount),
     )
     desiredTarget.current.set(0, THREE.MathUtils.lerp(0.25, 0.08, trayAmount) + ending * 0.2, 0)
-    camera.position.lerp(desired.current, 1 - Math.exp(-delta * (isMobile ? 3.1 : 1.9)))
-    target.current.lerp(desiredTarget.current, 1 - Math.exp(-delta * (isMobile ? 4.4 : 3.2)))
+    camera.position.lerp(desired.current, 1 - Math.exp(-smoothDelta * (isMobile ? 3.1 : 1.9)))
+    target.current.lerp(desiredTarget.current, 1 - Math.exp(-smoothDelta * (isMobile ? 4.4 : 3.2)))
     camera.lookAt(target.current)
   })
   return null

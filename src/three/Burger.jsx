@@ -474,6 +474,7 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
   const initialLightIntensity = useRef(index === activeIndex ? 2.15 : 0.25)
   const lastInteraction = useRef(0)
   const tapEnergy = useRef(0)
+  const floatingTime = useRef(0)
   const baseY = position[1]
   const baseZ = position[2]
   const floatingPhase = index * 1.7
@@ -484,15 +485,16 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
     const trayEntering = sceneEntryProgress?.current >= 0.64
     if (!isFloating && ((!trayEntering && sceneProgress?.current <= 0.001) || finalTransitionProgress?.current >= 0.999)) return
 
+    const smoothDelta = Math.min(delta, 1 / 30)
     const isActive = index === activeIndex
     if (accentLight.current) {
-      accentLight.current.intensity = THREE.MathUtils.damp(accentLight.current.intensity, isActive ? 2.15 : 0.25, 7, delta)
+      accentLight.current.intensity = THREE.MathUtils.damp(accentLight.current.intensity, isActive ? 2.15 : 0.25, 7, smoothDelta)
     }
     if (!isFloating && interactionPulse?.current.index === index && interactionPulse.current.token !== lastInteraction.current) {
       lastInteraction.current = interactionPulse.current.token
       tapEnergy.current = 1
     }
-    tapEnergy.current = THREE.MathUtils.damp(tapEnergy.current, 0, 7, delta)
+    tapEnergy.current = THREE.MathUtils.damp(tapEnergy.current, 0, 7, smoothDelta)
 
     const pickup = pickupTarget && pickupProgress ? getHandPickupProgress(pickupProgress.current) : 0
     const lift = pickupTarget && finalTransitionProgress
@@ -500,18 +502,19 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
       : 0
 
     const targetScale = isFloating ? floatingScale : isActive ? 1.12 + tapEnergy.current * 0.1 + lift * 0.045 : 0.84
-    const nextScale = THREE.MathUtils.damp(group.current.scale.x, targetScale, 4, delta)
+    const nextScale = THREE.MathUtils.damp(group.current.scale.x, targetScale, 4, smoothDelta)
     group.current.scale.setScalar(nextScale)
     if (isFloating) {
-      group.current.position.y = baseY + Math.sin(state.clock.elapsedTime * 0.8 + floatingPhase) * 0.23
-      group.current.rotation.y += delta * (0.14 + index * 0.012)
-      group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.42 + floatingPhase) * 0.08
+      floatingTime.current += smoothDelta
+      group.current.position.y = baseY + Math.sin(floatingTime.current * 0.8 + floatingPhase) * 0.23
+      group.current.rotation.y += smoothDelta * (0.14 + index * 0.012)
+      group.current.rotation.x = Math.sin(floatingTime.current * 0.42 + floatingPhase) * 0.08
     } else {
       const movementSpeed = pickup > 0 ? 4 : 5
-      group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, facingAngle, 5, delta)
-      group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, lift * -0.035, movementSpeed, delta)
-      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, baseY + (isActive ? 0.19 : 0) + tapEnergy.current * 0.22 + lift * 4.65, movementSpeed, delta)
-      group.current.position.z = THREE.MathUtils.damp(group.current.position.z, baseZ + lift * 0.32, movementSpeed, delta)
+      group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, facingAngle, 5, smoothDelta)
+      group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, lift * -0.035, movementSpeed, smoothDelta)
+      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, baseY + (isActive ? 0.19 : 0) + tapEnergy.current * 0.22 + lift * 4.65, movementSpeed, smoothDelta)
+      group.current.position.z = THREE.MathUtils.damp(group.current.position.z, baseZ + lift * 0.32, movementSpeed, smoothDelta)
     }
   })
 

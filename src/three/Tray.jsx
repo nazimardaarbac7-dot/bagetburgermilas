@@ -14,6 +14,7 @@ export default function Tray({ heroExitProgress, scrollProgress, finalTransition
   const isMobile = size.width <= 720
 
   useFrame((state, delta) => {
+    const smoothDelta = Math.min(delta, 1 / 30)
     const progress = scrollProgress.current
     const heroProgress = heroExitProgress.current
     const finalProgress = finalTransitionProgress.current
@@ -31,13 +32,13 @@ export default function Tray({ heroExitProgress, scrollProgress, finalTransition
     const targetRotation = -rotationProgress * (burgers.length - 1) * ((Math.PI * 2) / burgers.length) + trayDragOffset.current
     const targetScale = THREE.MathUtils.lerp(0.001, 1, intro)
     const settleSpeed = isMobile ? 4.2 : 2.8
-    const currentScale = THREE.MathUtils.damp(trayVisual.current.scale.x, targetScale, settleSpeed, delta)
-    tray.current.rotation.y = THREE.MathUtils.damp(tray.current.rotation.y, targetRotation, 4.2, delta)
+    const currentScale = THREE.MathUtils.damp(trayVisual.current.scale.x, targetScale, settleSpeed, smoothDelta)
+    tray.current.rotation.y = THREE.MathUtils.damp(tray.current.rotation.y, targetRotation, 4.2, smoothDelta)
     trayVisual.current.scale.setScalar(currentScale)
     const settledY = isMobile ? -0.48 : -0.95
     const entryY = isMobile ? -6.4 : -7
     const targetY = THREE.MathUtils.lerp(entryY, settledY, intro)
-    trayVisual.current.position.y = THREE.MathUtils.damp(trayVisual.current.position.y, targetY, settleSpeed, delta)
+    trayVisual.current.position.y = THREE.MathUtils.damp(trayVisual.current.position.y, targetY, settleSpeed, smoothDelta)
   })
 
   return (

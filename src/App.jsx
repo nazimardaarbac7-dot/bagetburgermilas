@@ -55,6 +55,7 @@ export default function App() {
   useLayoutEffect(() => {
     const media = gsap.matchMedia()
     const context = gsap.context(() => {
+      const mobileScene = window.matchMedia('(max-width: 720px)').matches
       const heroMotion = { progress: 0 }
       const heroTimeline = gsap.timeline({
         defaults: { ease: 'none' },
@@ -65,7 +66,7 @@ export default function App() {
           trigger: '#top',
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 0.75,
+          scrub: mobileScene ? 0.55 : 0.68,
         },
       })
 
@@ -78,6 +79,7 @@ export default function App() {
         scale: 1.08,
         opacity: 0,
         yPercent: -8,
+        force3D: true,
         duration: 1,
       }, 0)
 
@@ -87,7 +89,7 @@ export default function App() {
         duration: 0.45,
       }, 0)
 
-      const mobileTray = window.matchMedia('(max-width: 720px)').matches
+      const mobileTray = mobileScene
       trayTriggerRef.current = ScrollTrigger.create({
         trigger: '#tray',
         start: 'top bottom',

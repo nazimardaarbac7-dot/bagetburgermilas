@@ -26,16 +26,18 @@ export default function FloatingBurgers({ heroExitProgress }) {
 
   useFrame((state, delta) => {
     const progress = heroExitProgress.current
+    const smoothDelta = Math.min(delta, 1 / 30)
     if (hidden.current && progress <= 0.97) hidden.current = false
-    if (!hidden.current && progress >= 0.9995) hidden.current = true
     group.current.visible = !hidden.current
     if (hidden.current) return
 
     const handoff = THREE.MathUtils.smootherstep(progress, 0, 1)
     const pointerStrength = 1 - handoff
+    const motionSpeed = size.width <= 720 ? 9.5 : 8
+    let allSettled = true
 
-    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, state.pointer.x * 0.22 * pointerStrength, 3, delta)
-    group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, -state.pointer.y * 0.1 * pointerStrength, 3, delta)
+    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, state.pointer.x * 0.22 * pointerStrength, 3, smoothDelta)
+    group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, -state.pointer.y * 0.1 * pointerStrength, 3, smoothDelta)
 
     burgers.forEach((burger, index) => {
       const item = burgerGroups.current[index]
@@ -48,15 +50,28 @@ export default function FloatingBurgers({ heroExitProgress }) {
       const [baseX, baseY, baseZ] = burger.position
       const [exitX, exitY, exitZ] = burger.exit
 
-      item.position.set(
-        baseX + exitX * exitProgress,
-        baseY + exitY * exitProgress,
-        baseZ + exitZ * exitProgress,
-      )
-      item.rotation.z = burger.tilt * exitProgress
-      item.rotation.y = burger.yaw * exitProgress
-      item.scale.setScalar(1 - exitProgress * 0.04)
+      const targetX = baseX + exitX * exitProgress
+      const targetY = baseY + exitY * exitProgress
+      const targetZ = baseZ + exitZ * exitProgress
+      const targetScale = 1 - exitProgress * 0.04
+
+      item.position.x = THREE.MathUtils.damp(item.position.x, targetX, motionSpeed, smoothDelta)
+      item.position.y = THREE.MathUtils.damp(item.position.y, targetY, motionSpeed, smoothDelta)
+      item.position.z = THREE.MathUtils.damp(item.position.z, targetZ, motionSpeed, smoothDelta)
+      item.rotation.z = THREE.MathUtils.damp(item.rotation.z, burger.tilt * exitProgress, motionSpeed, smoothDelta)
+      item.rotation.y = THREE.MathUtils.damp(item.rotation.y, burger.yaw * exitProgress, motionSpeed, smoothDelta)
+      const nextScale = THREE.MathUtils.damp(item.scale.x, targetScale, motionSpeed, smoothDelta)
+      item.scale.setScalar(nextScale)
+
+      if (Math.abs(item.position.x - targetX) > 0.025 || Math.abs(item.position.y - targetY) > 0.025 || Math.abs(item.position.z - targetZ) > 0.025) {
+        allSettled = false
+      }
     })
+
+    if (progress >= 0.9995 && allSettled) {
+      hidden.current = true
+      group.current.visible = false
+    }
   })
 
   return (
