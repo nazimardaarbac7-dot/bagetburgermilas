@@ -1,0 +1,42 @@
+export const burgers = [
+  {
+    id: 'classic',
+    number: '01',
+    name: ['HAMBURGER'],
+    ingredients: ['EL YAPIMI BURGER KÖFTESİ', 'TURŞU', 'ÖZEL SOS', 'MAYONEZ'],
+    price: '220',
+    accent: '#e75d36',
+  },
+  {
+    id: 'double-smash',
+    number: '02',
+    name: ['DOUBLE', 'SMASH'],
+    ingredients: ['160G DANA ETİ', 'ÇİFT CHEDDAR', 'KARAMELİZE SOĞAN', 'TURŞU', 'BAGET SOS'],
+    price: '285',
+    accent: '#f0a83b',
+  },
+  {
+    id: 'bbq',
+    number: '03',
+    name: ['SMOKY', 'BBQ'],
+    ingredients: ['DANA KÖFTE', 'ISLİ PEYNİR', 'ÇITIR SOĞAN', 'BBQ GLAZE', 'ROKA'],
+    price: '275',
+    accent: '#bf3e2f',
+  },
+  {
+    id: 'mexican',
+    number: '04',
+    name: ['MEXICAN', 'HEAT'],
+    ingredients: ['DANA KÖFTE', 'JALAPENO', 'CHEDDAR', 'TOMATO SALSA', 'ACILI MAYO'],
+    price: '275',
+    accent: '#d4432f',
+  },
+  {
+    id: 'chicken',
+    number: '05',
+    name: ['CRISPY', 'CHICKEN'],
+    ingredients: ['ÇITIR TAVUK', 'COLESLAW', 'TURŞU', 'MARUL', 'BAGET SOS'],
+    price: '255',
+    accent: '#e1b15d',
+  },
+]
