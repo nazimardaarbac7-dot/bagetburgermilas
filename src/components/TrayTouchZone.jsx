@@ -1,25 +1,20 @@
 import React, { useRef } from 'react'
 
-const BURGER_STEP_ANGLE = (Math.PI * 2) / 5
-
-export default function TrayTouchZone({ enabled, dragOffset, onGestureStart, onSwipe, onTap }) {
+export default function TrayTouchZone({ enabled, onSwipe, onTap }) {
   const gesture = useRef(null)
   const suppressClick = useRef(false)
 
-  const resetGesture = (preserveOffset = false) => {
-    if (!preserveOffset) dragOffset.current = 0
+  const resetGesture = () => {
     gesture.current = null
   }
 
   const handlePointerDown = (event) => {
     if (!enabled || (event.pointerType === 'mouse' && event.button !== 0)) return
-    onGestureStart?.()
     suppressClick.current = false
     gesture.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      startOffset: dragOffset.current,
       axis: null,
     }
   }
@@ -45,9 +40,6 @@ export default function TrayTouchZone({ enabled, dragOffset, onGestureStart, onS
 
     if (current.axis !== 'horizontal') return
     event.preventDefault()
-    const width = Math.max(event.currentTarget.clientWidth, 1)
-    const nextOffset = current.startOffset + (deltaX / width) * BURGER_STEP_ANGLE * 1.8
-    dragOffset.current = Math.max(-BURGER_STEP_ANGLE * 0.72, Math.min(BURGER_STEP_ANGLE * 0.72, nextOffset))
   }
 
   const handlePointerUp = (event) => {
@@ -56,23 +48,18 @@ export default function TrayTouchZone({ enabled, dragOffset, onGestureStart, onS
 
     const deltaX = event.clientX - current.startX
     if (current.axis === 'horizontal') {
-      const swipeThreshold = Math.max(24, Math.min(34, event.currentTarget.clientWidth * 0.075))
+      const swipeThreshold = Math.max(22, Math.min(30, event.currentTarget.clientWidth * 0.065))
       suppressClick.current = Math.abs(deltaX) > 10
-      onSwipe(Math.abs(deltaX) >= swipeThreshold ? (deltaX < 0 ? 1 : -1) : 0)
+      if (Math.abs(deltaX) >= swipeThreshold) onSwipe(deltaX < 0 ? 1 : -1)
     }
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
-    resetGesture(current.axis === 'horizontal')
+    resetGesture()
   }
 
   const handlePointerCancel = () => {
-    if (gesture.current?.axis === 'horizontal') {
-      onSwipe(0)
-      resetGesture(true)
-      return
-    }
     resetGesture()
   }
 

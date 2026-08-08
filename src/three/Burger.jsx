@@ -482,7 +482,7 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
   useFrame((state, delta) => {
     if (!group.current) return
     if (isFloating && motionProgress?.current >= 0.999) return
-    const trayEntering = sceneEntryProgress?.current >= 0.64
+    const trayEntering = sceneEntryProgress?.current >= 0.54
     if (!isFloating && ((!trayEntering && sceneProgress?.current <= 0.001) || finalTransitionProgress?.current >= 0.999)) return
 
     const smoothDelta = Math.min(delta, 1 / 30)

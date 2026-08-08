@@ -34,9 +34,14 @@ export default function App() {
   const scrollProgress = useRef(0)
   const finalTransitionProgress = useRef(0)
   const trayTriggerRef = useRef(null)
-  const trayDragOffset = useRef(0)
   const traySnapTween = useRef(null)
-  const traySnapTargetIndex = useRef(null)
+  const trayRequestedIndex = useRef(0)
+  const traySettledIndex = useRef(0)
+  const runFinalScene = useRef(null)
+  const requestTrayIndex = useRef(null)
+  const finalSceneTween = useRef(null)
+  const finalSceneRequested = useRef(false)
+  const heroPhase = useRef('hero')
   const burgerInteraction = useRef({ index: -1, token: 0 })
   const heroRef = useRef(null)
   const activeIndexValue = useRef(0)
@@ -45,6 +50,7 @@ export default function App() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [showcaseReady, setShowcaseReady] = useState(false)
   const [showcaseActive, setShowcaseActive] = useState(false)
+  const [heroTransitioning, setHeroTransitioning] = useState(false)
   const [sceneReady, setSceneReady] = useState(false)
   const [navbarOnYellow, setNavbarOnYellow] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -55,76 +61,321 @@ export default function App() {
 
   useLayoutEffect(() => {
     const media = gsap.matchMedia()
+    let cleanupHeroScroll = () => {}
     const context = gsap.context(() => {
       const mobileScene = window.matchMedia('(max-width: 720px)').matches
+      const firstTrayProgress = mobileScene ? MOBILE_TRAY_SETTLE_END : TRAY_SETTLE_END
+      const scrollingElement = document.scrollingElement ?? document.documentElement
+      let scrollBehaviorLockDepth = 0
+      let originalScrollBehavior = scrollingElement.style.scrollBehavior
+      let heroScrollLocked = false
+      let heroScrollAnchor = 0
+
+      const lockScrollBehavior = () => {
+        if (scrollBehaviorLockDepth === 0) {
+          originalScrollBehavior = scrollingElement.style.scrollBehavior
+          scrollingElement.style.scrollBehavior = 'auto'
+        }
+        scrollBehaviorLockDepth += 1
+      }
+
+      const unlockScrollBehavior = () => {
+        scrollBehaviorLockDepth = Math.max(0, scrollBehaviorLockDepth - 1)
+        if (scrollBehaviorLockDepth === 0) {
+          scrollingElement.style.scrollBehavior = originalScrollBehavior
+        }
+      }
+
+      const releaseHeroScroll = () => {
+        if (!heroScrollLocked) return
+        heroScrollLocked = false
+        unlockScrollBehavior()
+      }
+      cleanupHeroScroll = releaseHeroScroll
+
+      lockScrollBehavior()
+      scrollingElement.scrollTop = 0
+      unlockScrollBehavior()
+
+      const setShowcaseVisibility = (ready, active) => {
+        if (showcaseReadyValue.current !== ready) {
+          showcaseReadyValue.current = ready
+          setShowcaseReady(ready)
+        }
+        if (showcaseActiveValue.current !== active) {
+          showcaseActiveValue.current = active
+          setShowcaseActive(active)
+        }
+      }
+
+      const setDisplayedBurger = (index) => {
+        if (activeIndexValue.current === index) return
+        activeIndexValue.current = index
+        setActiveIndex(index)
+      }
+
+      const jumpToScroll = (targetScroll) => {
+        lockScrollBehavior()
+        scrollingElement.scrollTop = targetScroll
+        ScrollTrigger.update()
+        unlockScrollBehavior()
+      }
+
       const heroMotion = { progress: 0 }
       const heroTimeline = gsap.timeline({
-        defaults: { ease: 'none' },
+        paused: true,
         onUpdate: () => {
+          if (heroScrollLocked) scrollingElement.scrollTop = heroScrollAnchor
           heroExitProgress.current = heroMotion.progress
+          const trayVisible = heroMotion.progress >= 0.6
+          setShowcaseVisibility(trayVisible, trayVisible)
         },
-        scrollTrigger: {
-          trigger: '#top',
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: mobileScene ? 0.55 : 0.68,
+        onComplete: () => {
+          heroPhase.current = 'tray'
+          setHeroTransitioning(false)
+          setShowcaseVisibility(true, true)
+          trayRequestedIndex.current = 0
+          traySettledIndex.current = 0
+          finalSceneRequested.current = false
+          finalTransitionProgress.current = 0
+          setDisplayedBurger(0)
+          scrollProgress.current = firstTrayProgress
+
+          const trayTrigger = trayTriggerRef.current
+          if (trayTrigger) {
+            jumpToScroll(trayTrigger.start + (trayTrigger.end - trayTrigger.start) * firstTrayProgress)
+          }
+          releaseHeroScroll()
+        },
+        onReverseComplete: () => {
+          heroPhase.current = 'hero'
+          setHeroTransitioning(false)
+          setShowcaseVisibility(false, false)
+          trayRequestedIndex.current = 0
+          traySettledIndex.current = 0
+          finalSceneRequested.current = false
+          finalTransitionProgress.current = 0
+          setDisplayedBurger(0)
+          scrollProgress.current = 0
+          jumpToScroll(0)
+          releaseHeroScroll()
         },
       })
 
       heroTimeline.to(heroMotion, {
         progress: 1,
-        duration: 1,
+        duration: 1.18,
+        ease: 'power2.inOut',
       }, 0)
 
       heroTimeline.to('.hero-copy', {
-        scale: 1.08,
+        scale: 1.06,
         opacity: 0,
-        yPercent: -8,
+        yPercent: -7,
         force3D: true,
-        duration: 1,
+        duration: 0.58,
+        ease: 'power2.in',
       }, 0)
 
       heroTimeline.to('.scroll-cue', {
         autoAlpha: 0,
         y: -12,
-        duration: 0.45,
+        duration: 0.3,
+        ease: 'power2.out',
       }, 0)
 
       const mobileTray = mobileScene
+      const runDigitalTrayStep = () => {
+        if (heroPhase.current !== 'tray' || traySnapTween.current || finalSceneTween.current) return
+
+        const currentIndex = traySettledIndex.current
+        const requestedIndex = trayRequestedIndex.current
+        if (currentIndex === requestedIndex) {
+          if (finalSceneRequested.current && currentIndex === burgers.length - 1) {
+            runFinalScene.current?.(true)
+          }
+          return
+        }
+
+        const nextIndex = currentIndex + Math.sign(requestedIndex - currentIndex)
+        const targetProgress = getTrayProgressForBurger(nextIndex, burgers.length, mobileTray)
+        const trayMotion = { progress: scrollProgress.current }
+
+        const stepTimeline = gsap.timeline({
+          onComplete: () => {
+            scrollProgress.current = targetProgress
+            traySettledIndex.current = nextIndex
+            setDisplayedBurger(nextIndex)
+            traySnapTween.current = null
+            if (finalSceneRequested.current && nextIndex === burgers.length - 1) {
+              runFinalScene.current?.(true)
+            } else {
+              runDigitalTrayStep()
+            }
+          },
+        })
+
+        traySnapTween.current = stepTimeline
+        stepTimeline.to(trayMotion, {
+          progress: targetProgress,
+          duration: 0.64,
+          ease: 'power2.inOut',
+          onUpdate: () => {
+            scrollProgress.current = trayMotion.progress
+          },
+        }, 0)
+        stepTimeline.call(() => setDisplayedBurger(nextIndex), [], 0.32)
+      }
+
+      const runDigitalFinalTransition = (forward) => {
+        if (heroPhase.current !== 'tray') return
+
+        const lastIndex = burgers.length - 1
+        if (forward && (trayRequestedIndex.current !== lastIndex || traySettledIndex.current !== lastIndex || traySnapTween.current)) {
+          trayRequestedIndex.current = lastIndex
+          runDigitalTrayStep()
+          return
+        }
+
+        finalSceneTween.current?.kill()
+        finalSceneTween.current = null
+
+        const lastBurgerProgress = getTrayProgressForBurger(lastIndex, burgers.length, mobileTray)
+        const trayTrigger = trayTriggerRef.current
+        const lastBurgerScroll = trayTrigger
+          ? trayTrigger.start + (trayTrigger.end - trayTrigger.start) * lastBurgerProgress
+          : window.scrollY
+        const finalMotion = {
+          tray: scrollProgress.current,
+          section: finalTransitionProgress.current,
+          page: window.scrollY,
+        }
+        const targetTrayProgress = forward ? 1 : lastBurgerProgress
+        const targetSectionProgress = forward ? 1 : 0
+        const targetPageScroll = forward && trayTrigger
+          ? trayTrigger.end + window.innerHeight * 0.78
+          : lastBurgerScroll
+        let scrollBehaviorRestored = false
+        const restoreScrollBehavior = () => {
+          if (scrollBehaviorRestored) return
+          unlockScrollBehavior()
+          scrollBehaviorRestored = true
+        }
+        lockScrollBehavior()
+
+        if (!forward) setShowcaseVisibility(true, true)
+
+        const finalTimeline = gsap.timeline({
+          onComplete: () => {
+            scrollProgress.current = targetTrayProgress
+            finalTransitionProgress.current = targetSectionProgress
+            finalSceneTween.current = null
+            restoreScrollBehavior()
+
+            if (forward) {
+              setShowcaseVisibility(true, false)
+            } else {
+              setShowcaseVisibility(true, true)
+              runDigitalTrayStep()
+            }
+          },
+          onInterrupt: restoreScrollBehavior,
+        })
+
+        finalSceneTween.current = finalTimeline
+        finalTimeline.to(finalMotion, {
+          tray: targetTrayProgress,
+          section: targetSectionProgress,
+          page: targetPageScroll,
+          duration: 0.96,
+          ease: 'power2.inOut',
+          onUpdate: () => {
+            scrollProgress.current = finalMotion.tray
+            finalTransitionProgress.current = finalMotion.section
+            scrollingElement.scrollTop = finalMotion.page
+          },
+        })
+      }
+
+      runFinalScene.current = runDigitalFinalTransition
+
+      const requestDigitalTrayIndex = (index, syncScroll = false) => {
+        if (heroPhase.current !== 'tray') return false
+
+        const nextIndex = Math.max(0, Math.min(burgers.length - 1, index))
+        trayRequestedIndex.current = nextIndex
+
+        if (syncScroll && trayTriggerRef.current) {
+          const triggerProgress = getTrayProgressForBurger(nextIndex, burgers.length, mobileTray)
+          const trayTrigger = trayTriggerRef.current
+          jumpToScroll(trayTrigger.start + (trayTrigger.end - trayTrigger.start) * triggerProgress)
+        }
+
+        runDigitalTrayStep()
+        return true
+      }
+
+      requestTrayIndex.current = requestDigitalTrayIndex
+
       trayTriggerRef.current = ScrollTrigger.create({
         trigger: '#tray',
         start: 'top bottom',
         end: 'bottom bottom',
-        scrub: 0.7,
         onUpdate: (self) => {
-          scrollProgress.current = self.progress
-          const rotationProgress = getTrayRotationProgress(self.progress, mobileTray)
-          const nextIndex = traySnapTargetIndex.current ?? getStableBurgerIndex(rotationProgress, activeIndexValue.current)
-          const isReady = self.progress >= (mobileTray ? MOBILE_TRAY_SETTLE_END : TRAY_SETTLE_END)
-          const isActive = self.progress > 0 && self.progress < 1
+          if (heroPhase.current !== 'tray') return
 
-          if (activeIndexValue.current !== nextIndex) {
-            activeIndexValue.current = nextIndex
-            setActiveIndex(nextIndex)
+          const rotationProgress = getTrayRotationProgress(self.progress, mobileTray)
+          const nextIndex = getStableBurgerIndex(rotationProgress, trayRequestedIndex.current)
+
+          requestDigitalTrayIndex(nextIndex)
+
+          if (self.progress >= 0.975 && !finalSceneRequested.current) {
+            finalSceneRequested.current = true
+            trayRequestedIndex.current = burgers.length - 1
+            const holdProgress = getTrayProgressForBurger(burgers.length - 1, burgers.length, mobileTray)
+            jumpToScroll(self.start + (self.end - self.start) * holdProgress)
+            runDigitalTrayStep()
+          } else if (self.progress <= 0.91 && finalSceneRequested.current) {
+            finalSceneRequested.current = false
+            runDigitalFinalTransition(false)
           }
-          if (showcaseReadyValue.current !== isReady) {
-            showcaseReadyValue.current = isReady
-            setShowcaseReady(isReady)
-          }
-          if (showcaseActiveValue.current !== isActive) {
-            showcaseActiveValue.current = isActive
-            setShowcaseActive(isActive)
-          }
+
+          const finalComplete = finalSceneRequested.current && finalTransitionProgress.current >= 0.999
+          setShowcaseVisibility(true, !finalComplete)
         },
       })
 
+      const beginHeroTransition = (forward) => {
+        if (heroPhase.current === 'transition') return
+        heroPhase.current = 'transition'
+        traySnapTween.current?.kill()
+        traySnapTween.current = null
+        finalSceneTween.current?.kill()
+        finalSceneTween.current = null
+        finalSceneRequested.current = false
+        finalTransitionProgress.current = 0
+        heroScrollAnchor = window.scrollY
+        if (!heroScrollLocked) {
+          heroScrollLocked = true
+          lockScrollBehavior()
+        }
+        setHeroTransitioning(true)
+
+        if (forward) heroTimeline.play()
+        else heroTimeline.reverse()
+      }
+
       ScrollTrigger.create({
-        trigger: '#milas',
-        start: 'top bottom',
-        end: 'top top',
-        scrub: 0.7,
+        trigger: '#top',
+        start: 'top top',
+        end: 'bottom bottom',
         onUpdate: (self) => {
-          finalTransitionProgress.current = self.progress
+          if (self.direction > 0 && self.progress > 0.012 && heroPhase.current === 'hero') {
+            beginHeroTransition(true)
+          }
+        },
+        onEnterBack: () => {
+          if (heroPhase.current === 'tray') beginHeroTransition(false)
         },
       })
 
@@ -132,7 +383,7 @@ export default function App() {
         trigger: '#milas',
         start: 'top 20px',
         end: 'bottom top',
-        onToggle: (self) => setNavbarOnYellow(self.isActive),
+        onToggle: (self) => setNavbarOnYellow(self.isActive && heroPhase.current === 'tray'),
       })
 
       const reviewCards = gsap.utils.toArray('.review-card')
@@ -224,7 +475,11 @@ export default function App() {
     return () => {
       traySnapTween.current?.kill()
       traySnapTween.current = null
-      traySnapTargetIndex.current = null
+      finalSceneTween.current?.kill()
+      finalSceneTween.current = null
+      cleanupHeroScroll()
+      runFinalScene.current = null
+      requestTrayIndex.current = null
       trayTriggerRef.current = null
       media.revert()
       context.revert()
@@ -232,114 +487,14 @@ export default function App() {
   }, [])
 
   const handleTraySwipe = (direction) => {
-    const settleDragOffset = () => {
-      traySnapTween.current?.kill()
-      traySnapTargetIndex.current = null
-
-      if (Math.abs(trayDragOffset.current) < 0.001) {
-        trayDragOffset.current = 0
-        traySnapTween.current = null
-        return
-      }
-
-      const settleMotion = { drag: trayDragOffset.current }
-      traySnapTween.current = gsap.to(settleMotion, {
-        drag: 0,
-        duration: 0.24,
-        ease: 'power3.out',
-        overwrite: true,
-        onUpdate: () => {
-          trayDragOffset.current = settleMotion.drag
-        },
-        onComplete: () => {
-          trayDragOffset.current = 0
-          traySnapTween.current = null
-        },
-      })
-    }
-
-    if (direction === 0) {
-      settleDragOffset()
+    const currentRequest = trayRequestedIndex.current
+    const targetIndex = Math.max(0, Math.min(burgers.length - 1, currentRequest + direction))
+    if (targetIndex === currentRequest) {
+      burgerInteraction.current = { index: activeIndexValue.current, token: burgerInteraction.current.token + 1 }
       return false
     }
 
-    const currentIndex = activeIndexValue.current
-    const targetIndex = Math.max(0, Math.min(burgers.length - 1, currentIndex + direction))
-    if (targetIndex === currentIndex) {
-      burgerInteraction.current = { index: currentIndex, token: burgerInteraction.current.token + 1 }
-      settleDragOffset()
-      return false
-    }
-
-    const trayTrigger = trayTriggerRef.current
-    if (!trayTrigger) {
-      settleDragOffset()
-      return false
-    }
-    const mobileTray = window.matchMedia('(max-width: 720px)').matches
-    const triggerProgress = getTrayProgressForBurger(targetIndex, burgers.length, mobileTray)
-    const targetScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * triggerProgress
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const scrollingElement = document.scrollingElement ?? document.documentElement
-
-    traySnapTween.current?.kill()
-    traySnapTargetIndex.current = targetIndex
-    activeIndexValue.current = targetIndex
-    setActiveIndex(targetIndex)
-
-    if (reducedMotion) {
-      const previousScrollBehavior = scrollingElement.style.scrollBehavior
-      scrollingElement.style.scrollBehavior = 'auto'
-      trayDragOffset.current = 0
-      scrollingElement.scrollTop = targetScroll
-      scrollingElement.style.scrollBehavior = previousScrollBehavior
-      traySnapTween.current = null
-      traySnapTargetIndex.current = null
-      return true
-    }
-
-    const snapMotion = {
-      scroll: window.scrollY,
-      drag: trayDragOffset.current,
-    }
-    const previousScrollBehavior = scrollingElement.style.scrollBehavior
-    let scrollBehaviorRestored = false
-    const restoreScrollBehavior = () => {
-      if (scrollBehaviorRestored) return
-      scrollingElement.style.scrollBehavior = previousScrollBehavior
-      scrollBehaviorRestored = true
-    }
-    scrollingElement.style.scrollBehavior = 'auto'
-
-    traySnapTween.current = gsap.to(snapMotion, {
-      scroll: targetScroll,
-      drag: 0,
-      duration: 0.48,
-      ease: 'power3.out',
-      overwrite: true,
-      onUpdate: () => {
-        trayDragOffset.current = snapMotion.drag
-        scrollingElement.scrollTop = snapMotion.scroll
-      },
-      onComplete: () => {
-        trayDragOffset.current = 0
-        traySnapTween.current = null
-        traySnapTargetIndex.current = null
-        restoreScrollBehavior()
-      },
-      onInterrupt: () => {
-        traySnapTween.current = null
-        traySnapTargetIndex.current = null
-        restoreScrollBehavior()
-      },
-    })
-
-    return true
-  }
-
-  const handleTrayGestureStart = () => {
-    if (!traySnapTween.current) return
-    traySnapTween.current.progress(1)
+    return requestTrayIndex.current?.(targetIndex, true) === true
   }
 
   const handleBurgerTap = () => {
@@ -347,13 +502,13 @@ export default function App() {
   }
 
   return (
-    <main>
-      <Experience heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} trayDragOffset={trayDragOffset} burgerInteraction={burgerInteraction} onReady={handleSceneReady} />
+    <main className={heroTransitioning ? 'is-hero-transitioning' : undefined}>
+      <Experience heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} burgerInteraction={burgerInteraction} onReady={handleSceneReady} />
       <div className={`scene-curtain${sceneReady ? ' is-hidden' : ''}`} aria-hidden="true" />
       <div className="grain" />
       <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} />
       <Hero ref={heroRef} />
-      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} trayDragOffset={trayDragOffset} onTrayGestureStart={handleTrayGestureStart} onTraySwipe={handleTraySwipe} onBurgerTap={handleBurgerTap} />
+      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseActive && !heroTransitioning} onTraySwipe={handleTraySwipe} onBurgerTap={handleBurgerTap} />
       <MilasSection onOpenMenu={openMenu} />
       <MenuOverlay open={menuOpen} onClose={closeMenu} />
     </main>
