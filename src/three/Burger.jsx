@@ -12,6 +12,11 @@ const burgerPhotoPaths = [
   '/assets/burgers/baldicanli-burger-cutout.png',
 ]
 
+const handTexturePath = '/assets/interaction/hand-grab.png'
+
+burgerPhotoPaths.forEach((path) => useTexture.preload(path))
+useTexture.preload(handTexturePath)
+
 const matte = {
   bun: '#a94f1d',
   bunHighlight: '#d47a2d',
@@ -137,7 +142,7 @@ function BurgerPhoto({ index }) {
 function HandPickup({ scrollProgress }) {
   const hand = useRef()
   const material = useRef()
-  const texture = useTexture('/assets/interaction/hand-grab.png')
+  const texture = useTexture(handTexturePath)
 
   useLayoutEffect(() => {
     texture.colorSpace = THREE.SRGBColorSpace

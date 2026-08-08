@@ -13,7 +13,8 @@ export default function CameraRig({ heroExitProgress, scrollProgress }) {
     const smoothDelta = Math.min(delta, 1 / 30)
     const progress = scrollProgress.current
     const isMobile = size.width <= 720
-    const heroHandoff = THREE.MathUtils.smootherstep(heroExitProgress.current, 0.54, 1)
+    const heroProgress = heroExitProgress.current
+    const heroHandoff = THREE.MathUtils.smootherstep(heroProgress, 0.54, 1)
     const trayEntry = THREE.MathUtils.smootherstep(progress, 0, isMobile ? 0.065 : 0.11)
     const trayAmount = Math.max(heroHandoff, trayEntry)
     const ending = THREE.MathUtils.smoothstep(getHandPickupProgress(progress), 0, 1)
@@ -26,8 +27,20 @@ export default function CameraRig({ heroExitProgress, scrollProgress }) {
       THREE.MathUtils.lerp(heroZ, trayZ - ending * 1.75, trayAmount),
     )
     desiredTarget.current.set(0, THREE.MathUtils.lerp(0.25, 0.08, trayAmount) + ending * 0.2, 0)
-    camera.position.lerp(desired.current, 1 - Math.exp(-smoothDelta * (isMobile ? 3.1 : 1.9)))
-    target.current.lerp(desiredTarget.current, 1 - Math.exp(-smoothDelta * (isMobile ? 4.4 : 3.2)))
+    const heroTransitionActive = heroProgress > 0.0001 && heroProgress < 0.9999
+    const cameraEase = 1 - Math.exp(-smoothDelta * (isMobile ? 3.1 : 1.9))
+    const targetEase = 1 - Math.exp(-smoothDelta * (isMobile ? 4.4 : 3.2))
+
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, desired.current.x, cameraEase)
+    if (heroTransitionActive) {
+      camera.position.y = desired.current.y
+      camera.position.z = desired.current.z
+      target.current.copy(desiredTarget.current)
+    } else {
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, desired.current.y, cameraEase)
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, desired.current.z, cameraEase)
+      target.current.lerp(desiredTarget.current, targetEase)
+    }
     camera.lookAt(target.current)
   })
   return null
