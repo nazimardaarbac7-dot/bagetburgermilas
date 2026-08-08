@@ -106,6 +106,56 @@ export default function App() {
         },
       })
 
+      media.add('(prefers-reduced-motion: no-preference)', () => {
+        const burgerImpactTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: '.milas-copy',
+            start: 'top 82%',
+            toggleActions: 'restart none restart reverse',
+          },
+        })
+
+        burgerImpactTimeline
+          .set('.bitten-burger', { autoAlpha: 1 }, .34)
+          .fromTo('.bitten-burger', {
+            xPercent: 110,
+            yPercent: -38,
+            scale: 1.45,
+            rotation: 24,
+          }, {
+            xPercent: -4,
+            yPercent: 2,
+            scale: .93,
+            rotation: -11,
+            duration: .34,
+            ease: 'power4.in',
+          }, .34)
+
+        burgerImpactTimeline
+          .to('.milas-copy h2', { x: -10, duration: .055, ease: 'none' }, .68)
+          .to('.milas-copy h2', { x: 7, duration: .055, ease: 'none' }, .735)
+          .to('.milas-copy h2', { x: -3, duration: .055, ease: 'none' }, .79)
+          .to('.milas-copy h2', { x: 0, duration: .09, ease: 'power2.out' }, .845)
+          .to('.bitten-burger', {
+            xPercent: 0,
+            yPercent: 0,
+            scale: 1.07,
+            rotation: -5,
+            duration: .12,
+            ease: 'power2.out',
+          }, .68)
+          .to('.bitten-burger', {
+            scale: 1,
+            rotation: -7,
+            duration: .34,
+            ease: 'elastic.out(1, .45)',
+          }, .8)
+      })
+
+      media.add('(prefers-reduced-motion: reduce)', () => {
+        gsap.set('.bitten-burger', { autoAlpha: 1, xPercent: 0, yPercent: 0, scale: 1, rotation: -7 })
+      })
+
       media.add('(max-width: 720px)', () => {
         gsap.fromTo('.milas-copy', {
           autoAlpha: 0,
