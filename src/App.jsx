@@ -14,7 +14,8 @@ gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
 
 const ACTIVE_INDEX_HYSTERESIS = 0.08
-const HERO_TRANSITION_DURATION = 1.36
+const HERO_TRANSITION_DURATION = 2.05
+const HERO_COPY_EXIT_DURATION = 1.16
 
 function getStableBurgerIndex(rotationProgress, currentIndex) {
   const position = rotationProgress * (burgers.length - 1)
@@ -174,14 +175,14 @@ export default function App() {
         opacity: 0,
         yPercent: -7,
         force3D: true,
-        duration: 0.68,
-        ease: 'power2.in',
+        duration: HERO_COPY_EXIT_DURATION,
+        ease: 'power2.inOut',
       }, 0)
 
       heroTimeline.to('.scroll-cue', {
         autoAlpha: 0,
         y: -12,
-        duration: 0.3,
+        duration: 0.46,
         ease: 'power2.out',
       }, 0)
 
