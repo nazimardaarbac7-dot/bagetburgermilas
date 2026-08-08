@@ -1,10 +1,10 @@
 import React from 'react'
 
 const reviews = [
-  { quote: 'Gayet memnunum, elinize sağlık.', name: 'AYŞE K.', rotation: -7, tone: 'cream' },
-  { quote: 'Burgerler gerçekten çok başarılıydı.', name: 'MERT A.', rotation: 6, tone: 'ink' },
-  { quote: 'Çalışanlar çok ilgili ve güler yüzlüydü.', name: 'DENİZ T.', rotation: -4, tone: 'clay' },
-  { quote: 'Milas’a geldiğimde tekrar geleceğim.', name: 'SELİN Y.', rotation: 5, tone: 'sand' },
+  { quote: "Milas'ta hamburger yiyeceksen başka adres aramaya gerek yok. Bu temiz mekanı Milas'a kazandıran Önür ailesine hayırlı işler bol kazançlar dilerim. Herkese tavsiye ederim. Afiyet olsun...", name: 'KORAY ETYEMEZ', rotation: -7, tone: 'cream', compact: true },
+  { quote: 'Lezzet,atmosfer çok güzel herşey için teşşekkür ederiz…', name: 'HAMDİ KARADAĞ', rotation: 6, tone: 'ink' },
+  { quote: "Nihayet!!! Milas'ta Teksas hamburgerinden kaliteli hamburger yeme zamanı !!!", name: 'UFUK M.', rotation: -4, tone: 'clay' },
+  { quote: "Milasta yediğim açık ara en iyii burger", name: 'YAVUZ YAVUZER', rotation: 5, tone: 'sand' },
 ]
 
 export default function MilasSection() {
@@ -16,7 +16,7 @@ export default function MilasSection() {
           <p className="reviews-label">MİLAS'TAN NOTLAR <span>04 / 04</span></p>
           {reviews.map((review, index) => (
             <article
-              className={`review-card review-card-${index + 1} ${review.tone}`}
+              className={`review-card review-card-${index + 1} ${review.tone}${review.compact ? ' compact' : ''}`}
               data-rotation={review.rotation}
               key={review.name}
             >
