@@ -2,22 +2,24 @@ import React, { useRef } from 'react'
 
 const BURGER_STEP_ANGLE = (Math.PI * 2) / 5
 
-export default function TrayTouchZone({ enabled, dragOffset, onSwipe, onTap }) {
+export default function TrayTouchZone({ enabled, dragOffset, onGestureStart, onSwipe, onTap }) {
   const gesture = useRef(null)
   const suppressClick = useRef(false)
 
-  const resetGesture = () => {
-    dragOffset.current = 0
+  const resetGesture = (preserveOffset = false) => {
+    if (!preserveOffset) dragOffset.current = 0
     gesture.current = null
   }
 
   const handlePointerDown = (event) => {
     if (!enabled || (event.pointerType === 'mouse' && event.button !== 0)) return
+    onGestureStart?.()
     suppressClick.current = false
     gesture.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
+      startOffset: dragOffset.current,
       axis: null,
     }
   }
@@ -37,7 +39,8 @@ export default function TrayTouchZone({ enabled, dragOffset, onSwipe, onTap }) {
     if (current.axis !== 'horizontal') return
     event.preventDefault()
     const width = Math.max(event.currentTarget.clientWidth, 1)
-    dragOffset.current = Math.max(-BURGER_STEP_ANGLE * 0.72, Math.min(BURGER_STEP_ANGLE * 0.72, (deltaX / width) * BURGER_STEP_ANGLE * 1.8))
+    const nextOffset = current.startOffset + (deltaX / width) * BURGER_STEP_ANGLE * 1.8
+    dragOffset.current = Math.max(-BURGER_STEP_ANGLE * 0.72, Math.min(BURGER_STEP_ANGLE * 0.72, nextOffset))
   }
 
   const handlePointerUp = (event) => {
@@ -45,15 +48,16 @@ export default function TrayTouchZone({ enabled, dragOffset, onSwipe, onTap }) {
     if (!current || current.pointerId !== event.pointerId) return
 
     const deltaX = event.clientX - current.startX
+    let transitionAccepted = false
     if (current.axis === 'horizontal' && Math.abs(deltaX) > 42) {
       suppressClick.current = true
-      onSwipe(deltaX < 0 ? 1 : -1)
+      transitionAccepted = onSwipe(deltaX < 0 ? 1 : -1) === true
     }
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
-    resetGesture()
+    resetGesture(transitionAccepted)
   }
 
   const handleClick = () => {
@@ -73,7 +77,7 @@ export default function TrayTouchZone({ enabled, dragOffset, onSwipe, onTap }) {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerCancel={resetGesture}
+      onPointerCancel={() => resetGesture()}
       onClick={handleClick}
     />
   )

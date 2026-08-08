@@ -11,6 +11,23 @@ import { burgers } from './data/burgers'
 import { getTrayRotationProgress, MOBILE_TRAY_SETTLE_END, TRAY_ROTATION_END, TRAY_ROTATION_START, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
+ScrollTrigger.config({ ignoreMobileResize: true })
+
+const ACTIVE_INDEX_HYSTERESIS = 0.08
+
+function getStableBurgerIndex(rotationProgress, currentIndex) {
+  const position = rotationProgress * (burgers.length - 1)
+  let nextIndex = currentIndex
+
+  while (nextIndex < burgers.length - 1 && position >= nextIndex + 0.5 + ACTIVE_INDEX_HYSTERESIS) {
+    nextIndex += 1
+  }
+  while (nextIndex > 0 && position <= nextIndex - 0.5 - ACTIVE_INDEX_HYSTERESIS) {
+    nextIndex -= 1
+  }
+
+  return nextIndex
+}
 
 export default function App() {
   const heroExitProgress = useRef(0)
@@ -18,6 +35,7 @@ export default function App() {
   const finalTransitionProgress = useRef(0)
   const trayTriggerRef = useRef(null)
   const trayDragOffset = useRef(0)
+  const traySnapTween = useRef(null)
   const burgerInteraction = useRef({ index: -1, token: 0 })
   const heroRef = useRef(null)
   const activeIndexValue = useRef(0)
@@ -78,7 +96,7 @@ export default function App() {
         onUpdate: (self) => {
           scrollProgress.current = self.progress
           const rotationProgress = getTrayRotationProgress(self.progress, mobileTray)
-          const nextIndex = Math.min(burgers.length - 1, Math.round(rotationProgress * (burgers.length - 1)))
+          const nextIndex = getStableBurgerIndex(rotationProgress, activeIndexValue.current)
           const isReady = self.progress >= (mobileTray ? MOBILE_TRAY_SETTLE_END : TRAY_SETTLE_END)
           const isActive = self.progress > 0 && self.progress < 1
 
@@ -201,6 +219,8 @@ export default function App() {
       })
     })
     return () => {
+      traySnapTween.current?.kill()
+      traySnapTween.current = null
       trayTriggerRef.current = null
       media.revert()
       context.revert()
@@ -211,16 +231,53 @@ export default function App() {
     const targetIndex = Math.max(0, Math.min(burgers.length - 1, activeIndex + direction))
     if (targetIndex === activeIndex) {
       burgerInteraction.current = { index: activeIndex, token: burgerInteraction.current.token + 1 }
-      return
+      return false
     }
 
     const trayTrigger = trayTriggerRef.current
-    if (!trayTrigger) return
+    if (!trayTrigger) return false
     const rotationProgress = targetIndex / (burgers.length - 1)
     const triggerProgress = TRAY_ROTATION_START + rotationProgress * (TRAY_ROTATION_END - TRAY_ROTATION_START)
     const targetScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * triggerProgress
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    window.scrollTo({ top: targetScroll, behavior: reducedMotion ? 'auto' : 'smooth' })
+    const scrollingElement = document.scrollingElement ?? document.documentElement
+
+    traySnapTween.current?.kill()
+
+    if (reducedMotion) {
+      trayDragOffset.current = 0
+      scrollingElement.scrollTop = targetScroll
+      traySnapTween.current = null
+      return true
+    }
+
+    const snapMotion = {
+      scroll: window.scrollY,
+      drag: trayDragOffset.current,
+    }
+
+    traySnapTween.current = gsap.to(snapMotion, {
+      scroll: targetScroll,
+      drag: 0,
+      duration: 0.64,
+      ease: 'power3.out',
+      overwrite: true,
+      onUpdate: () => {
+        trayDragOffset.current = snapMotion.drag
+        scrollingElement.scrollTop = snapMotion.scroll
+      },
+      onComplete: () => {
+        trayDragOffset.current = 0
+        traySnapTween.current = null
+      },
+    })
+
+    return true
+  }
+
+  const handleTrayGestureStart = () => {
+    traySnapTween.current?.kill()
+    traySnapTween.current = null
   }
 
   const handleBurgerTap = () => {
@@ -234,7 +291,7 @@ export default function App() {
       <div className="grain" />
       <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} />
       <Hero ref={heroRef} />
-      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} trayDragOffset={trayDragOffset} onTraySwipe={handleTraySwipe} onBurgerTap={handleBurgerTap} />
+      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} trayDragOffset={trayDragOffset} onTrayGestureStart={handleTrayGestureStart} onTraySwipe={handleTraySwipe} onBurgerTap={handleBurgerTap} />
       <MilasSection onOpenMenu={openMenu} />
       <MenuOverlay open={menuOpen} onClose={closeMenu} />
     </main>

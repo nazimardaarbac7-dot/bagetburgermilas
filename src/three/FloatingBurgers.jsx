@@ -20,13 +20,16 @@ const mobileFloatingBurgers = [
 export default function FloatingBurgers({ heroExitProgress }) {
   const group = useRef()
   const burgerGroups = useRef([])
+  const hidden = useRef(false)
   const { size } = useThree()
   const burgers = size.width <= 720 ? mobileFloatingBurgers : floatingBurgers
 
   useFrame((state, delta) => {
     const progress = heroExitProgress.current
-    group.current.visible = progress < 0.999
-    if (!group.current.visible) return
+    if (hidden.current && progress <= 0.97) hidden.current = false
+    if (!hidden.current && progress >= 0.9995) hidden.current = true
+    group.current.visible = !hidden.current
+    if (hidden.current) return
 
     const handoff = THREE.MathUtils.smootherstep(progress, 0, 1)
     const pointerStrength = 1 - handoff

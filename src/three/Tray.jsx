@@ -5,40 +5,43 @@ import Burger from './Burger'
 import { burgers } from '../data/burgers'
 import { getTrayRotationProgress } from '../utils/scrollProgress'
 
-export default function Tray({ scrollProgress, finalTransitionProgress, activeIndex, trayDragOffset, burgerInteraction }) {
+export default function Tray({ heroExitProgress, scrollProgress, finalTransitionProgress, activeIndex, trayDragOffset, burgerInteraction }) {
   const tray = useRef()
   const trayVisual = useRef()
+  const entryVisible = useRef(false)
+  const finalHidden = useRef(false)
   const { size } = useThree()
   const isMobile = size.width <= 720
 
   useFrame((state, delta) => {
     const progress = scrollProgress.current
-    const transitionComplete = finalTransitionProgress.current >= 0.999
-    trayVisual.current.visible = progress > 0.001 && !transitionComplete
-    if (!trayVisual.current.visible) {
-      if (progress <= 0.001) {
-        trayVisual.current.scale.setScalar(0.001)
-        trayVisual.current.position.y = -8.5
-        tray.current.rotation.y = 0
-      }
-      return
-    }
+    const heroProgress = heroExitProgress.current
+    const finalProgress = finalTransitionProgress.current
+    if (!entryVisible.current && (heroProgress >= 0.6 || progress > 0.0005)) entryVisible.current = true
+    if (entryVisible.current && heroProgress <= 0.54 && progress <= 0.0001) entryVisible.current = false
+    if (finalHidden.current && finalProgress <= 0.97) finalHidden.current = false
+    if (!finalHidden.current && finalProgress >= 0.9995) finalHidden.current = true
+    trayVisual.current.visible = entryVisible.current && !finalHidden.current
+    if (!trayVisual.current.visible) return
 
-    const intro = THREE.MathUtils.smoothstep(progress, 0, isMobile ? 0.065 : 0.11)
+    const heroHandoff = THREE.MathUtils.smootherstep(heroProgress, 0.64, 1)
+    const trayEntry = THREE.MathUtils.smootherstep(progress, 0, isMobile ? 0.055 : 0.09)
+    const intro = Math.max(heroHandoff, trayEntry)
     const rotationProgress = getTrayRotationProgress(progress, isMobile)
     const targetRotation = -rotationProgress * (burgers.length - 1) * ((Math.PI * 2) / burgers.length) + trayDragOffset.current
-    const targetScale = 0.08 + intro * 0.92
+    const targetScale = THREE.MathUtils.lerp(0.001, 1, intro)
     const settleSpeed = isMobile ? 4.2 : 2.8
     const currentScale = THREE.MathUtils.damp(trayVisual.current.scale.x, targetScale, settleSpeed, delta)
     tray.current.rotation.y = THREE.MathUtils.damp(tray.current.rotation.y, targetRotation, 4.2, delta)
     trayVisual.current.scale.setScalar(currentScale)
     const settledY = isMobile ? -0.48 : -0.95
-    const targetY = THREE.MathUtils.lerp(-8.5, settledY, intro)
+    const entryY = isMobile ? -6.4 : -7
+    const targetY = THREE.MathUtils.lerp(entryY, settledY, intro)
     trayVisual.current.position.y = THREE.MathUtils.damp(trayVisual.current.position.y, targetY, settleSpeed, delta)
   })
 
   return (
-    <group ref={trayVisual} position={[0, -8.5, 0]} scale={0.001} visible={false}>
+    <group ref={trayVisual} position={[0, -8.5, 0]} scale={0.001}>
       <group ref={tray}>
         <mesh receiveShadow>
           <cylinderGeometry args={[5.55, 5.55, 0.34, 80]} />
@@ -62,6 +65,7 @@ export default function Tray({ scrollProgress, finalTransitionProgress, activeIn
             accent={burger.accent}
             interactionPulse={burgerInteraction}
             sceneProgress={scrollProgress}
+            sceneEntryProgress={heroExitProgress}
             pickupTarget={index === burgers.length - 1}
             pickupProgress={scrollProgress}
             finalTransitionProgress={finalTransitionProgress}
