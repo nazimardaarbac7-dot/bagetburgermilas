@@ -27,8 +27,8 @@ export default function MilasSection() {
           ))}
         </div>
         <div className="milas-copy">
-          <p className="eyebrow">A LOCAL OBSESSION</p>
-          <h2>MADE<br />IN MİLAS</h2>
+          <p className="eyebrow">YEREL BİR TUTKU</p>
+          <h2>MİLAS'TA<br />EL<br />YAPIMI</h2>
           <img
             className="bitten-burger"
             src="/assets/burgers/baldicanli-burger-bitten.png"
@@ -45,7 +45,7 @@ export default function MilasSection() {
         <a href="tel:+905498232020">0549 823 20 20</a>
         <a className="directions" href="https://maps.google.com/?q=Baget+Burger+Milas" target="_blank" rel="noreferrer">YOL TARİFİ <span>↗</span></a>
       </div>
-      <p className="footer-note">GOOD FOOD, NO SHORTCUTS <span>✦</span> GOOD FOOD, NO SHORTCUTS</p>
+      <p className="footer-note">İYİ YEMEK, TAVİZ YOK <span>✦</span> İYİ YEMEK, TAVİZ YOK</p>
     </section>
   )
 }
