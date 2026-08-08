@@ -104,8 +104,8 @@ export default function App() {
         autoAlpha: 1,
         y: 0,
         rotation: (index, element) => Number(element.dataset.rotation),
-        duration: 1.44,
-        stagger: 0.28,
+        duration: 1.584,
+        stagger: 0.308,
         ease: 'power3.out',
         scrollTrigger: {
           trigger: '#milas',
