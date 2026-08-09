@@ -25,13 +25,13 @@ export default function Tray({ trayEntryProgress, scrollProgress, finalTransitio
     trayVisual.current.visible = entryVisible.current && !finalHidden.current
     if (!trayVisual.current.visible) return
 
-    const heroHandoff = THREE.MathUtils.smootherstep(entryProgress, 0, 1)
+    const heroHandoff = entryProgress
     const trayEntry = THREE.MathUtils.smootherstep(progress, 0, isMobile ? 0.055 : 0.09)
     const intro = Math.max(heroHandoff, trayEntry)
     const heroTransitionActive = entryProgress > 0.0001 && entryProgress < 0.9999
     const rotationProgress = getTrayRotationProgress(progress, isMobile)
     const targetRotation = -rotationProgress * (burgers.length - 1) * ((Math.PI * 2) / burgers.length)
-    const targetScale = THREE.MathUtils.lerp(0.001, 1, intro)
+    const targetScale = THREE.MathUtils.lerp(isMobile ? 0.72 : 0.68, 1, intro)
     const settleSpeed = isMobile ? 4.2 : 2.8
     const rotationSpeed = isMobile ? 8.5 : 5.5
     const currentScale = heroTransitionActive
@@ -40,7 +40,7 @@ export default function Tray({ trayEntryProgress, scrollProgress, finalTransitio
     tray.current.rotation.y = THREE.MathUtils.damp(tray.current.rotation.y, targetRotation, rotationSpeed, smoothDelta)
     trayVisual.current.scale.setScalar(currentScale)
     const settledY = isMobile ? -0.48 : -0.95
-    const entryY = isMobile ? -6.4 : -7
+    const entryY = isMobile ? -4.3 : -5.2
     const targetY = THREE.MathUtils.lerp(entryY, settledY, intro)
     trayVisual.current.position.y = heroTransitionActive
       ? targetY

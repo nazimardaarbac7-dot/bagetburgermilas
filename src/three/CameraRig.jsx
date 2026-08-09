@@ -20,7 +20,7 @@ export default function CameraRig({ heroExitProgress, trayEntryProgress, scrollP
     const isMobile = size.width <= 720
     const heroProgress = heroExitProgress.current
     const entryProgress = trayEntryProgress.current
-    const heroHandoff = THREE.MathUtils.smootherstep(entryProgress, 0, 1)
+    const heroHandoff = entryProgress
     const trayEntry = THREE.MathUtils.smootherstep(progress, 0, isMobile ? 0.065 : 0.11)
     const trayAmount = Math.max(heroHandoff, trayEntry)
     const ending = THREE.MathUtils.smoothstep(getHandPickupProgress(progress), 0, 1)
