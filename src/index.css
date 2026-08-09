@@ -264,7 +264,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
   .milas-copy { order: 2; margin-top: 78px; }
   .milas-section h2 { font-size: clamp(4.6rem, 22vw, 8rem); }
   .bitten-burger { width: min(72vw, 270px); margin: -160px -18px 0 auto; transform: rotate(-7deg); }
-  .menu-cta { width: min(53vw, 204px); margin: 48px 0 0 24px; }
+  .menu-cta { width: min(53vw, 204px); margin: 64px 0 0 24px; }
   .menu-cta-label { font-size: 1.05rem; }
   .reviews-composition { min-height: 535px; margin-top: 0; }
   .reviews-label { left: 0; width: 100%; }
