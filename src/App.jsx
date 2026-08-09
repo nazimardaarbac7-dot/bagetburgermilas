@@ -17,7 +17,7 @@ const ACTIVE_INDEX_HYSTERESIS = 0.08
 const HERO_TRANSITION_DURATION = 2.35
 const HERO_COPY_EXIT_DURATION = 1.16
 const TRAY_ENTRY_START = 1.08
-const TRAY_ENTRY_DURATION = 1.62
+const TRAY_ENTRY_DURATION = 1.46
 const TRAY_INFO_REVEAL_PROGRESS = 0.72
 
 function getStableBurgerIndex(rotationProgress, currentIndex) {
