@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { getHandPickupProgress } from '../utils/scrollProgress'
 
-export default function CameraRig({ heroExitProgress, scrollProgress }) {
+export default function CameraRig({ heroExitProgress, trayEntryProgress, scrollProgress }) {
   const { camera, size, viewport } = useThree()
   const target = useRef(new THREE.Vector3(0, 0.25, 0))
   const desired = useRef(new THREE.Vector3())
@@ -19,7 +19,8 @@ export default function CameraRig({ heroExitProgress, scrollProgress }) {
     const progress = scrollProgress.current
     const isMobile = size.width <= 720
     const heroProgress = heroExitProgress.current
-    const heroHandoff = THREE.MathUtils.smootherstep(heroProgress, 0.47, 1)
+    const entryProgress = trayEntryProgress.current
+    const heroHandoff = THREE.MathUtils.smootherstep(entryProgress, 0, 1)
     const trayEntry = THREE.MathUtils.smootherstep(progress, 0, isMobile ? 0.065 : 0.11)
     const trayAmount = Math.max(heroHandoff, trayEntry)
     const ending = THREE.MathUtils.smoothstep(getHandPickupProgress(progress), 0, 1)
@@ -32,7 +33,8 @@ export default function CameraRig({ heroExitProgress, scrollProgress }) {
       THREE.MathUtils.lerp(heroZ, trayZ - ending * 1.75, trayAmount),
     )
     desiredTarget.current.set(0, THREE.MathUtils.lerp(0.25, 0.08, trayAmount) + ending * 0.2, 0)
-    const heroTransitionActive = heroProgress > 0.0001 && heroProgress < 0.9999
+    const heroTransitionActive = (heroProgress > 0.0001 && heroProgress < 0.9999)
+      || (entryProgress > 0.0001 && entryProgress < 0.9999)
     const cameraEase = 1 - Math.exp(-smoothDelta * (isMobile ? 3.1 : 1.9))
     const targetEase = 1 - Math.exp(-smoothDelta * (isMobile ? 4.4 : 3.2))
 

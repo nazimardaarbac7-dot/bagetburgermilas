@@ -16,8 +16,9 @@ ScrollTrigger.config({ ignoreMobileResize: true })
 const ACTIVE_INDEX_HYSTERESIS = 0.08
 const HERO_TRANSITION_DURATION = 2.35
 const HERO_COPY_EXIT_DURATION = 1.16
-const HERO_TRAY_REVEAL_PROGRESS = 0.47
-const HERO_INFO_REVEAL_PROGRESS = 0.87
+const TRAY_ENTRY_START = 1.22
+const TRAY_ENTRY_DURATION = 1.48
+const TRAY_INFO_REVEAL_PROGRESS = 0.72
 
 function getStableBurgerIndex(rotationProgress, currentIndex) {
   const position = rotationProgress * (burgers.length - 1)
@@ -35,6 +36,7 @@ function getStableBurgerIndex(rotationProgress, currentIndex) {
 
 export default function App() {
   const heroExitProgress = useRef(0)
+  const trayEntryProgress = useRef(0)
   const scrollProgress = useRef(0)
   const finalTransitionProgress = useRef(0)
   const trayTriggerRef = useRef(null)
@@ -126,13 +128,15 @@ export default function App() {
       }
 
       const heroMotion = { progress: 0 }
+      const trayEntryMotion = { progress: 0 }
       const heroTimeline = gsap.timeline({
         paused: true,
         onUpdate: () => {
           if (heroScrollLocked) scrollingElement.scrollTop = heroScrollAnchor
           heroExitProgress.current = heroMotion.progress
-          const trayVisible = heroMotion.progress >= HERO_TRAY_REVEAL_PROGRESS
-          const infoVisible = heroMotion.progress >= HERO_INFO_REVEAL_PROGRESS
+          trayEntryProgress.current = trayEntryMotion.progress
+          const trayVisible = trayEntryMotion.progress > 0.001
+          const infoVisible = trayEntryMotion.progress >= TRAY_INFO_REVEAL_PROGRESS
           setShowcaseVisibility(infoVisible, trayVisible)
         },
         onComplete: () => {
@@ -143,6 +147,7 @@ export default function App() {
           traySettledIndex.current = 0
           finalSceneRequested.current = false
           finalTransitionProgress.current = 0
+          trayEntryProgress.current = 1
           setDisplayedBurger(0)
           scrollProgress.current = firstTrayProgress
 
@@ -160,6 +165,7 @@ export default function App() {
           traySettledIndex.current = 0
           finalSceneRequested.current = false
           finalTransitionProgress.current = 0
+          trayEntryProgress.current = 0
           setDisplayedBurger(0)
           scrollProgress.current = 0
           jumpToScroll(0)
@@ -172,6 +178,12 @@ export default function App() {
         duration: HERO_TRANSITION_DURATION,
         ease: 'power2.inOut',
       }, 0)
+
+      heroTimeline.to(trayEntryMotion, {
+        progress: 1,
+        duration: TRAY_ENTRY_DURATION,
+        ease: 'power2.inOut',
+      }, TRAY_ENTRY_START)
 
       heroTimeline.to('.hero-copy', {
         scale: 1.06,
@@ -508,7 +520,7 @@ export default function App() {
 
   return (
     <main className={heroTransitioning ? 'is-hero-transitioning' : undefined}>
-      <Experience heroExitProgress={heroExitProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} burgerInteraction={burgerInteraction} onReady={handleSceneReady} />
+      <Experience heroExitProgress={heroExitProgress} trayEntryProgress={trayEntryProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} burgerInteraction={burgerInteraction} onReady={handleSceneReady} />
       <div className={`scene-curtain${sceneReady ? ' is-hidden' : ''}`} aria-hidden="true" />
       <div className="grain" />
       <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} />
