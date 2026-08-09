@@ -13,6 +13,11 @@ const burgerPhotoPaths = [
   '/assets/burgers/baldicanli-burger-cutout.webp',
 ]
 
+// Cutout files have different amounts of transparent padding. These values
+// normalize their visible footprint on the shared plane without changing the
+// tray or active-burger scale.
+const burgerPhotoScales = [1, 1, 1.22, 1.04, 1.12, 1.05]
+
 const handTexturePath = '/assets/interaction/hand-grab.webp'
 const drumstickTexturePath = '/assets/interaction/drumstick-confetti.webp'
 const DRUMSTICKS_PER_BURST = 12
@@ -133,7 +138,7 @@ function ClassicBunSpeckles() {
 
 function BurgerPhoto({ index }) {
   const texture = useTexture(burgerPhotoPaths[index])
-  const photoScale = index === 2 ? 1.18 : 1
+  const photoScale = burgerPhotoScales[index] ?? 1
 
   useLayoutEffect(() => {
     texture.colorSpace = THREE.SRGBColorSpace
