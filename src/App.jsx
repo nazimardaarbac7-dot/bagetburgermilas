@@ -371,7 +371,7 @@ export default function App() {
         if (!trayTrigger) return false
         const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress, mobileTray)
         const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START, mobileTray)
-        const dragSensitivity = mobileTray ? 4.25 : 3.15
+        const dragSensitivity = mobileTray ? 4.4 : 3.15
         const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * dragSensitivity))
         jumpToScroll(targetScroll)
         return true
