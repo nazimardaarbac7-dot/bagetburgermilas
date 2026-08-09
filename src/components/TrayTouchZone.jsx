@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 
-export default function TrayTouchZone({ enabled, onSwipe, onTap }) {
+export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap }) {
   const gesture = useRef(null)
   const suppressClick = useRef(false)
 
@@ -15,6 +15,7 @@ export default function TrayTouchZone({ enabled, onSwipe, onTap }) {
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
+      lastX: event.clientX,
       axis: null,
     }
   }
@@ -40,17 +41,18 @@ export default function TrayTouchZone({ enabled, onSwipe, onTap }) {
 
     if (current.axis !== 'horizontal') return
     event.preventDefault()
+    const movementX = event.clientX - current.lastX
+    current.lastX = event.clientX
+    onDrag(movementX)
   }
 
   const handlePointerUp = (event) => {
     const current = gesture.current
     if (!current || current.pointerId !== event.pointerId) return
 
-    const deltaX = event.clientX - current.startX
     if (current.axis === 'horizontal') {
-      const swipeThreshold = Math.max(22, Math.min(30, event.currentTarget.clientWidth * 0.065))
-      suppressClick.current = Math.abs(deltaX) > 10
-      if (Math.abs(deltaX) >= swipeThreshold) onSwipe(deltaX < 0 ? 1 : -1)
+      suppressClick.current = Math.abs(event.clientX - current.startX) > 10
+      onDragEnd()
     }
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -60,6 +62,7 @@ export default function TrayTouchZone({ enabled, onSwipe, onTap }) {
   }
 
   const handlePointerCancel = () => {
+    if (gesture.current?.axis === 'horizontal') onDragEnd()
     resetGesture()
   }
 

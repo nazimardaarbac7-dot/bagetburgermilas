@@ -28,7 +28,7 @@ function World({ heroExitProgress, trayEntryProgress, scrollProgress, finalTrans
     <Environment preset="city" environmentIntensity={0.3} />
     <FloatingBurgers heroExitProgress={heroExitProgress} />
     <Tray trayEntryProgress={trayEntryProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} burgerInteraction={burgerInteraction} />
-    <CameraRig heroExitProgress={heroExitProgress} trayEntryProgress={trayEntryProgress} scrollProgress={scrollProgress} />
+    <CameraRig heroExitProgress={heroExitProgress} trayEntryProgress={trayEntryProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} />
     <Preload all />
     <SceneReady onReady={onReady} />
   </>

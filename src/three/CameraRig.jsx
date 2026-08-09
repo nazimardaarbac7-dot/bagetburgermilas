@@ -1,9 +1,9 @@
 import React, { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { getHandPickupProgress } from '../utils/scrollProgress'
+import { getHandLiftProgress } from '../utils/scrollProgress'
 
-export default function CameraRig({ heroExitProgress, trayEntryProgress, scrollProgress }) {
+export default function CameraRig({ heroExitProgress, trayEntryProgress, scrollProgress, finalTransitionProgress }) {
   const { camera, size, viewport } = useThree()
   const target = useRef(new THREE.Vector3(0, 0.25, 0))
   const desired = useRef(new THREE.Vector3())
@@ -23,7 +23,7 @@ export default function CameraRig({ heroExitProgress, trayEntryProgress, scrollP
     const heroHandoff = entryProgress
     const trayEntry = THREE.MathUtils.smootherstep(progress, 0, isMobile ? 0.065 : 0.11)
     const trayAmount = Math.max(heroHandoff, trayEntry)
-    const ending = THREE.MathUtils.smoothstep(getHandPickupProgress(progress), 0, 1)
+    const ending = THREE.MathUtils.smoothstep(getHandLiftProgress(finalTransitionProgress.current), 0, 1)
     const compact = viewport.width < 7
     const heroZ = compact ? 15.5 : 13.4
     const trayZ = compact ? 15.2 : 13.1

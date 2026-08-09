@@ -74,7 +74,7 @@ export default function Tray({ trayEntryProgress, scrollProgress, finalTransitio
             sceneProgress={scrollProgress}
             sceneEntryProgress={trayEntryProgress}
             pickupTarget={index === burgers.length - 1}
-            pickupProgress={scrollProgress}
+            pickupProgress={finalTransitionProgress}
             finalTransitionProgress={finalTransitionProgress}
             position={[Math.sin(angle) * radius, 0.5, Math.cos(angle) * radius]}
             facingAngle={angle}

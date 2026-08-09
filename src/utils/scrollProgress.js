@@ -1,8 +1,7 @@
 export const TRAY_SETTLE_END = 0.17
 export const MOBILE_TRAY_SETTLE_END = 0.075
-export const TRAY_ROTATION_END = 0.94
-export const HAND_PICKUP_START = 0.936
-export const HAND_PICKUP_END = 1
+export const TRAY_ROTATION_END = 0.62
+export const FINAL_TRANSITION_START = TRAY_ROTATION_END
 
 const DESKTOP_FIRST_ROTATION_START = TRAY_SETTLE_END
 const MOBILE_FIRST_ROTATION_START = MOBILE_TRAY_SETTLE_END
@@ -26,6 +25,16 @@ export function getTrayProgressForBurger(index, burgerCount, isMobile = false) {
 }
 
 export function getHandPickupProgress(progress) {
-  const normalized = (progress - HAND_PICKUP_START) / (HAND_PICKUP_END - HAND_PICKUP_START)
+  const normalized = progress / 0.38
+  return Math.min(1, Math.max(0, normalized))
+}
+
+export function getHandLiftProgress(progress) {
+  const normalized = (progress - 0.44) / 0.48
+  return Math.min(1, Math.max(0, normalized))
+}
+
+export function getFinalTransitionProgress(progress) {
+  const normalized = (progress - FINAL_TRANSITION_START) / (1 - FINAL_TRANSITION_START)
   return Math.min(1, Math.max(0, normalized))
 }

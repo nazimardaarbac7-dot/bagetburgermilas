@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import { getHandPickupProgress } from '../utils/scrollProgress'
+import { getHandLiftProgress, getHandPickupProgress } from '../utils/scrollProgress'
 
 const burgerPhotoPaths = [
   '/assets/burgers/hamburger-classic-cutout.png',
@@ -502,9 +502,7 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
     tapEnergy.current = THREE.MathUtils.damp(tapEnergy.current, 0, 7, smoothDelta)
 
     const pickup = pickupTarget && pickupProgress ? getHandPickupProgress(pickupProgress.current) : 0
-    const lift = pickupTarget && finalTransitionProgress
-      ? THREE.MathUtils.smootherstep(finalTransitionProgress.current, 0, 0.78)
-      : 0
+    const lift = pickupTarget && finalTransitionProgress ? getHandLiftProgress(finalTransitionProgress.current) : 0
 
     const targetScale = isFloating ? floatingScale : isActive ? 1.12 + tapEnergy.current * 0.1 + lift * 0.045 : 0.84
     const nextScale = THREE.MathUtils.damp(group.current.scale.x, targetScale, 4, smoothDelta)

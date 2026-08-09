@@ -333,3 +333,19 @@ c7bc7d2 Convert scene navigation to digital transitions
 4. Onaylı süreleri veya dijital hero girişini değiştirme.
 5. Kullanıcı isterse sıradaki görev olan **tepsiden heroya dijital geri dönüşü** uygula.
 
+## 14. 9 Ağustos 2026 — navigasyon mimarisi güncellemesi
+
+Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yerine geçer.
+
+- Hero ↔ tepsi geçişi dijital ve sabit süreli kalır.
+- Tepsi burger navigasyonu artık analogdur: doğal dikey scroll ve mobil yatay sürükleme tepsiyi sürekli döndürür.
+- Girdi durduğunda tepsi en yakın burger durağına kısa ve yumuşak bir snap ile yerleşir.
+- Burger bilgi katmanı yalnızca tepsi bir burger durağına yerleştiğinde görünür.
+- Tepsi dönüş aralığı showcase progress'inde mobilde `0.075 → 0.62`, masaüstünde `0.17 → 0.62` aralığıdır.
+- Showcase yüksekliği mobil ve masaüstünde `720vh` olarak ayarlanmıştır.
+- Son burger → Made in Milas geçişi dijital değildir. Showcase progress'inin son `0.62 → 1` bölümü gerçek scroll progress'iyle çalışır ve yaklaşık `300vh` mesafe sağlar.
+- Final akışı üç fazlıdır: el yaklaşır (`0 → 0.38`), kısa kavrama aralığı oluşur (`0.38 → 0.44`), burger kaldırılır (`0.44 → 0.92`).
+- Made in Milas bölümü doğal sayfa scroll'u ile el/burger çıkışının ikinci yarısında yükselir.
+- Yukarı kaydırma aynı progress'i tersine çevirdiği için Milas → son burger dönüşünde ayrı dijital komut veya ters tween yoktur.
+- Geri dönüş sonunda burger tepsiye yerleşir, `05 — 05` bilgisi ve tepsi etkileşimi yeniden açılır.
+- Hero → tepsi girişinde tepsi render'a ekranın tamamen altında başlar (`Y`: mobil `-8.5`, masaüstü `-9.5`) ve fiziksel olarak aşağıdan gelir.
