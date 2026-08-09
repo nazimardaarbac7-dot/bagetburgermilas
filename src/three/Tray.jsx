@@ -18,7 +18,7 @@ export default function Tray({ trayEntryProgress, scrollProgress, finalTransitio
     const progress = scrollProgress.current
     const entryProgress = trayEntryProgress.current
     const finalProgress = finalTransitionProgress.current
-    if (!entryVisible.current && (entryProgress > 0.001 || progress > 0.0005)) entryVisible.current = true
+    if (!entryVisible.current && (entryProgress > 0.00001 || progress > 0.0005)) entryVisible.current = true
     if (entryVisible.current && entryProgress <= 0.001 && progress <= 0.0001) entryVisible.current = false
     if (finalHidden.current && finalProgress <= 0.97) finalHidden.current = false
     if (!finalHidden.current && finalProgress >= 0.9995) finalHidden.current = true
@@ -40,7 +40,7 @@ export default function Tray({ trayEntryProgress, scrollProgress, finalTransitio
     tray.current.rotation.y = THREE.MathUtils.damp(tray.current.rotation.y, targetRotation, rotationSpeed, smoothDelta)
     trayVisual.current.scale.setScalar(currentScale)
     const settledY = isMobile ? -0.48 : -0.95
-    const entryY = isMobile ? -4.3 : -5.2
+    const entryY = isMobile ? -5.5 : -6.2
     const targetY = THREE.MathUtils.lerp(entryY, settledY, intro)
     trayVisual.current.position.y = heroTransitionActive
       ? targetY
