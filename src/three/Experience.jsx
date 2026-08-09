@@ -5,6 +5,20 @@ import CameraRig from './CameraRig'
 import FloatingBurgers from './FloatingBurgers'
 import Tray from './Tray'
 
+function getMobileRenderProfile() {
+  const memory = navigator.deviceMemory
+  const cores = navigator.hardwareConcurrency
+  const constrainedDevice = (Number.isFinite(memory) && memory <= 2)
+    || (Number.isFinite(cores) && cores <= 4)
+
+  if (constrainedDevice) return { dpr: 1, antialias: false }
+
+  return {
+    dpr: Math.min(Math.max(window.devicePixelRatio || 1, 1), 1.3),
+    antialias: true,
+  }
+}
+
 function SceneReady({ onReady }) {
   const reported = useRef(false)
 
@@ -52,6 +66,7 @@ function World({ heroExitProgress, trayEntryProgress, scrollProgress, finalTrans
 
 function Experience({ heroExitProgress, trayEntryProgress, scrollProgress, finalTransitionProgress, activeIndex, burgerInteraction, onReady, paused = false }) {
   const [mobileOptimized, setMobileOptimized] = useState(() => window.matchMedia('(max-width: 720px)').matches)
+  const [mobileRenderProfile] = useState(getMobileRenderProfile)
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [pageVisible, setPageVisible] = useState(() => document.visibilityState !== 'hidden')
 
@@ -81,7 +96,7 @@ function Experience({ heroExitProgress, trayEntryProgress, scrollProgress, final
   return (
     <div className="canvas-wrap" aria-hidden="true">
       <SceneErrorBoundary onError={onReady}>
-        <Canvas fallback={<SceneFallback />} frameloop={paused || !pageVisible ? 'demand' : 'always'} key={mobileOptimized ? 'mobile' : 'desktop'} dpr={mobileOptimized ? 1 : [1, 1.5]} shadows={!mobileOptimized} camera={{ position: [0, 0.3, 13.4], fov: 38 }} gl={{ antialias: !mobileOptimized, powerPreference: 'high-performance', stencil: false }}>
+        <Canvas fallback={<SceneFallback />} frameloop={paused || !pageVisible ? 'demand' : 'always'} key={mobileOptimized ? 'mobile' : 'desktop'} dpr={mobileOptimized ? mobileRenderProfile.dpr : [1, 1.5]} shadows={!mobileOptimized} camera={{ position: [0, 0.3, 13.4], fov: 38 }} gl={{ antialias: mobileOptimized ? mobileRenderProfile.antialias : true, powerPreference: 'high-performance', stencil: false }}>
           <World heroExitProgress={heroExitProgress} trayEntryProgress={trayEntryProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} burgerInteraction={burgerInteraction} onReady={onReady} mobileOptimized={mobileOptimized} reducedMotion={reducedMotion} />
         </Canvas>
       </SceneErrorBoundary>
