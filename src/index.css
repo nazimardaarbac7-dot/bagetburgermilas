@@ -148,7 +148,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
 .menu-category-nav button:hover, .menu-category-nav button:focus-visible { color: #f5ead7; background: rgba(245, 234, 215, .055); outline: none; }
 .menu-category-nav button.is-active { background: #de860b; color: #183d3f; }
 .menu-category-nav button.is-active span { color: #183d3f; opacity: .58; }
-.menu-dialog-content { position: relative; z-index: 1; min-height: 0; padding: clamp(28px, 3.5vw, 54px) clamp(28px, 5vw, 80px) 48px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #de860b rgba(245, 234, 215, .08); }
+.menu-dialog-content { position: relative; z-index: 1; min-height: 0; padding: clamp(28px, 3.5vw, 54px) clamp(28px, 5vw, 80px) 132px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #de860b rgba(245, 234, 215, .08); }
 .menu-category-section { padding-bottom: clamp(62px, 8vw, 112px); scroll-margin-top: 18px; }
 .menu-category-section + .menu-category-section { padding-top: clamp(44px, 6vw, 82px); border-top: 1px solid rgba(245, 234, 215, .16); }
 .menu-category-section:last-child { padding-bottom: 18px; }
@@ -166,11 +166,11 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
 .menu-product strong { color: #f2a42b; font-family: 'Archivo Black', Impact, sans-serif; font-size: clamp(1.45rem, 2vw, 2rem); line-height: .9; letter-spacing: -.055em; white-space: nowrap; }
 .menu-product strong small { margin-right: 3px; font: 500 .42em/1 'DM Mono', monospace; vertical-align: top; }
 @keyframes menuItemHit { from { opacity: 0; transform: translateY(28px) rotate(.35deg); } to { opacity: 1; transform: translateY(0) rotate(0); } }
-.menu-dialog-footer { position: relative; z-index: 3; min-height: 72px; padding: 10px clamp(28px, 5vw, 80px); display: flex; align-items: center; justify-content: space-between; gap: 24px; background: #122f31; border-top: 1px solid rgba(245, 234, 215, .13); }
-.menu-dialog-footer p { margin: 0; color: rgba(245, 234, 215, .5); font: 500 .52rem/1 'DM Mono', monospace; letter-spacing: .15em; }
-.menu-dialog-footer a { min-width: 245px; min-height: 50px; padding: 0 8px 0 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; background: #de860b; color: #183d3f; font: 600 .56rem/1 'DM Mono', monospace; letter-spacing: .12em; transition: background .25s ease, transform .25s ease; }
+.menu-dialog-footer { position: absolute; z-index: 7; right: clamp(20px, 3vw, 46px); bottom: calc(20px + env(safe-area-inset-bottom)); width: auto; height: auto; padding: 0; pointer-events: none; }
+.menu-dialog-footer p { display: none; }
+.menu-dialog-footer a { width: 88px; height: 88px; min-width: 0; min-height: 0; padding: 0; border-radius: 50%; display: grid; place-content: center; justify-items: center; gap: 5px; pointer-events: auto; background: #de860b; color: #183d3f; font: 700 .61rem/1 'DM Mono', monospace; letter-spacing: .1em; box-shadow: 0 13px 34px rgba(4, 17, 18, .38); transition: background .25s ease, transform .25s ease; }
 .menu-dialog-footer a:hover, .menu-dialog-footer a:focus-visible { background: #f2a42b; transform: translateY(-2px); outline: none; }
-.menu-dialog-footer a i { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #183d3f; color: #f2a42b; font: normal 1rem/1 Manrope, sans-serif; }
+.menu-dialog-footer a i { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: #183d3f; color: #f2a42b; font: normal 1rem/1 Manrope, sans-serif; }
 .menu-dialog-footer a i svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: square; stroke-linejoin: miter; }
 
 .discount-popup { position: fixed; z-index: 90; inset: 0; display: grid; place-items: center; padding: 24px; }
@@ -271,7 +271,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
   .menu-category-nav { min-height: 51px; padding: 0 70px 0 20px; }
   .menu-category-nav button { min-height: 51px; padding: 0 17px; font-size: .56rem; }
   .menu-category-nav button span { margin-right: 9px; }
-  .menu-dialog-content { padding: 27px 20px 38px; }
+  .menu-dialog-content { padding: 27px 20px 116px; }
   .menu-category-heading { margin-bottom: 27px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 13px; }
   .menu-category-heading > div > p { margin-bottom: 9px; font-size: .55rem; }
   .menu-category-heading h3 { font-size: clamp(2.45rem, 12vw, 3.2rem); }
@@ -287,11 +287,9 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
   .menu-product h4 { font-size: .96rem; line-height: 1.05; }
   .menu-product p { margin-top: 8px; font-size: .68rem; line-height: 1.48; }
   .menu-product strong { font-size: 1.42rem; }
-  .menu-dialog-footer { min-height: calc(68px + env(safe-area-inset-bottom)); padding: 9px 20px calc(9px + env(safe-area-inset-bottom)); }
-  .menu-dialog-footer p { display: none; }
-  .menu-dialog-footer { justify-content: center; }
-  .menu-dialog-footer a { width: min(100%, 286px); min-width: 0; min-height: 44px; padding-left: 15px; font-size: .56rem; }
-  .menu-dialog-footer a i { width: 30px; height: 30px; }
+  .menu-dialog-footer { right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); }
+  .menu-dialog-footer a { width: 74px; height: 74px; font-size: .56rem; }
+  .menu-dialog-footer a i { width: 22px; height: 22px; }
   .discount-popup { padding: 20px; }
   .discount-popup-card { width: min(350px, calc(100vw - 40px)); }
   .discount-popup-close { top: 10px; right: 10px; width: 44px; height: 44px; font-size: 1.55rem; }

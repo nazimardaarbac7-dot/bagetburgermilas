@@ -151,8 +151,8 @@ export default function MenuOverlay({ open, onClose }) {
 
         <footer className="menu-dialog-footer">
           <p>GÜNCEL STOK VE SİPARİŞ İÇİN</p>
-          <a href={GETIR_MENU_URL} target="_blank" rel="noreferrer">
-            <span>GETİR'DEN SİPARİŞ VER</span>
+          <a href={GETIR_MENU_URL} target="_blank" rel="noreferrer" aria-label="Getir'den sipariş ver">
+            <span>GETİR</span>
             <i aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
                 <path d="M7 17 17 7M9 7h8v8" />

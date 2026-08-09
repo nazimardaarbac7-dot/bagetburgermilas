@@ -318,8 +318,8 @@ export default function App() {
         const snapMotion = { scroll: scrollingElement.scrollTop }
         traySnapTween.current = gsap.to(snapMotion, {
           scroll: targetScroll,
-          duration: reduceMotion ? 0.01 : Math.min(0.52, Math.max(0.28, distance / window.innerHeight * 0.34)),
-          ease: 'power2.out',
+          duration: reduceMotion ? 0.01 : Math.min(0.32, Math.max(0.16, distance / window.innerHeight * 0.22)),
+          ease: 'power3.out',
           onUpdate: () => {
             scrollingElement.scrollTop = snapMotion.scroll
             ScrollTrigger.update()
@@ -348,7 +348,7 @@ export default function App() {
         traySnapTimer = window.setTimeout(() => {
           traySnapTimer = null
           snapTrayToNearest()
-        }, 150)
+        }, mobileScene ? 70 : 100)
       }
 
       adjustTrayProgress.current = (movementX) => {
