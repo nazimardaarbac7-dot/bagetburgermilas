@@ -52,15 +52,15 @@ export default function Tray({ trayEntryProgress, scrollProgress, finalTransitio
       <group ref={tray}>
         <mesh receiveShadow>
           <cylinderGeometry args={[5.55, 5.55, 0.34, 80]} />
-          <meshStandardMaterial color="#252327" metalness={0.93} roughness={0.29} />
+          <meshStandardMaterial color={mobileOptimized ? '#686a6c' : '#252327'} metalness={mobileOptimized ? 0.22 : 0.93} roughness={mobileOptimized ? 0.58 : 0.29} />
         </mesh>
         <mesh position={[0, 0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <torusGeometry args={[5.3, 0.16, 12, 72]} />
-          <meshStandardMaterial color="#8a7164" metalness={1} roughness={0.22} />
+          <meshStandardMaterial color={mobileOptimized ? '#b4aaa2' : '#8a7164'} metalness={mobileOptimized ? 0.36 : 1} roughness={mobileOptimized ? 0.4 : 0.22} />
         </mesh>
         <mesh position={[0, 0.205, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
           <circleGeometry args={[5.27, 80]} />
-          <meshStandardMaterial color="#312b2b" metalness={0.72} roughness={0.43} />
+          <meshStandardMaterial color={mobileOptimized ? '#626466' : '#312b2b'} metalness={mobileOptimized ? 0.18 : 0.72} roughness={mobileOptimized ? 0.6 : 0.43} />
         </mesh>
         {burgers.map((burger, index) => {
           const angle = (index / burgers.length) * Math.PI * 2

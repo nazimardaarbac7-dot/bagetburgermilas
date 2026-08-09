@@ -21,10 +21,10 @@ function World({ heroExitProgress, trayEntryProgress, scrollProgress, finalTrans
   return <>
     <color attach="background" args={['#1d4042']} />
     <fog attach="fog" args={['#1d4042', 13, 28]} />
-    <ambientLight intensity={0.36} color="#f5d49b" />
-    <directionalLight castShadow={!mobileOptimized} intensity={mobileOptimized ? 2.4 : 3.15} color="#ffd18a" position={[5, 9, 6]} shadow-mapSize={[1024, 1024]} shadow-camera-left={-10} shadow-camera-right={10} shadow-camera-top={10} shadow-camera-bottom={-10} />
+    <ambientLight intensity={mobileOptimized ? 0.48 : 0.36} color={mobileOptimized ? '#ffffff' : '#f5d49b'} />
+    <directionalLight castShadow={!mobileOptimized} intensity={mobileOptimized ? 2.4 : 3.15} color={mobileOptimized ? '#fff3dd' : '#ffd18a'} position={[5, 9, 6]} shadow-mapSize={[1024, 1024]} shadow-camera-left={-10} shadow-camera-right={10} shadow-camera-top={10} shadow-camera-bottom={-10} />
     {!mobileOptimized && <spotLight intensity={49} angle={0.48} penumbra={0.82} color="#de860b" position={[-8, 7, -4]} target-position={[0, 0, 0]} />}
-    <pointLight intensity={mobileOptimized ? 8 : 17} distance={16} color="#f2a42b" position={[0, 3, 5]} />
+    <pointLight intensity={mobileOptimized ? 6 : 17} distance={16} color={mobileOptimized ? '#d9e3df' : '#f2a42b'} position={[0, 3, 5]} />
     {!mobileOptimized && <Environment preset="city" environmentIntensity={0.3} />}
     <FloatingBurgers heroExitProgress={heroExitProgress} mobileOptimized={mobileOptimized} />
     <Tray trayEntryProgress={trayEntryProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} burgerInteraction={burgerInteraction} mobileOptimized={mobileOptimized} />

@@ -358,3 +358,5 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Mobil Canvas DPR değeri `1` olur; antialias, WebGL gölgeleri, environment haritası, hero burger başına ek nokta ışıkları ve tepsi burgerlerinin beş ayrı vurgu ışığı kapatılır.
 - Mobilde tam ekran gren katmanının pahalı `screen` blend işlemi ve burger bilgi geçişlerindeki blur filtresi kaldırılır.
 - Mobil 375×844 yerel testte hero, hero → tepsi, analog burger rotasyonu, son burger → Milas ve Milas → son burger geri dönüşü doğrulandı; konsolda warning/error yoktu.
+- Environment haritası mobilde kapalı kaldığı için tepsinin yüksek metalness değerleri siyaha yakın görünmemelidir; mobil tepsi malzemeleri daha açık metalik gri/kahverengi ve daha düşük metalness değerleri kullanır.
+- Mobil yatay tepsi sürükleme katsayısı `2.35` yerine `3.15` oldu. Bir burgerlik hareket yaklaşık `%25` daha kısa parmak mesafesiyle tamamlanır; doğal dikey scroll ve final el geçişi mesafeleri değişmez.

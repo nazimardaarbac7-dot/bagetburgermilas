@@ -263,7 +263,7 @@ export default function App() {
         if (!trayTrigger) return false
         const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * firstTrayProgress
         const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * FINAL_TRANSITION_START
-        const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * 2.35))
+        const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * 3.15))
         jumpToScroll(targetScroll)
         return true
       }
