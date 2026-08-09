@@ -30,7 +30,7 @@ export function getHandPickupProgress(progress) {
 }
 
 export function getHandLiftProgress(progress) {
-  const normalized = (progress - 0.374) / 0.408
+  const normalized = (progress - 0.374) / 0.3264
   return Math.min(1, Math.max(0, normalized))
 }
 
