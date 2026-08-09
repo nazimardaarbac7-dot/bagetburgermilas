@@ -83,17 +83,12 @@ export default function App() {
   const [sceneReady, setSceneReady] = useState(false)
   const [navbarOnYellow, setNavbarOnYellow] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [discountOpen, setDiscountOpen] = useState(() => {
-    try { return sessionStorage.getItem('baget-discount-seen') !== '1' } catch { return true }
-  })
+  const [discountOpen, setDiscountOpen] = useState(true)
 
   const openMenu = useCallback(() => setMenuOpen(true), [])
   const closeMenu = useCallback(() => setMenuOpen(false), [])
   const handleSceneReady = useCallback(() => setSceneReady(true), [])
-  const closeDiscount = useCallback(() => {
-    try { sessionStorage.setItem('baget-discount-seen', '1') } catch { /* storage may be disabled */ }
-    setDiscountOpen(false)
-  }, [])
+  const closeDiscount = useCallback(() => setDiscountOpen(false), [])
   const handleNavigate = useCallback((target) => sectionNavigation.current?.(target), [])
 
   useLayoutEffect(() => {
@@ -344,11 +339,11 @@ export default function App() {
           traySnapTimer = null
           return
         }
-        if (traySnapTimer) window.clearTimeout(traySnapTimer)
+        if (traySnapTimer) return
         traySnapTimer = window.setTimeout(() => {
           traySnapTimer = null
           snapTrayToNearest()
-        }, mobileScene ? 70 : 100)
+        }, mobileScene ? 180 : 140)
       }
 
       adjustTrayProgress.current = (movementX) => {
@@ -586,7 +581,12 @@ export default function App() {
         touchActive = false
         touchStartedAtFinalStop = false
         heroTouchStartY = null
-        if (isAtFinalStop() && !finalGateOpen) scheduleFinalGateReady()
+        if (isAtFinalStop() && !finalGateOpen) {
+          scheduleFinalGateReady()
+        } else if (heroPhase.current === 'tray' && finalTransitionProgress.current <= 0.001) {
+          cancelTraySnap()
+          window.requestAnimationFrame(snapTrayToNearest)
+        }
       }
 
       window.addEventListener('wheel', handleHeroWheel, { passive: false, capture: true })
@@ -747,7 +747,7 @@ export default function App() {
       </ExperienceBoundary>
       <div className={`scene-curtain${sceneReady ? ' is-hidden' : ''}`} aria-hidden="true"><span>BAGET BURGER</span><i /></div>
       <div className="grain" />
-      <Navbar onYellow={navbarOnYellow} onOpenMenu={openMenu} onNavigate={handleNavigate} />
+      <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} onOpenMenu={openMenu} onNavigate={handleNavigate} />
       <Hero ref={heroRef} />
       <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
       <MilasSection onOpenMenu={openMenu} />
