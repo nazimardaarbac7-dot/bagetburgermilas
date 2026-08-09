@@ -39,7 +39,7 @@ export default function MilasSection({ onOpenMenu }) {
           <button className="menu-cta" type="button" onClick={onOpenMenu} aria-label="Tüm menüyü gör">
             <span className="menu-cta-art" aria-hidden="true">
               <img src="/assets/interaction/menu-drumstick-cutout.png" alt="" loading="lazy" decoding="async" />
-              <span className="menu-cta-label">TÜM MENÜ</span>
+              <span className="menu-cta-label"><span>TÜM</span><span>MENÜ</span></span>
             </span>
           </button>
         </div>
