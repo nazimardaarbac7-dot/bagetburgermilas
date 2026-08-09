@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   FINAL_TRANSITION_START,
+  GRIP_END_SEQUENCE_PROGRESS,
+  MOBILE_SHOWCASE_MIN_HEIGHT_SVH,
   TRAY_ROTATION_END,
   getFinalTransitionProgress,
   getHandLiftProgress,
@@ -24,11 +26,27 @@ test('el, burgere temasın hemen ardından kaydırmaya tepki verir', () => {
 })
 
 test('ham ve sahne ilerlemesi birbirinin tersidir', () => {
-  for (let step = 0; step <= 100; step += 1) {
-    const raw = step / 100
-    const roundTrip = getRawProgressForSequenceProgress(getSequenceProgress(raw))
-    assert.ok(Math.abs(roundTrip - raw) < 1e-10)
+  for (const isMobile of [false, true]) {
+    for (let step = 0; step <= 100; step += 1) {
+      const raw = step / 100
+      const roundTrip = getRawProgressForSequenceProgress(getSequenceProgress(raw, isMobile), isMobile)
+      assert.ok(Math.abs(roundTrip - raw) < 1e-10)
+    }
   }
+})
+
+test('mobilde kavrama sonrası kaydırma mesafesi yüzde 15 daha kısadır', () => {
+  const previousMobileTriggerSpan = 760 + 100
+  const mobileTriggerSpan = MOBILE_SHOWCASE_MIN_HEIGHT_SVH + 100
+  const previousGripRaw = getRawProgressForSequenceProgress(GRIP_END_SEQUENCE_PROGRESS)
+  const mobileGripRaw = getRawProgressForSequenceProgress(GRIP_END_SEQUENCE_PROGRESS, true)
+  const previousPreGripDistance = previousMobileTriggerSpan * previousGripRaw
+  const mobilePreGripDistance = mobileTriggerSpan * mobileGripRaw
+  const previousPostGripDistance = previousMobileTriggerSpan * (1 - previousGripRaw)
+  const mobilePostGripDistance = mobileTriggerSpan * (1 - mobileGripRaw)
+
+  assert.ok(Math.abs(previousPreGripDistance - mobilePreGripDistance) < 1e-10)
+  assert.ok(Math.abs(mobilePostGripDistance / previousPostGripDistance - 0.85) < 1e-10)
 })
 
 test('burger durakları tepsi dönüşüyle aynı indekse karşılık gelir', () => {

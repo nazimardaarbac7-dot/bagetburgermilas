@@ -8,9 +8,16 @@ const HAND_REACH_END = HAND_PICKUP_END * 0.6
 const HAND_GRIP_END = 0.374
 const HAND_LIFT_END = 0.7004
 const POST_GRIP_SCROLL_SCALE = 0.9
-const GRIP_END_SEQUENCE_PROGRESS = FINAL_TRANSITION_START + HAND_GRIP_END * (1 - FINAL_TRANSITION_START)
+export const GRIP_END_SEQUENCE_PROGRESS = FINAL_TRANSITION_START + HAND_GRIP_END * (1 - FINAL_TRANSITION_START)
 const SHOWCASE_SCROLL_SPAN_SCALE = GRIP_END_SEQUENCE_PROGRESS + (1 - GRIP_END_SEQUENCE_PROGRESS) * POST_GRIP_SCROLL_SCALE
 const GRIP_END_RAW_PROGRESS = GRIP_END_SEQUENCE_PROGRESS / SHOWCASE_SCROLL_SPAN_SCALE
+const MOBILE_POST_GRIP_DISTANCE_SCALE = 0.85
+const MOBILE_BASE_SHOWCASE_MIN_HEIGHT_SVH = 760
+const VIEWPORT_TRIGGER_PADDING_SVH = 100
+const MOBILE_BASE_TRIGGER_SPAN_SVH = MOBILE_BASE_SHOWCASE_MIN_HEIGHT_SVH + VIEWPORT_TRIGGER_PADDING_SVH
+const MOBILE_TRIGGER_SPAN_SCALE = GRIP_END_RAW_PROGRESS + (1 - GRIP_END_RAW_PROGRESS) * MOBILE_POST_GRIP_DISTANCE_SCALE
+const MOBILE_GRIP_END_RAW_PROGRESS = GRIP_END_RAW_PROGRESS / MOBILE_TRIGGER_SPAN_SCALE
+export const MOBILE_SHOWCASE_MIN_HEIGHT_SVH = MOBILE_BASE_TRIGGER_SPAN_SVH * MOBILE_TRIGGER_SPAN_SCALE - VIEWPORT_TRIGGER_PADDING_SVH
 
 const DESKTOP_FIRST_ROTATION_START = TRAY_SETTLE_END
 const MOBILE_FIRST_ROTATION_START = MOBILE_TRAY_SETTLE_END
@@ -51,21 +58,22 @@ export function getFinalTransitionProgress(progress) {
   return Math.min(1, Math.max(0, normalized))
 }
 
-// The showcase is physically shorter only after the hand has gripped the final
-// burger. This piecewise mapping preserves every earlier scroll distance while
-// making the lift and the following Milas handoff 10% quicker in both directions.
-export function getSequenceProgress(rawProgress) {
+// Mobile shortens the physical post-grip span by 15%. Its adjusted breakpoint
+// keeps every scroll distance before the grip identical to the existing map.
+export function getSequenceProgress(rawProgress, isMobile = false) {
   const clamped = Math.min(1, Math.max(0, rawProgress))
-  if (clamped <= GRIP_END_RAW_PROGRESS) return clamped * SHOWCASE_SCROLL_SPAN_SCALE
+  const gripEndRawProgress = isMobile ? MOBILE_GRIP_END_RAW_PROGRESS : GRIP_END_RAW_PROGRESS
+  if (clamped <= gripEndRawProgress) return clamped * (GRIP_END_SEQUENCE_PROGRESS / gripEndRawProgress)
 
-  const postGripProgress = (clamped - GRIP_END_RAW_PROGRESS) / (1 - GRIP_END_RAW_PROGRESS)
+  const postGripProgress = (clamped - gripEndRawProgress) / (1 - gripEndRawProgress)
   return GRIP_END_SEQUENCE_PROGRESS + postGripProgress * (1 - GRIP_END_SEQUENCE_PROGRESS)
 }
 
-export function getRawProgressForSequenceProgress(sequenceProgress) {
+export function getRawProgressForSequenceProgress(sequenceProgress, isMobile = false) {
   const clamped = Math.min(1, Math.max(0, sequenceProgress))
-  if (clamped <= GRIP_END_SEQUENCE_PROGRESS) return clamped / SHOWCASE_SCROLL_SPAN_SCALE
+  const gripEndRawProgress = isMobile ? MOBILE_GRIP_END_RAW_PROGRESS : GRIP_END_RAW_PROGRESS
+  if (clamped <= GRIP_END_SEQUENCE_PROGRESS) return clamped * (gripEndRawProgress / GRIP_END_SEQUENCE_PROGRESS)
 
   const postGripProgress = (clamped - GRIP_END_SEQUENCE_PROGRESS) / (1 - GRIP_END_SEQUENCE_PROGRESS)
-  return GRIP_END_RAW_PROGRESS + postGripProgress * (1 - GRIP_END_RAW_PROGRESS)
+  return gripEndRawProgress + postGripProgress * (1 - gripEndRawProgress)
 }

@@ -230,7 +230,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
   .hero h1 { font-size: clamp(4.35rem, 21.5vw, 8rem); line-height: .76; text-shadow: 0 9px 34px rgba(19, 49, 50, .62); }
   .hero-location { margin-top: 24px; }
   .hero { min-height: 190svh; }
-  .showcase { min-height: 760vh; }
+  .showcase { min-height: var(--mobile-showcase-min-height, 760svh); }
   .showcase-panel { position: fixed; inset: 0; height: 100svh; opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility 0s linear .18s; }
   .showcase.is-active .showcase-panel { opacity: 1; visibility: visible; transition: opacity .18s ease; }
   .showcase .showcase-topline,

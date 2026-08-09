@@ -8,7 +8,7 @@ import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
 import { burgers } from './data/burgers'
-import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getTrayProgressForBurger, getTrayRotationProgress, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
+import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getTrayProgressForBurger, getTrayRotationProgress, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
@@ -195,7 +195,7 @@ export default function App() {
         const trayTrigger = trayTriggerRef.current
         if (!trayTrigger || finalGateClamping) return
         const targetScroll = trayTrigger.start
-          + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START)
+          + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START, mobileScene)
         if (Math.abs(scrollingElement.scrollTop - targetScroll) < 0.5) return
         finalGateClamping = true
         jumpToScroll(targetScroll)
@@ -233,7 +233,7 @@ export default function App() {
 
           const trayTrigger = trayTriggerRef.current
           if (trayTrigger) {
-            jumpToScroll(trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress))
+            jumpToScroll(trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress, mobileScene))
           }
           releaseHeroScroll()
           if (pendingNavigation === 'milas') {
@@ -304,7 +304,7 @@ export default function App() {
         if (!trayTrigger) return
         const targetIndex = Math.max(0, Math.min(burgers.length - 1, requestedIndex))
         const targetProgress = getTrayProgressForBurger(targetIndex, burgers.length, mobileTray)
-        const targetScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(targetProgress)
+        const targetScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(targetProgress, mobileTray)
         const distance = Math.abs(targetScroll - scrollingElement.scrollTop)
         const finishSnap = () => {
           trayDisplayTimer = null
@@ -369,8 +369,8 @@ export default function App() {
         trayPointerDragging = true
         const trayTrigger = trayTriggerRef.current
         if (!trayTrigger) return false
-        const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress)
-        const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START)
+        const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress, mobileTray)
+        const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START, mobileTray)
         const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * 3.15))
         jumpToScroll(targetScroll)
         return true
@@ -392,7 +392,7 @@ export default function App() {
         onUpdate: (self) => {
           if (heroPhase.current !== 'tray') return
 
-          let sequenceProgress = getSequenceProgress(self.progress)
+          let sequenceProgress = getSequenceProgress(self.progress, mobileTray)
           let returnedToFinalStop = false
           if (!finalGateOpen && sequenceProgress > FINAL_TRANSITION_START) {
             sequenceProgress = FINAL_TRANSITION_START
@@ -775,7 +775,7 @@ export default function App() {
       <div className="grain" />
       <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} onOpenMenu={openMenu} onNavigate={handleNavigate} />
       <Hero ref={heroRef} />
-      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
+      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} mobileMinHeight={`${MOBILE_SHOWCASE_MIN_HEIGHT_SVH}svh`} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
       <MilasSection onOpenMenu={openMenu} />
       <MenuOverlay open={menuOpen} onClose={closeMenu} />
       <DiscountPopup open={discountOpen} onClose={closeDiscount} />

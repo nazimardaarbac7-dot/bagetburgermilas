@@ -2,11 +2,11 @@ import React from 'react'
 import BurgerInfo from '../components/BurgerInfo'
 import TrayTouchZone from '../components/TrayTouchZone'
 
-export default function BurgerShowcase({ burger, activeIndex, isReady, isActive, isInteractive, onTrayDrag, onTrayDragEnd, onBurgerTap, onTrayStep }) {
+export default function BurgerShowcase({ burger, activeIndex, isReady, isActive, isInteractive, mobileMinHeight, onTrayDrag, onTrayDragEnd, onBurgerTap, onTrayStep }) {
   const isLastBurger = activeIndex === 5
 
   return (
-    <section id="tray" className={`showcase${isReady ? ' is-ready' : ''}${isActive ? ' is-active' : ''}`} aria-label="Burger menüsü">
+    <section id="tray" className={`showcase${isReady ? ' is-ready' : ''}${isActive ? ' is-active' : ''}`} style={{ '--mobile-showcase-min-height': mobileMinHeight }} aria-label="Burger menüsü">
       <div className="showcase-panel">
         <div className="showcase-topline">
           <span className="selector-label">BURGERİNİ SEÇ</span>
