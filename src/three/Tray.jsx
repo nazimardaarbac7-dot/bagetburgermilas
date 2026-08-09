@@ -39,7 +39,7 @@ export default function Tray({ trayEntryProgress, scrollProgress, finalTransitio
       : THREE.MathUtils.damp(trayVisual.current.scale.x, targetScale, settleSpeed, smoothDelta)
     tray.current.rotation.y = THREE.MathUtils.damp(tray.current.rotation.y, targetRotation, rotationSpeed, smoothDelta)
     trayVisual.current.scale.setScalar(currentScale)
-    const settledY = isMobile ? 1.65 : -0.95
+    const settledY = isMobile ? 0 : -0.95
     const entryY = isMobile ? -8.5 : -9.5
     const targetY = THREE.MathUtils.lerp(entryY, settledY, intro)
     trayVisual.current.position.y = heroTransitionActive
