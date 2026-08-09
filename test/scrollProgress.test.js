@@ -35,7 +35,7 @@ test('ham ve sahne ilerlemesi birbirinin tersidir', () => {
   }
 })
 
-test('mobilde kavrama sonrası kaydırma mesafesi mevcut halinden yüzde 8 daha kısadır', () => {
+test('mobilde el ve Milas ortak finali mevcut halinden yüzde 15 daha kısadır', () => {
   const previousMobileTriggerSpan = 760 + 100
   const mobileTriggerSpan = MOBILE_SHOWCASE_MIN_HEIGHT_SVH + 100
   const previousGripRaw = getRawProgressForSequenceProgress(GRIP_END_SEQUENCE_PROGRESS)
@@ -46,7 +46,8 @@ test('mobilde kavrama sonrası kaydırma mesafesi mevcut halinden yüzde 8 daha 
   const mobilePostGripDistance = mobileTriggerSpan * (1 - mobileGripRaw)
 
   assert.ok(Math.abs(previousPreGripDistance - mobilePreGripDistance) < 1e-10)
-  assert.ok(Math.abs(mobilePostGripDistance / previousPostGripDistance - 0.85 * 0.92) < 1e-10)
+  const previousLivePostGripDistance = previousPostGripDistance * 0.85 * 0.92
+  assert.ok(Math.abs(mobilePostGripDistance / previousLivePostGripDistance - 0.85) < 1e-10)
 })
 
 test('burger durakları tepsi dönüşüyle aynı indekse karşılık gelir', () => {
