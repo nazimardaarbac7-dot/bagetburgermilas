@@ -16,6 +16,8 @@ ScrollTrigger.config({ ignoreMobileResize: true })
 const ACTIVE_INDEX_HYSTERESIS = 0.08
 const HERO_TRANSITION_DURATION = 2.35
 const HERO_COPY_EXIT_DURATION = 1.16
+const HERO_TRAY_REVEAL_PROGRESS = 0.54
+const HERO_INFO_REVEAL_PROGRESS = 0.87
 
 function getStableBurgerIndex(rotationProgress, currentIndex) {
   const position = rotationProgress * (burgers.length - 1)
@@ -129,8 +131,9 @@ export default function App() {
         onUpdate: () => {
           if (heroScrollLocked) scrollingElement.scrollTop = heroScrollAnchor
           heroExitProgress.current = heroMotion.progress
-          const trayVisible = heroMotion.progress >= 0.6
-          setShowcaseVisibility(trayVisible, trayVisible)
+          const trayVisible = heroMotion.progress >= HERO_TRAY_REVEAL_PROGRESS
+          const infoVisible = heroMotion.progress >= HERO_INFO_REVEAL_PROGRESS
+          setShowcaseVisibility(infoVisible, trayVisible)
         },
         onComplete: () => {
           heroPhase.current = 'tray'

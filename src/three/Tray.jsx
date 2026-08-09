@@ -18,7 +18,7 @@ export default function Tray({ heroExitProgress, scrollProgress, finalTransition
     const progress = scrollProgress.current
     const heroProgress = heroExitProgress.current
     const finalProgress = finalTransitionProgress.current
-    if (!entryVisible.current && (heroProgress >= 0.6 || progress > 0.0005)) entryVisible.current = true
+    if (!entryVisible.current && (heroProgress >= 0.54 || progress > 0.0005)) entryVisible.current = true
     if (entryVisible.current && heroProgress <= 0.54 && progress <= 0.0001) entryVisible.current = false
     if (finalHidden.current && finalProgress <= 0.97) finalHidden.current = false
     if (!finalHidden.current && finalProgress >= 0.9995) finalHidden.current = true
