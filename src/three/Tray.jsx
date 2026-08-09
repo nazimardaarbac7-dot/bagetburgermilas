@@ -42,6 +42,7 @@ export default function Tray({ trayEntryProgress, scrollProgress, finalTransitio
     const settledY = isMobile ? 0 : -0.95
     const entryY = isMobile ? -8.5 : -9.5
     const targetY = THREE.MathUtils.lerp(entryY, settledY, intro)
+    trayVisual.current.position.x = isMobile ? 0 : 0.18
     trayVisual.current.position.y = heroTransitionActive
       ? targetY
       : THREE.MathUtils.damp(trayVisual.current.position.y, targetY, settleSpeed, smoothDelta)

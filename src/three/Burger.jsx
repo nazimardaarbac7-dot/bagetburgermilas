@@ -605,7 +605,9 @@ export default function Burger({ index, activeIndex, isFloating = false, mobileO
     const pickup = pickupTarget && pickupProgress ? getHandPickupProgress(pickupProgress.current) : 0
     const lift = pickupTarget && finalTransitionProgress ? getHandLiftProgress(finalTransitionProgress.current) : 0
 
-    const targetScale = isFloating ? floatingScale : isActive ? 1.12 + tapEnergy.current * 0.1 + lift * 0.045 : 0.84
+    const tapScale = mobileOptimized ? 0.1 : 0.16
+    const tapLift = mobileOptimized ? 0.22 : 0.34
+    const targetScale = isFloating ? floatingScale : isActive ? 1.12 + tapEnergy.current * tapScale + lift * 0.045 : 0.84
     const nextScale = THREE.MathUtils.damp(group.current.scale.x, targetScale, 4, smoothDelta)
     group.current.scale.setScalar(nextScale)
     if (isFloating) {
@@ -619,7 +621,7 @@ export default function Burger({ index, activeIndex, isFloating = false, mobileO
       const movementSpeed = pickup > 0 ? 4 : 5
       group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, facingAngle, 5, smoothDelta)
       group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, lift * -0.035, movementSpeed, smoothDelta)
-      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, baseY + (isActive ? 0.19 : 0) + tapEnergy.current * 0.22 + lift * 4.65, movementSpeed, smoothDelta)
+      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, baseY + (isActive ? 0.19 : 0) + tapEnergy.current * tapLift + lift * 4.65, movementSpeed, smoothDelta)
       group.current.position.z = THREE.MathUtils.damp(group.current.position.z, baseZ + lift * 0.32, movementSpeed, smoothDelta)
     }
   })

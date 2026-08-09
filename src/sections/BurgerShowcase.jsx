@@ -26,7 +26,7 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
           </svg>
         </div>
         <TrayTouchZone enabled={isInteractive} onDrag={onTrayDrag} onDragEnd={onTrayDragEnd} onTap={onBurgerTap} onStep={onTrayStep} />
-        <p className={`rotate-prompt${isLastBurger ? ' is-final' : ''}`}><i /><span className="rotate-copy-desktop">{isLastBurger ? 'AŞAĞI KAYDIR' : 'TEPSİYİ KAYDIR / BURGERE DOKUN'}</span><span className="rotate-copy-mobile">{isLastBurger ? 'AŞAĞI KAYDIR' : 'TEPSİYİ KAYDIR'}</span></p>
+        <p className={`rotate-prompt${isLastBurger ? ' is-final' : ''}`}><i /><span className="rotate-copy-desktop">AŞAĞI KAYDIR</span><span className="rotate-copy-mobile">{isLastBurger ? 'AŞAĞI KAYDIR' : 'TEPSİYİ KAYDIR'}</span></p>
       </div>
     </section>
   )
