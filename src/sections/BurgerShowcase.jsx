@@ -11,6 +11,13 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
           <span className="progress-count">0{activeIndex + 1} — 06</span>
         </div>
         <BurgerInfo burger={burger} />
+        <div className="tap-hint" aria-hidden="true">
+          <span>TIKLA</span>
+          <svg viewBox="0 0 96 64" focusable="false">
+            <path d="M82 13C59 5 28 17 13 49" />
+            <path d="m13 49 1-12M13 49l12-1" />
+          </svg>
+        </div>
         <TrayTouchZone enabled={isInteractive} onDrag={onTrayDrag} onDragEnd={onTrayDragEnd} onTap={onBurgerTap} />
         <p className="rotate-prompt"><i /><span className="rotate-copy-desktop">KAYDIR / BURGERE DOKUN</span><span className="rotate-copy-mobile">KAYDIR / BURGERE DOKUN</span></p>
         <div className="tray-markers" aria-hidden="true">

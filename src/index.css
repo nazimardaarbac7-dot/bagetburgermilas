@@ -50,10 +50,12 @@ main { position: relative; isolation: isolate; }
 .showcase-panel { height: 100svh; position: sticky; top: 0; pointer-events: none; }
 .showcase .showcase-topline,
 .showcase .burger-info,
+.showcase .tap-hint,
 .showcase .rotate-prompt,
 .showcase .tray-markers { transition: opacity .9s ease, filter .9s ease; }
 .showcase:not(.is-ready) .showcase-topline,
 .showcase:not(.is-ready) .burger-info,
+.showcase:not(.is-ready) .tap-hint,
 .showcase:not(.is-ready) .rotate-prompt,
 .showcase:not(.is-ready) .tray-markers { opacity: 0 !important; filter: blur(8px); }
 .showcase-topline { position: absolute; left: clamp(26px, 8vw, 148px); right: 38px; top: clamp(104px, 16vh, 168px); display: flex; justify-content: space-between; font: 500 .58rem/1 'DM Mono', monospace; letter-spacing: .14em; color: rgba(245,234,215,.76); }
@@ -69,6 +71,9 @@ main { position: relative; isolation: isolate; }
 .burger-info ul { padding: 0; margin: 0; list-style: none; font: 500 clamp(.62rem, .72vw, .78rem)/1.9 'DM Mono', monospace; letter-spacing: .08em; color: rgba(245,234,215,.88); }
 .price { margin-top: 22px; color: #f5ead7; font-family: 'Archivo Black', Impact, sans-serif; font-size: clamp(2.75rem, 3.5vw, 4rem); line-height: .8; letter-spacing: -.07em; }
 .price span { color: #f2a42b; font: 500 .37em/1 'DM Mono', monospace; vertical-align: top; padding-right: .18em; }
+.tap-hint { position: absolute; z-index: 3; left: calc(50% + clamp(74px, 8vw, 132px)); top: clamp(176px, 25vh, 252px); width: 96px; height: 64px; opacity: .62; pointer-events: none; transform: rotate(-4deg); transform-origin: center; }
+.tap-hint span { position: absolute; top: 0; right: 1px; color: #f2a42b; font: 500 .49rem/1 'DM Mono', monospace; letter-spacing: .16em; }
+.tap-hint svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; stroke: rgba(245, 234, 215, .82); stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
 .rotate-prompt { position: absolute; left: 50%; bottom: 31px; margin: 0; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; font: 500 .54rem/1 'DM Mono', monospace; letter-spacing: .13em; white-space: nowrap; color: rgba(245,234,215,.7); }
 .rotate-prompt i { width: 22px; height: 10px; border-top: 1px solid #f2a42b; border-radius: 50%; position: relative; }
 .rotate-prompt i::after { content: '→'; position: absolute; right: -5px; top: -8px; color: #f2a42b; }
@@ -199,6 +204,7 @@ main { position: relative; isolation: isolate; }
   .showcase.is-active .showcase-panel { opacity: 1; visibility: visible; transition: opacity .18s ease; }
   .showcase .showcase-topline,
   .showcase .burger-info,
+  .showcase .tap-hint,
   .showcase .rotate-prompt,
   .showcase .tray-markers { transition-duration: .58s; }
   .showcase-topline { left: 20px; right: 20px; top: calc(22px + env(safe-area-inset-top)); transform: none; font-size: .49rem; }
@@ -209,10 +215,12 @@ main { position: relative; isolation: isolate; }
   @keyframes enterInfo { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
   .showcase .showcase-topline,
   .showcase .burger-info,
+  .showcase .tap-hint,
   .showcase .rotate-prompt,
   .showcase .tray-markers { transition-property: opacity; }
   .showcase:not(.is-ready) .showcase-topline,
   .showcase:not(.is-ready) .burger-info,
+  .showcase:not(.is-ready) .tap-hint,
   .showcase:not(.is-ready) .rotate-prompt,
   .showcase:not(.is-ready) .tray-markers { filter: none; }
   .info-index { font-size: .54rem; margin-bottom: 12px; }
@@ -221,6 +229,9 @@ main { position: relative; isolation: isolate; }
   .burger-info ul { columns: 2; column-gap: 14px; line-height: 1.65; font-size: .53rem; max-width: 340px; }
   .burger-info li { break-inside: avoid; }
   .price { position: absolute; right: 0; bottom: 0; font-size: 2.75rem; }
+  .tap-hint { left: calc(50% + 72px); top: 36svh; width: 82px; height: 55px; opacity: .56; }
+  .tap-hint span { font-size: .43rem; }
+  .tap-hint svg { stroke-width: 1.2; }
   .rotate-prompt { bottom: 28px; font-size: .46rem; }
   .rotate-copy-desktop { display: none; }
   .rotate-copy-mobile { display: inline; }

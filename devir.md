@@ -383,3 +383,9 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Tavuk Burger yatay ve daha basık, Karışık Burger daha yüksek/geniş gibi ürün biçimleri ayrı ayrı hesaba katılır.
 - Her dokunma bağımsız bir patlama oluşturur. Devam eden patlama yeni dokunmada sıfırlanmaz veya durdurulmaz; eşzamanlı patlamalar aynı `instancedMesh` içinde üst üste render edilir.
 - Mobil güvenlik sınırı altı eşzamanlı patlamadır (`72` baget instance). Tamamlanan patlamalar bağımsız temizlenir ve diğerleri devam eder.
+
+## 19. 9 Ağustos 2026 — burger tıklama ipucu
+
+- Yerleşmiş burgerin üst-sağında küçük ve düşük kontrastlı `TIKLA` etiketi bulunur.
+- Kullanıcının çizdiği temsili ok, responsive ve keskin kalması için kod tabanlı SVG olarak yeniden tasarlanmıştır; kıvrılarak aşağı-sola, aktif burgere yönelir.
+- İpucu tıklamaları engellemez (`pointer-events: none`) ve tepsi hareket ederken burger bilgileriyle birlikte gizlenir.
