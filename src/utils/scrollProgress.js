@@ -3,6 +3,12 @@ export const MOBILE_TRAY_SETTLE_END = 0.075
 export const TRAY_ROTATION_END = 0.62
 export const FINAL_TRANSITION_START = TRAY_ROTATION_END
 
+const HAND_GRIP_END = 0.374
+const POST_GRIP_SCROLL_SCALE = 0.8
+const GRIP_END_SEQUENCE_PROGRESS = FINAL_TRANSITION_START + HAND_GRIP_END * (1 - FINAL_TRANSITION_START)
+const SHOWCASE_SCROLL_SPAN_SCALE = GRIP_END_SEQUENCE_PROGRESS + (1 - GRIP_END_SEQUENCE_PROGRESS) * POST_GRIP_SCROLL_SCALE
+const GRIP_END_RAW_PROGRESS = GRIP_END_SEQUENCE_PROGRESS / SHOWCASE_SCROLL_SPAN_SCALE
+
 const DESKTOP_FIRST_ROTATION_START = TRAY_SETTLE_END
 const MOBILE_FIRST_ROTATION_START = MOBILE_TRAY_SETTLE_END
 
@@ -30,11 +36,30 @@ export function getHandPickupProgress(progress) {
 }
 
 export function getHandLiftProgress(progress) {
-  const normalized = (progress - 0.374) / 0.3264
+  const normalized = (progress - HAND_GRIP_END) / 0.3264
   return Math.min(1, Math.max(0, normalized))
 }
 
 export function getFinalTransitionProgress(progress) {
   const normalized = (progress - FINAL_TRANSITION_START) / (1 - FINAL_TRANSITION_START)
   return Math.min(1, Math.max(0, normalized))
+}
+
+// The showcase is physically shorter only after the hand has gripped the final
+// burger. This piecewise mapping preserves every earlier scroll distance while
+// making the lift and the following Milas handoff 20% quicker in both directions.
+export function getSequenceProgress(rawProgress) {
+  const clamped = Math.min(1, Math.max(0, rawProgress))
+  if (clamped <= GRIP_END_RAW_PROGRESS) return clamped * SHOWCASE_SCROLL_SPAN_SCALE
+
+  const postGripProgress = (clamped - GRIP_END_RAW_PROGRESS) / (1 - GRIP_END_RAW_PROGRESS)
+  return GRIP_END_SEQUENCE_PROGRESS + postGripProgress * (1 - GRIP_END_SEQUENCE_PROGRESS)
+}
+
+export function getRawProgressForSequenceProgress(sequenceProgress) {
+  const clamped = Math.min(1, Math.max(0, sequenceProgress))
+  if (clamped <= GRIP_END_SEQUENCE_PROGRESS) return clamped / SHOWCASE_SCROLL_SPAN_SCALE
+
+  const postGripProgress = (clamped - GRIP_END_SEQUENCE_PROGRESS) / (1 - GRIP_END_SEQUENCE_PROGRESS)
+  return GRIP_END_RAW_PROGRESS + postGripProgress * (1 - GRIP_END_RAW_PROGRESS)
 }

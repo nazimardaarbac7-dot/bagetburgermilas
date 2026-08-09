@@ -12,7 +12,7 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
         </div>
         <BurgerInfo burger={burger} />
         <div className="tap-hint" aria-hidden="true">
-          <span>TIKLA</span>
+          <span>BANA TIKLA</span>
           <svg viewBox="0 0 96 64" focusable="false">
             <path d="M82 13C59 5 28 17 13 49" />
             <path d="m13 49 1-12M13 49l12-1" />

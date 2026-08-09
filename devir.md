@@ -389,3 +389,13 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Yerleşmiş burgerin üst-sağında küçük ve düşük kontrastlı `TIKLA` etiketi bulunur.
 - Kullanıcının çizdiği temsili ok, responsive ve keskin kalması için kod tabanlı SVG olarak yeniden tasarlanmıştır; kıvrılarak aşağı-sola, aktif burgere yönelir.
 - İpucu tıklamaları engellemez (`pointer-events: none`) ve tepsi hareket ederken burger bilgileriyle birlikte gizlenir.
+
+## 20. 9 Ağustos 2026 — mobil tepsi kararlılığı ve final hız ayarı
+
+- Burger tıklama ipucunun metni `BANA TIKLA` olarak güncellendi; küçük SVG ok ve düşük kontrastlı konumu korundu.
+- Elin son burgere yaklaşma ve kavrama mesafeleri değiştirilmedi. Yalnızca kavrama tamamlandıktan sonraki burgeri kaldırma + Made in Milas bölümünün gelişi için gereken fiziksel scroll mesafesi `%20` azaltıldı.
+- Bu hızlandırma ileri ve geri yönde aynı parçalı progress eşlemesini kullanır; dolayısıyla Milas → son burger dönüşü de birebir tersine çalışır ve ayrı tween içermez.
+- Önceki aşamaların fiziksel scroll mesafelerini korumak için showcase yüksekliği `720vh` yerine yaklaşık `681vh` oldu. Ham scroll progress'i, kavrama bitişine kadar eski mesafeyi koruyan ve yalnızca son parçayı hızlandıran `getSequenceProgress()` ile sahne progress'ine çevrilir.
+- Mobilde devam eden snap artık yalnızca gerçek yatay sürükleme başladığında iptal edilir; sıradan bir dokunuş veya dikey kaydırma tepsiyi iki burger arasında bırakamaz.
+- Burger bilgileri artık hassas bir “tam durağa ulaştı” toleransına bağlı değildir. Tepsi menü aralığında olduğu sürece yazılar görünür kalır; son el geçişi başladığında birlikte gizlenir ve geri dönüldüğünde birlikte yeniden açılır.
+- Yerel üretim derlemesi ve ileri/geri scroll eşikleri doğrulandı; tarayıcı konsolunda hata veya warning oluşmadı.

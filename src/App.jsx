@@ -9,7 +9,7 @@ import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
 import Experience from './three/Experience'
 import { burgers } from './data/burgers'
-import { FINAL_TRANSITION_START, getFinalTransitionProgress, getTrayProgressForBurger, getTrayRotationProgress, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
+import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getTrayProgressForBurger, getTrayRotationProgress, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
@@ -158,7 +158,7 @@ export default function App() {
 
           const trayTrigger = trayTriggerRef.current
           if (trayTrigger) {
-            jumpToScroll(trayTrigger.start + (trayTrigger.end - trayTrigger.start) * firstTrayProgress)
+            jumpToScroll(trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress))
           }
           releaseHeroScroll()
         },
@@ -222,7 +222,7 @@ export default function App() {
         const rotationProgress = getTrayRotationProgress(scrollProgress.current, mobileTray)
         const targetIndex = Math.round(rotationProgress * (burgers.length - 1))
         const targetProgress = getTrayProgressForBurger(targetIndex, burgers.length, mobileTray)
-        const targetScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * targetProgress
+        const targetScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(targetProgress)
         const distance = Math.abs(targetScroll - scrollingElement.scrollTop)
 
         if (distance < 1) {
@@ -263,8 +263,8 @@ export default function App() {
         trayPointerDragging = true
         const trayTrigger = trayTriggerRef.current
         if (!trayTrigger) return false
-        const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * firstTrayProgress
-        const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * FINAL_TRANSITION_START
+        const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress)
+        const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START)
         const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * 3.15))
         jumpToScroll(targetScroll)
         return true
@@ -282,18 +282,18 @@ export default function App() {
         onUpdate: (self) => {
           if (heroPhase.current !== 'tray') return
 
-          scrollProgress.current = self.progress
-          const finalProgress = getFinalTransitionProgress(self.progress)
+          const sequenceProgress = getSequenceProgress(self.progress)
+          scrollProgress.current = sequenceProgress
+          const finalProgress = getFinalTransitionProgress(sequenceProgress)
           finalTransitionProgress.current = finalProgress
-          const rotationProgress = getTrayRotationProgress(self.progress, mobileTray)
+          const rotationProgress = getTrayRotationProgress(sequenceProgress, mobileTray)
           const nextIndex = finalProgress > 0
             ? burgers.length - 1
             : getStableBurgerIndex(rotationProgress, activeIndexValue.current)
-          const nearestProgress = getTrayProgressForBurger(nextIndex, burgers.length, mobileTray)
-          const trayAtRest = finalProgress <= 0.001 && Math.abs(self.progress - nearestProgress) < 0.0007
+          const trayMenuActive = finalProgress <= 0.001 && sequenceProgress >= firstTrayProgress - 0.002
           traySettledIndex.current = nextIndex
           setDisplayedBurger(nextIndex)
-          setShowcaseVisibility(trayAtRest, finalProgress < 0.995)
+          setShowcaseVisibility(trayMenuActive, finalProgress < 0.995)
 
           if (finalProgress > 0) {
             if (traySnapTimer) window.clearTimeout(traySnapTimer)
@@ -405,7 +405,6 @@ export default function App() {
         }
       }
       const handleHeroTouchStart = (event) => {
-        if (heroPhase.current === 'tray' && traySnapTween.current) cancelTraySnap()
         heroTouchStartY = event.touches.length === 1 ? event.touches[0].clientY : null
       }
       const handleHeroTouchMove = (event) => {

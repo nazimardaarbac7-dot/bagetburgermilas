@@ -46,7 +46,7 @@ main { position: relative; isolation: isolate; }
 .scroll-cue i { width: 1px; height: 34px; background: #de860b; animation: scrollLine 1.9s ease-in-out infinite; transform-origin: top; }
 @keyframes scrollLine { 0%, 100% { transform: scaleY(.25); opacity: .3; } 50% { transform: scaleY(1); opacity: 1; } }
 
-.showcase { min-height: 720vh; position: relative; z-index: 2; }
+.showcase { min-height: 681vh; position: relative; z-index: 2; }
 .showcase-panel { height: 100svh; position: sticky; top: 0; pointer-events: none; }
 .showcase .showcase-topline,
 .showcase .burger-info,
@@ -72,7 +72,7 @@ main { position: relative; isolation: isolate; }
 .price { margin-top: 22px; color: #f5ead7; font-family: 'Archivo Black', Impact, sans-serif; font-size: clamp(2.75rem, 3.5vw, 4rem); line-height: .8; letter-spacing: -.07em; }
 .price span { color: #f2a42b; font: 500 .37em/1 'DM Mono', monospace; vertical-align: top; padding-right: .18em; }
 .tap-hint { position: absolute; z-index: 3; left: calc(50% + clamp(74px, 8vw, 132px)); top: clamp(176px, 25vh, 252px); width: 96px; height: 64px; opacity: .62; pointer-events: none; transform: rotate(-4deg); transform-origin: center; }
-.tap-hint span { position: absolute; top: 0; right: 1px; color: #f2a42b; font: 500 .49rem/1 'DM Mono', monospace; letter-spacing: .16em; }
+.tap-hint span { position: absolute; top: 0; right: 1px; color: #f2a42b; font: 500 .49rem/1 'DM Mono', monospace; letter-spacing: .16em; white-space: nowrap; }
 .tap-hint svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; stroke: rgba(245, 234, 215, .82); stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
 .rotate-prompt { position: absolute; left: 50%; bottom: 31px; margin: 0; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; font: 500 .54rem/1 'DM Mono', monospace; letter-spacing: .13em; white-space: nowrap; color: rgba(245,234,215,.7); }
 .rotate-prompt i { width: 22px; height: 10px; border-top: 1px solid #f2a42b; border-radius: 50%; position: relative; }
@@ -199,7 +199,7 @@ main { position: relative; isolation: isolate; }
   .hero h1 { font-size: clamp(4.35rem, 21.5vw, 8rem); line-height: .76; text-shadow: 0 9px 34px rgba(19, 49, 50, .62); }
   .hero-location { margin-top: 24px; }
   .hero { min-height: 190svh; }
-  .showcase { min-height: 720vh; }
+  .showcase { min-height: 681vh; }
   .showcase-panel { position: fixed; inset: 0; height: 100svh; opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility 0s linear .18s; }
   .showcase.is-active .showcase-panel { opacity: 1; visibility: visible; transition: opacity .18s ease; }
   .showcase .showcase-topline,
