@@ -17,13 +17,9 @@ export default function DiscountPopup({ open, onClose }) {
       <button className="discount-popup-backdrop" type="button" aria-label="İndirim duyurusunu kapat" onClick={onClose} />
       <div className="discount-popup-card">
         <button className="discount-popup-close" type="button" aria-label="Kapat" onClick={onClose}>×</button>
-        <div className="discount-popup-brand" aria-label="Baget Burger Milas">
-          <strong>BAGET BURGER</strong>
-          <span>MİLAS · 2023</span>
-        </div>
         <div className="discount-popup-body">
           <p className="discount-popup-kicker"><i /> SADECE TELEFONDA</p>
-          <h2>SİPARİŞİN<br /><span>BİZDEN.</span></h2>
+          <h2>SİPARİŞİNE<br /><span>BİZDEN.</span></h2>
           <div className="discount-popup-offer" aria-label="Yüzde 5 indirim">
             <strong>%5</strong>
             <span>İNDİRİM</span>
@@ -36,7 +32,6 @@ export default function DiscountPopup({ open, onClose }) {
           </a>
           <button className="discount-popup-later" type="button" onClick={onClose}>ŞİMDİLİK DEĞİL</button>
         </div>
-        <span className="discount-popup-stamp" aria-hidden="true">%5 · %5 · %5 · %5 · %5</span>
       </div>
     </div>
   )

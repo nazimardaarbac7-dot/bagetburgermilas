@@ -399,3 +399,9 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Mobilde devam eden snap artık yalnızca gerçek yatay sürükleme başladığında iptal edilir; sıradan bir dokunuş veya dikey kaydırma tepsiyi iki burger arasında bırakamaz.
 - Burger bilgileri artık hassas bir “tam durağa ulaştı” toleransına bağlı değildir. Tepsi menü aralığında olduğu sürece yazılar görünür kalır; son el geçişi başladığında birlikte gizlenir ve geri dönüldüğünde birlikte yeniden açılır.
 - Yerel üretim derlemesi ve ileri/geri scroll eşikleri doğrulandı; tarayıcı konsolunda hata veya warning oluşmadı.
+
+## 21. 9 Ağustos 2026 — popup sadeleştirmesi
+
+- Popupın üstündeki petrol yeşili `BAGET BURGER / MİLAS · 2023` marka şeridi tamamen kaldırıldı.
+- Ana başlık `SİPARİŞİNE BİZDEN.` olarak değiştirildi; daha soldan başlar ve mobil dahil kart genişliğine taşmadan sığacak responsive punto kullanır.
+- Kartın altındaki tekrar eden `%5 · %5 · %5 · %5 · %5` şeridi kaldırıldı.
