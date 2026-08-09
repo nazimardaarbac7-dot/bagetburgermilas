@@ -242,7 +242,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
   .rotate-copy-desktop { display: none; }
   .rotate-copy-mobile { display: inline; }
   .showcase.is-active .tray-touch-zone { inset: 0; pointer-events: auto; touch-action: pan-y; }
-  .tray-markers { right: 20px; top: 112px; bottom: auto; }
+  .tray-markers { right: 20px; top: 82px; bottom: auto; }
   .tray-markers span { width: 13px; }
   .tray-markers span.active { width: 25px; }
   .milas-section { padding: 9svh max(20px, env(safe-area-inset-right)) calc(31px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); min-height: 100svh; }
