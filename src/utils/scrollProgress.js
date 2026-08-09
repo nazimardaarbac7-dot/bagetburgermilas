@@ -1,13 +1,13 @@
 export const TRAY_SETTLE_END = 0.17
 export const MOBILE_TRAY_SETTLE_END = 0.075
 export const TRAY_ROTATION_END = 0.62
-export const FINAL_TRANSITION_START = TRAY_ROTATION_END
+export const FINAL_TRANSITION_START = 0.70
 
 const HAND_PICKUP_END = 0.323
 const HAND_REACH_END = HAND_PICKUP_END * 0.6
 const HAND_GRIP_END = 0.374
 const HAND_LIFT_END = 0.7004
-const POST_GRIP_SCROLL_SCALE = 0.8
+const POST_GRIP_SCROLL_SCALE = 0.9
 const GRIP_END_SEQUENCE_PROGRESS = FINAL_TRANSITION_START + HAND_GRIP_END * (1 - FINAL_TRANSITION_START)
 const SHOWCASE_SCROLL_SPAN_SCALE = GRIP_END_SEQUENCE_PROGRESS + (1 - GRIP_END_SEQUENCE_PROGRESS) * POST_GRIP_SCROLL_SCALE
 const GRIP_END_RAW_PROGRESS = GRIP_END_SEQUENCE_PROGRESS / SHOWCASE_SCROLL_SPAN_SCALE
@@ -53,7 +53,7 @@ export function getFinalTransitionProgress(progress) {
 
 // The showcase is physically shorter only after the hand has gripped the final
 // burger. This piecewise mapping preserves every earlier scroll distance while
-// making the lift and the following Milas handoff 20% quicker in both directions.
+// making the lift and the following Milas handoff 10% quicker in both directions.
 export function getSequenceProgress(rawProgress) {
   const clamped = Math.min(1, Math.max(0, rawProgress))
   if (clamped <= GRIP_END_RAW_PROGRESS) return clamped * SHOWCASE_SCROLL_SPAN_SCALE

@@ -102,6 +102,8 @@ export default function App() {
     let cleanupHeroInput = () => {}
     let heroReturnTween = null
     let traySnapTimer = null
+    let finalGateTimer = null
+    let finalGateClampFrame = null
     const context = gsap.context(() => {
       const mobileScene = window.matchMedia('(max-width: 720px)').matches
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -112,6 +114,11 @@ export default function App() {
       let heroScrollLocked = false
       let heroScrollAnchor = 0
       let pendingNavigation = null
+      let finalGateReady = false
+      let finalGateOpen = false
+      let finalGateClamping = false
+      let touchActive = false
+      let touchStartedAtFinalStop = false
 
       const lockScrollBehavior = () => {
         if (scrollBehaviorLockDepth === 0) {
@@ -163,6 +170,48 @@ export default function App() {
         unlockScrollBehavior()
       }
 
+      const clearFinalGateTimer = () => {
+        if (finalGateTimer) window.clearTimeout(finalGateTimer)
+        finalGateTimer = null
+      }
+
+      const isAtFinalStop = () => finalTransitionProgress.current <= 0.001
+        && scrollProgress.current >= FINAL_TRANSITION_START - 0.002
+
+      const resetFinalGate = () => {
+        clearFinalGateTimer()
+        finalGateReady = false
+        finalGateOpen = false
+        touchStartedAtFinalStop = false
+      }
+
+      const scheduleFinalGateReady = () => {
+        if (finalGateOpen) return
+        clearFinalGateTimer()
+        finalGateReady = false
+        finalGateTimer = window.setTimeout(() => {
+          finalGateTimer = null
+          if (!touchActive && isAtFinalStop()) finalGateReady = true
+        }, mobileScene ? 220 : 170)
+      }
+
+      const holdAtFinalStop = () => {
+        const trayTrigger = trayTriggerRef.current
+        if (!trayTrigger || finalGateClamping) return
+        const targetScroll = trayTrigger.start
+          + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START)
+        if (Math.abs(scrollingElement.scrollTop - targetScroll) < 0.5) return
+        finalGateClamping = true
+        jumpToScroll(targetScroll)
+        finalGateClamping = false
+      }
+
+      const openFinalGate = () => {
+        clearFinalGateTimer()
+        finalGateReady = false
+        finalGateOpen = true
+      }
+
       const heroMotion = { progress: 0 }
       const trayEntryMotion = { progress: 0 }
       const heroTimeline = gsap.timeline({
@@ -181,6 +230,7 @@ export default function App() {
           setShowcaseVisibility(true, true)
           traySettledIndex.current = 0
           finalTransitionProgress.current = 0
+          resetFinalGate()
           trayEntryProgress.current = 1
           setDisplayedBurger(0)
           scrollProgress.current = firstTrayProgress
@@ -202,6 +252,7 @@ export default function App() {
           setShowcaseVisibility(false, false)
           traySettledIndex.current = 0
           finalTransitionProgress.current = 0
+          resetFinalGate()
           trayEntryProgress.current = 0
           setDisplayedBurger(0)
           scrollProgress.current = 0
@@ -288,6 +339,11 @@ export default function App() {
 
       const scheduleTraySnap = () => {
         if (trayPointerDragging || traySnapTween.current || finalTransitionProgress.current > 0.001) return
+        if (scrollProgress.current >= FINAL_TRANSITION_START - 0.002) {
+          if (traySnapTimer) window.clearTimeout(traySnapTimer)
+          traySnapTimer = null
+          return
+        }
         if (traySnapTimer) window.clearTimeout(traySnapTimer)
         traySnapTimer = window.setTimeout(() => {
           traySnapTimer = null
@@ -324,10 +380,27 @@ export default function App() {
         onUpdate: (self) => {
           if (heroPhase.current !== 'tray') return
 
-          const sequenceProgress = getSequenceProgress(self.progress)
+          let sequenceProgress = getSequenceProgress(self.progress)
+          let returnedToFinalStop = false
+          if (!finalGateOpen && sequenceProgress > FINAL_TRANSITION_START) {
+            sequenceProgress = FINAL_TRANSITION_START
+            scheduleFinalGateReady()
+            if (!finalGateClampFrame) {
+              finalGateClampFrame = window.requestAnimationFrame(() => {
+                finalGateClampFrame = null
+                holdAtFinalStop()
+              })
+            }
+          } else if (finalGateOpen && self.direction < 0 && sequenceProgress <= FINAL_TRANSITION_START + 0.001) {
+            resetFinalGate()
+            returnedToFinalStop = true
+          } else if (sequenceProgress < FINAL_TRANSITION_START - 0.015 && (finalGateOpen || finalGateReady)) {
+            resetFinalGate()
+          }
           scrollProgress.current = sequenceProgress
           const finalProgress = getFinalTransitionProgress(sequenceProgress)
           finalTransitionProgress.current = finalProgress
+          if (returnedToFinalStop) scheduleFinalGateReady()
           const rotationProgress = getTrayRotationProgress(sequenceProgress, mobileTray)
           const nextIndex = finalProgress > 0
             ? burgers.length - 1
@@ -338,6 +411,10 @@ export default function App() {
           setShowcaseVisibility(trayMenuActive, finalProgress < 0.995)
 
           if (finalProgress > 0) {
+            clearFinalGateTimer()
+            if (traySnapTimer) window.clearTimeout(traySnapTimer)
+            traySnapTimer = null
+          } else if (sequenceProgress >= FINAL_TRANSITION_START - 0.002) {
             if (traySnapTimer) window.clearTimeout(traySnapTimer)
             traySnapTimer = null
           } else if (!traySnapTween.current) {
@@ -456,6 +533,16 @@ export default function App() {
         if (document.querySelector('.discount-popup, .menu-overlay.is-open')) return
         if (preventHeroMomentum(event)) return
         if (heroPhase.current === 'tray' && traySnapTween.current) cancelTraySnap()
+        if (heroPhase.current === 'tray' && event.deltaY > 0 && isAtFinalStop() && !finalGateOpen) {
+          if (finalGateReady) {
+            openFinalGate()
+            return
+          }
+          if (event.cancelable) event.preventDefault()
+          holdAtFinalStop()
+          scheduleFinalGateReady()
+          return
+        }
         if (heroPhase.current === 'hero' && event.deltaY > 0) {
           if (event.cancelable) event.preventDefault()
           beginHeroTransition(true)
@@ -467,13 +554,24 @@ export default function App() {
         }
       }
       const handleHeroTouchStart = (event) => {
+        touchActive = event.touches.length === 1
         heroTouchStartY = event.touches.length === 1 ? event.touches[0].clientY : null
+        touchStartedAtFinalStop = touchActive && finalGateReady && isAtFinalStop()
       }
       const handleHeroTouchMove = (event) => {
         if (document.querySelector('.discount-popup, .menu-overlay.is-open')) return
         if (preventHeroMomentum(event)) return
         if (heroTouchStartY === null || event.touches.length !== 1) return
         const verticalDistance = heroTouchStartY - event.touches[0].clientY
+        if (heroPhase.current === 'tray' && verticalDistance >= 4 && isAtFinalStop() && !finalGateOpen) {
+          if (touchStartedAtFinalStop && finalGateReady) {
+            openFinalGate()
+            return
+          }
+          if (event.cancelable) event.preventDefault()
+          holdAtFinalStop()
+          return
+        }
         if (heroPhase.current === 'hero' && verticalDistance >= 4) {
           if (event.cancelable) event.preventDefault()
           beginHeroTransition(true)
@@ -485,7 +583,10 @@ export default function App() {
         }
       }
       const clearHeroTouch = () => {
+        touchActive = false
+        touchStartedAtFinalStop = false
         heroTouchStartY = null
+        if (isAtFinalStop() && !finalGateOpen) scheduleFinalGateReady()
       }
 
       window.addEventListener('wheel', handleHeroWheel, { passive: false, capture: true })
@@ -610,6 +711,8 @@ export default function App() {
     })
     return () => {
       if (traySnapTimer) window.clearTimeout(traySnapTimer)
+      if (finalGateTimer) window.clearTimeout(finalGateTimer)
+      if (finalGateClampFrame) window.cancelAnimationFrame(finalGateClampFrame)
       traySnapTween.current?.kill()
       traySnapTween.current = null
       heroReturnTween?.kill()

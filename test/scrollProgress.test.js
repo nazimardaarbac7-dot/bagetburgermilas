@@ -1,12 +1,21 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
+  FINAL_TRANSITION_START,
+  TRAY_ROTATION_END,
+  getFinalTransitionProgress,
   getHandLiftProgress,
   getRawProgressForSequenceProgress,
   getSequenceProgress,
   getTrayProgressForBurger,
   getTrayRotationProgress,
 } from '../src/utils/scrollProgress.js'
+
+test('son burger ile el geçişi arasında görünür bir durak vardır', () => {
+  assert.ok(FINAL_TRANSITION_START - TRAY_ROTATION_END >= 0.075)
+  assert.equal(getFinalTransitionProgress(TRAY_ROTATION_END), 0)
+  assert.equal(getFinalTransitionProgress(FINAL_TRANSITION_START), 0)
+})
 
 test('el, burgere temasın hemen ardından kaydırmaya tepki verir', () => {
   const contactProgress = 0.323 * 0.6
