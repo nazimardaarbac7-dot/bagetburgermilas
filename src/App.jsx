@@ -68,6 +68,7 @@ export default function App() {
   useLayoutEffect(() => {
     const media = gsap.matchMedia()
     let cleanupHeroScroll = () => {}
+    let cleanupHeroInput = () => {}
     const context = gsap.context(() => {
       const mobileScene = window.matchMedia('(max-width: 720px)').matches
       const firstTrayProgress = mobileScene ? MOBILE_TRAY_SETTLE_END : TRAY_SETTLE_END
@@ -371,7 +372,8 @@ export default function App() {
         finalSceneTween.current = null
         finalSceneRequested.current = false
         finalTransitionProgress.current = 0
-        heroScrollAnchor = window.scrollY
+        heroScrollAnchor = forward ? 0 : window.scrollY
+        if (forward && scrollingElement.scrollTop !== 0) scrollingElement.scrollTop = 0
         if (!heroScrollLocked) {
           heroScrollLocked = true
           lockScrollBehavior()
@@ -382,12 +384,52 @@ export default function App() {
         else heroTimeline.reverse()
       }
 
+      let heroTouchStartY = null
+      const preventHeroMomentum = (event) => {
+        if (heroPhase.current !== 'transition' || !heroScrollLocked) return false
+        if (event.cancelable) event.preventDefault()
+        return true
+      }
+      const handleHeroWheel = (event) => {
+        if (preventHeroMomentum(event)) return
+        if (heroPhase.current !== 'hero' || event.deltaY <= 0) return
+        if (event.cancelable) event.preventDefault()
+        beginHeroTransition(true)
+      }
+      const handleHeroTouchStart = (event) => {
+        heroTouchStartY = event.touches.length === 1 ? event.touches[0].clientY : null
+      }
+      const handleHeroTouchMove = (event) => {
+        if (preventHeroMomentum(event)) return
+        if (heroPhase.current !== 'hero' || heroTouchStartY === null || event.touches.length !== 1) return
+        const upwardDistance = heroTouchStartY - event.touches[0].clientY
+        if (upwardDistance < 4) return
+        if (event.cancelable) event.preventDefault()
+        beginHeroTransition(true)
+      }
+      const clearHeroTouch = () => {
+        heroTouchStartY = null
+      }
+
+      window.addEventListener('wheel', handleHeroWheel, { passive: false, capture: true })
+      window.addEventListener('touchstart', handleHeroTouchStart, { passive: true, capture: true })
+      window.addEventListener('touchmove', handleHeroTouchMove, { passive: false, capture: true })
+      window.addEventListener('touchend', clearHeroTouch, { passive: true, capture: true })
+      window.addEventListener('touchcancel', clearHeroTouch, { passive: true, capture: true })
+      cleanupHeroInput = () => {
+        window.removeEventListener('wheel', handleHeroWheel, true)
+        window.removeEventListener('touchstart', handleHeroTouchStart, true)
+        window.removeEventListener('touchmove', handleHeroTouchMove, true)
+        window.removeEventListener('touchend', clearHeroTouch, true)
+        window.removeEventListener('touchcancel', clearHeroTouch, true)
+      }
+
       ScrollTrigger.create({
         trigger: '#top',
         start: 'top top',
         end: 'bottom bottom',
         onUpdate: (self) => {
-          if (self.direction > 0 && self.progress > 0.012 && heroPhase.current === 'hero') {
+          if (self.direction > 0 && self.progress > 0 && heroPhase.current === 'hero') {
             beginHeroTransition(true)
           }
         },
@@ -494,6 +536,7 @@ export default function App() {
       traySnapTween.current = null
       finalSceneTween.current?.kill()
       finalSceneTween.current = null
+      cleanupHeroInput()
       cleanupHeroScroll()
       runFinalScene.current = null
       requestTrayIndex.current = null
