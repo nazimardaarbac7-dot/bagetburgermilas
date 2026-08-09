@@ -12,7 +12,7 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
         </div>
         <BurgerInfo burger={burger} />
         <TrayTouchZone enabled={isInteractive} onDrag={onTrayDrag} onDragEnd={onTrayDragEnd} onTap={onBurgerTap} />
-        <p className="rotate-prompt"><i /><span className="rotate-copy-desktop">TEPSİYİ DÖNDÜRMEK İÇİN KAYDIR</span><span className="rotate-copy-mobile">KAYDIR / TEPSİYİ SÜRÜKLE</span></p>
+        <p className="rotate-prompt"><i /><span className="rotate-copy-desktop">KAYDIR / BURGERE DOKUN</span><span className="rotate-copy-mobile">KAYDIR / BURGERE DOKUN</span></p>
         <div className="tray-markers" aria-hidden="true">
           {Array.from({ length: 6 }, (_, index) => <span className={index === activeIndex ? 'active' : ''} key={index} />)}
         </div>

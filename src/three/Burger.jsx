@@ -14,9 +14,11 @@ const burgerPhotoPaths = [
 ]
 
 const handTexturePath = '/assets/interaction/hand-grab.png'
+const drumstickTexturePath = '/assets/interaction/drumstick-confetti.png'
 
 burgerPhotoPaths.forEach((path) => useTexture.preload(path))
 useTexture.preload(handTexturePath)
+useTexture.preload(drumstickTexturePath)
 
 const matte = {
   bun: '#a94f1d',
@@ -119,6 +121,7 @@ function ClassicBunSpeckles() {
 
 function BurgerPhoto({ index }) {
   const texture = useTexture(burgerPhotoPaths[index])
+  const photoScale = index === 2 ? 1.18 : 1
 
   useLayoutEffect(() => {
     texture.colorSpace = THREE.SRGBColorSpace
@@ -127,7 +130,7 @@ function BurgerPhoto({ index }) {
   }, [texture])
 
   return (
-    <mesh position={[0, 0.65, 0.72]} renderOrder={2} castShadow>
+    <mesh position={[0, 0.65, 0.72]} scale={photoScale} renderOrder={2} castShadow>
       <planeGeometry args={[2.52, 1.895]} />
       <meshBasicMaterial
         map={texture}
@@ -179,6 +182,70 @@ function HandPickup({ scrollProgress }) {
         side={THREE.DoubleSide}
       />
     </mesh>
+  )
+}
+
+function DrumstickBurst({ index, interactionPulse }) {
+  const burst = useRef()
+  const material = useRef()
+  const lastToken = useRef(0)
+  const elapsed = useRef(2)
+  const texture = useTexture(drumstickTexturePath)
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+  const particles = useMemo(() => Array.from({ length: 12 }, (_, particleIndex) => ({
+    angle: (particleIndex / 12) * Math.PI * 2 + (particleIndex % 3) * 0.12,
+    speed: 2.15 + (particleIndex % 4) * 0.24,
+    scale: 0.42 + (particleIndex % 3) * 0.055,
+    spin: (particleIndex % 2 ? 1 : -1) * (2.8 + (particleIndex % 5) * 0.55),
+    rotation: particleIndex * 0.73,
+  })), [])
+
+  useLayoutEffect(() => {
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.anisotropy = 4
+    texture.needsUpdate = true
+  }, [texture])
+
+  useFrame((state, delta) => {
+    if (!burst.current || !material.current || !interactionPulse) return
+    const interaction = interactionPulse.current
+    if (interaction.index === index && interaction.token !== lastToken.current) {
+      lastToken.current = interaction.token
+      elapsed.current = 0
+      burst.current.visible = true
+    }
+    if (!burst.current.visible) return
+
+    elapsed.current += Math.min(delta, 1 / 24)
+    const progress = Math.min(1, elapsed.current / 1.15)
+    const pop = THREE.MathUtils.smootherstep(progress, 0, 0.12)
+    const fade = 1 - THREE.MathUtils.smoothstep(progress, 0.56, 1)
+    const gravity = progress * progress * 1.65
+
+    particles.forEach((particle, particleIndex) => {
+      const distance = progress * particle.speed
+      dummy.position.set(
+        Math.cos(particle.angle) * distance,
+        0.2 + Math.sin(particle.angle) * distance * 0.74 + progress * 0.92 - gravity,
+        1.1 + (particleIndex % 3) * 0.035,
+      )
+      dummy.rotation.set(0, 0, particle.rotation + particle.spin * progress)
+      const scale = particle.scale * pop * (1 - progress * 0.22)
+      dummy.scale.setScalar(scale)
+      dummy.updateMatrix()
+      burst.current.setMatrixAt(particleIndex, dummy.matrix)
+    })
+    burst.current.instanceMatrix.needsUpdate = true
+    material.current.opacity = fade
+
+    if (progress >= 1) burst.current.visible = false
+  })
+
+  return (
+    <instancedMesh ref={burst} args={[null, null, 12]} visible={false} frustumCulled={false} renderOrder={6}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial ref={material} map={texture} transparent opacity={0} alphaTest={0.02} depthWrite={false} toneMapped={false} side={THREE.DoubleSide} />
+    </instancedMesh>
   )
 }
 
@@ -535,6 +602,7 @@ export default function Burger({ index, activeIndex, isFloating = false, mobileO
       {isFloating && <HeroBurgerDepth mobileOptimized={mobileOptimized} />}
       {pickupTarget && <HandPickup scrollProgress={pickupProgress} />}
       {!isFloating || mobileOptimized ? <BurgerPhoto index={index} /> : <ClassicBurger withCheese />}
+      {!isFloating && <DrumstickBurst index={index} interactionPulse={interactionPulse} />}
       {!isFloating && !mobileOptimized && <pointLight ref={accentLight} color={accent} intensity={initialLightIntensity.current} distance={3.2} position={[0, 2.2, 1.5]} />}
     </group>
   )

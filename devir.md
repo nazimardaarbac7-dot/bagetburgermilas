@@ -368,3 +368,11 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Tavuk Burger görseli kullanıcının verdiği ürün fotoğrafından şeffaf kesim olarak `public/assets/burgers/tavuk-burger-cutout.png` dosyasına hazırlandı.
 - Her yeni sayfa açılışında telefon siparişlerine `%5 indirim` görseli kapatılabilir popup olarak açılır.
 - Mobil tam menü altındaki Getir sipariş butonu `286px` azami genişlik ve `44px` yüksekliğe küçültüldü.
+
+## 17. 9 Ağustos 2026 — modern popup ve baget konfeti
+
+- Tavuk Burger tepsi görseli diğer burgerlere göre `1.18` ölçeğinde gösterilir.
+- Açılış kampanyası artık eski afiş görselini doğrudan göstermez; responsive, kod tabanlı modern marka kartı kullanır. Kartta `%5`, telefon açıklaması ve `0549 823 20 20` arama CTA'sı bulunur.
+- Burger bilgi alanı aktifken burgere dokunmak/tıklamak, burger çevresinden 12 tavuk bagetinin konfeti gibi çıktığı yaklaşık `1.15s` süren bir etkileşim başlatır.
+- Bagetler performans için 12 ayrı draw call yerine tek `instancedMesh` ile render edilir.
+- Baget sprite'ı kullanıcının verdiği fotoğraftan hazırlanmış şeffaf `public/assets/interaction/drumstick-confetti.png` dosyasıdır.
