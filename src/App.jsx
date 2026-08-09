@@ -19,10 +19,10 @@ const HERO_COPY_EXIT_DURATION = 1.16
 const TRAY_ENTRY_START = 1.08
 const TRAY_ENTRY_DURATION = 1.46
 const TRAY_INFO_REVEAL_PROGRESS = 0.72
-const TRAY_RETURN_START = 0.12
-const TRAY_RETURN_DURATION = 1.34
-const HERO_RETURN_START = 0.78
-const HERO_RETURN_DURATION = 1.28
+const TRAY_RETURN_DURATION = TRAY_ENTRY_DURATION
+const HERO_RETURN_START = TRAY_RETURN_DURATION
+const HERO_RETURN_DURATION = HERO_TRANSITION_DURATION
+const HERO_COPY_RETURN_START = HERO_RETURN_START + HERO_RETURN_DURATION - HERO_COPY_EXIT_DURATION
 
 function getStableBurgerIndex(rotationProgress, currentIndex) {
   const position = rotationProgress * (burgers.length - 1)
@@ -391,6 +391,7 @@ export default function App() {
         }
 
         setShowcaseVisibility(false, true)
+        scrollProgress.current = 0
         heroReturnTween?.kill()
         heroReturnTween = gsap.timeline({
           onUpdate: () => {
@@ -421,7 +422,9 @@ export default function App() {
           progress: 0,
           duration: TRAY_RETURN_DURATION,
           ease: 'sine.inOut',
-        }, TRAY_RETURN_START)
+        }, 0)
+
+        heroReturnTween.call(() => setShowcaseVisibility(false, false), [], TRAY_RETURN_DURATION)
 
         heroReturnTween.to(heroMotion, {
           progress: 0,
@@ -434,16 +437,16 @@ export default function App() {
           opacity: 1,
           yPercent: 0,
           force3D: true,
-          duration: HERO_RETURN_DURATION,
+          duration: HERO_COPY_EXIT_DURATION,
           ease: 'power2.inOut',
-        }, HERO_RETURN_START)
+        }, HERO_COPY_RETURN_START)
 
         heroReturnTween.to('.scroll-cue', {
           autoAlpha: 1,
           y: 0,
-          duration: 0.54,
+          duration: 0.46,
           ease: 'power2.out',
-        }, HERO_RETURN_START + HERO_RETURN_DURATION - 0.54)
+        }, HERO_RETURN_START + HERO_RETURN_DURATION - 0.46)
       }
 
       const canReturnToHero = () => heroPhase.current === 'tray'
