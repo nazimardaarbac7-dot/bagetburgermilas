@@ -11,10 +11,10 @@ import {
   getTrayRotationProgress,
 } from '../src/utils/scrollProgress.js'
 
-test('son burger ile el geçişi arasında görünür bir durak vardır', () => {
-  assert.ok(FINAL_TRANSITION_START - TRAY_ROTATION_END >= 0.075)
+test('el geçişi son burger durağında boşluk bırakmadan başlar', () => {
+  assert.equal(FINAL_TRANSITION_START, TRAY_ROTATION_END)
   assert.equal(getFinalTransitionProgress(TRAY_ROTATION_END), 0)
-  assert.equal(getFinalTransitionProgress(FINAL_TRANSITION_START), 0)
+  assert.ok(getFinalTransitionProgress(FINAL_TRANSITION_START + 0.0001) > 0)
 })
 
 test('el, burgere temasın hemen ardından kaydırmaya tepki verir', () => {

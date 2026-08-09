@@ -405,3 +405,10 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Popupın üstündeki petrol yeşili `BAGET BURGER / MİLAS · 2023` marka şeridi tamamen kaldırıldı.
 - Ana başlık `SİPARİŞİNE BİZDEN.` olarak değiştirildi; daha soldan başlar ve mobil dahil kart genişliğine taşmadan sığacak responsive punto kullanır.
 - Kartın altındaki tekrar eden `%5 · %5 · %5 · %5 · %5` şeridi kaldırıldı.
+
+## 22. 9 Ağustos 2026 — son burger momentum kapısı düzeltmesi
+
+- Son burger durağı ile el animasyonunun başlangıcı yeniden aynı progress noktasına (`0.62`) alındı; aradaki görünmeyen `0.62 → 0.70` scroll boşluğu kaldırıldı.
+- Momentum kapısı animasyona süreli bir bekleme eklemez. Önceki hareketten taşan mobil momentum son burger durağında tutulur; bu durakta başlayan yeni yukarı kaydırma el geçişini doğrudan açar.
+- Yeni hareketin başlangıç durumu parmak ilk değdiği anda kaydedilir. İlk dikey hareket sırasında scroll değeri küçük miktarda değişse bile el kapısı güvenilir biçimde açılır.
+- Elin yaklaşması, burgeri tutması, kaldırması ve Made in Milas geçişi korunur; yalnızca animasyondan önce oluşan hatalı boş aralık kaldırılmıştır.

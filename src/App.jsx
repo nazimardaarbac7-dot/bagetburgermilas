@@ -559,14 +559,16 @@ export default function App() {
         if (preventHeroMomentum(event)) return
         if (heroTouchStartY === null || event.touches.length !== 1) return
         const verticalDistance = heroTouchStartY - event.touches[0].clientY
-        if (heroPhase.current === 'tray' && verticalDistance >= 4 && isAtFinalStop() && !finalGateOpen) {
+        if (heroPhase.current === 'tray' && verticalDistance >= 4 && !finalGateOpen) {
           if (touchStartedAtFinalStop) {
             openFinalGate()
             return
           }
-          if (event.cancelable) event.preventDefault()
-          holdAtFinalStop()
-          return
+          if (isAtFinalStop()) {
+            if (event.cancelable) event.preventDefault()
+            holdAtFinalStop()
+            return
+          }
         }
         if (heroPhase.current === 'hero' && verticalDistance >= 4) {
           if (event.cancelable) event.preventDefault()
