@@ -313,9 +313,9 @@ export default function App() {
         }
 
         if (distance < 1) {
-          if (mobileTray && activeIndexValue.current !== targetIndex) {
+          if (activeIndexValue.current !== targetIndex) {
             if (trayDisplayTimer) window.clearTimeout(trayDisplayTimer)
-            trayDisplayTimer = window.setTimeout(finishSnap, 90)
+            trayDisplayTimer = window.setTimeout(finishSnap, mobileTray ? 90 : 70)
           } else {
             finishSnap()
           }
@@ -329,7 +329,7 @@ export default function App() {
             ? 0.01
             : mobileTray
               ? Math.min(0.22, Math.max(0.12, distance / window.innerHeight * 0.15))
-              : Math.min(0.32, Math.max(0.16, distance / window.innerHeight * 0.22)),
+              : Math.min(0.24, Math.max(0.13, distance / window.innerHeight * 0.17)),
           ease: 'power3.out',
           onUpdate: () => {
             scrollingElement.scrollTop = snapMotion.scroll
@@ -337,11 +337,7 @@ export default function App() {
           },
           onComplete: () => {
             traySnapTween.current = null
-            if (mobileTray) {
-              trayDisplayTimer = window.setTimeout(finishSnap, 40)
-            } else {
-              finishSnap()
-            }
+            trayDisplayTimer = window.setTimeout(finishSnap, mobileTray ? 40 : 55)
           },
         })
       }
@@ -359,13 +355,12 @@ export default function App() {
           return
         }
         if (traySnapTimer) {
-          if (!mobileTray) return
           window.clearTimeout(traySnapTimer)
         }
         traySnapTimer = window.setTimeout(() => {
           traySnapTimer = null
           snapTrayToNearest()
-        }, mobileScene ? 70 : 140)
+        }, mobileScene ? 70 : 90)
       }
 
       adjustTrayProgress.current = (movementX) => {
@@ -423,7 +418,7 @@ export default function App() {
             ? burgers.length - 1
             : getStableBurgerIndex(rotationProgress, activeIndexValue.current)
           const trayMenuActive = finalProgress <= 0.001 && sequenceProgress >= firstTrayProgress - 0.002
-          if (!mobileTray || finalProgress > 0) {
+          if (finalProgress > 0) {
             traySettledIndex.current = nextIndex
             setDisplayedBurger(nextIndex)
           }
@@ -436,7 +431,7 @@ export default function App() {
           } else if (sequenceProgress >= FINAL_TRANSITION_START - 0.002) {
             if (traySnapTimer) window.clearTimeout(traySnapTimer)
             traySnapTimer = null
-            if (mobileTray && traySettledIndex.current !== burgers.length - 1 && !traySnapTween.current && !trayDisplayTimer) {
+            if (traySettledIndex.current !== burgers.length - 1 && !traySnapTween.current && !trayDisplayTimer) {
               snapTrayToIndex(burgers.length - 1)
             }
           } else if (!traySnapTween.current) {
