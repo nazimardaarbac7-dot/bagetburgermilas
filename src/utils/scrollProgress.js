@@ -13,7 +13,7 @@ const SHOWCASE_SCROLL_SPAN_SCALE = GRIP_END_SEQUENCE_PROGRESS + (1 - GRIP_END_SE
 const GRIP_END_RAW_PROGRESS = GRIP_END_SEQUENCE_PROGRESS / SHOWCASE_SCROLL_SPAN_SCALE
 const MOBILE_INITIAL_POST_GRIP_DISTANCE_SCALE = 0.85
 const MOBILE_ADDITIONAL_POST_GRIP_DISTANCE_SCALE = 0.92
-const MOBILE_COUPLED_FINAL_PHASE_SCALE = 0.85
+const MOBILE_COUPLED_FINAL_PHASE_SCALE = 0.85 * 0.8
 const MOBILE_POST_GRIP_DISTANCE_SCALE = MOBILE_INITIAL_POST_GRIP_DISTANCE_SCALE
   * MOBILE_ADDITIONAL_POST_GRIP_DISTANCE_SCALE
   * MOBILE_COUPLED_FINAL_PHASE_SCALE
@@ -63,8 +63,8 @@ export function getFinalTransitionProgress(progress) {
   return Math.min(1, Math.max(0, normalized))
 }
 
-// Mobile shortens the physical post-grip span by 15%. Its adjusted breakpoint
-// keeps every scroll distance before the grip identical to the existing map.
+// Mobile shortens only the coupled hand-lift and Milas transition after the
+// grip. Its adjusted breakpoint keeps every pre-grip distance unchanged.
 export function getSequenceProgress(rawProgress, isMobile = false) {
   const clamped = Math.min(1, Math.max(0, rawProgress))
   const gripEndRawProgress = isMobile ? MOBILE_GRIP_END_RAW_PROGRESS : GRIP_END_RAW_PROGRESS
