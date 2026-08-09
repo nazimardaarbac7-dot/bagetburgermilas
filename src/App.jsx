@@ -187,7 +187,7 @@ export default function App() {
         finalGateTimer = window.setTimeout(() => {
           finalGateTimer = null
           if (!touchActive && isAtFinalStop()) finalGateReady = true
-        }, mobileScene ? 220 : 170)
+        }, mobileScene ? 90 : 120)
       }
 
       const holdAtFinalStop = () => {
@@ -551,7 +551,8 @@ export default function App() {
       const handleHeroTouchStart = (event) => {
         touchActive = event.touches.length === 1
         heroTouchStartY = event.touches.length === 1 ? event.touches[0].clientY : null
-        touchStartedAtFinalStop = touchActive && finalGateReady && isAtFinalStop()
+        touchStartedAtFinalStop = touchActive && isAtFinalStop()
+        if (touchStartedAtFinalStop) clearFinalGateTimer()
       }
       const handleHeroTouchMove = (event) => {
         if (document.querySelector('.discount-popup, .menu-overlay.is-open')) return
@@ -559,7 +560,7 @@ export default function App() {
         if (heroTouchStartY === null || event.touches.length !== 1) return
         const verticalDistance = heroTouchStartY - event.touches[0].clientY
         if (heroPhase.current === 'tray' && verticalDistance >= 4 && isAtFinalStop() && !finalGateOpen) {
-          if (touchStartedAtFinalStop && finalGateReady) {
+          if (touchStartedAtFinalStop) {
             openFinalGate()
             return
           }
