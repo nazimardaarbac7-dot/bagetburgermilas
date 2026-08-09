@@ -25,12 +25,12 @@ export function getTrayProgressForBurger(index, burgerCount, isMobile = false) {
 }
 
 export function getHandPickupProgress(progress) {
-  const normalized = progress / 0.38
+  const normalized = progress / 0.323
   return Math.min(1, Math.max(0, normalized))
 }
 
 export function getHandLiftProgress(progress) {
-  const normalized = (progress - 0.44) / 0.48
+  const normalized = (progress - 0.374) / 0.408
   return Math.min(1, Math.max(0, normalized))
 }
 

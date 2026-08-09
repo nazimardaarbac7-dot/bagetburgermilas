@@ -344,7 +344,7 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Tepsi dönüş aralığı showcase progress'inde mobilde `0.075 → 0.62`, masaüstünde `0.17 → 0.62` aralığıdır.
 - Showcase yüksekliği mobil ve masaüstünde `720vh` olarak ayarlanmıştır.
 - Son burger → Made in Milas geçişi dijital değildir. Showcase progress'inin son `0.62 → 1` bölümü gerçek scroll progress'iyle çalışır ve yaklaşık `300vh` mesafe sağlar.
-- Final akışı üç fazlıdır: el yaklaşır (`0 → 0.38`), kısa kavrama aralığı oluşur (`0.38 → 0.44`), burger kaldırılır (`0.44 → 0.92`).
+- Final akışı üç fazlıdır: el yaklaşır (`0 → 0.323`), kısa kavrama aralığı oluşur (`0.323 → 0.374`), burger kaldırılır (`0.374 → 0.782`). El hareketinin tamamlanması önceki ayara göre `%15` daha az scroll gerektirir.
 - Made in Milas bölümü doğal sayfa scroll'u ile el/burger çıkışının ikinci yarısında yükselir.
 - Yukarı kaydırma aynı progress'i tersine çevirdiği için Milas → son burger dönüşünde ayrı dijital komut veya ters tween yoktur.
 - Geri dönüş sonunda burger tepsiye yerleşir, `05 — 05` bilgisi ve tepsi etkileşimi yeniden açılır.
