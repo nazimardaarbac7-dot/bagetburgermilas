@@ -3,12 +3,19 @@ import BurgerInfo from '../components/BurgerInfo'
 import TrayTouchZone from '../components/TrayTouchZone'
 
 export default function BurgerShowcase({ burger, activeIndex, isReady, isActive, isInteractive, onTrayDrag, onTrayDragEnd, onBurgerTap, onTrayStep }) {
+  const isLastBurger = activeIndex === 5
+
   return (
     <section id="tray" className={`showcase${isReady ? ' is-ready' : ''}${isActive ? ' is-active' : ''}`} aria-label="Burger menüsü">
       <div className="showcase-panel">
         <div className="showcase-topline">
           <span className="selector-label">BURGERİNİ SEÇ</span>
-          <span className="progress-count">0{activeIndex + 1} — 06</span>
+          <span className="progress-status">
+            <span className="progress-count">0{activeIndex + 1} — 06</span>
+            <span className="tray-markers" aria-hidden="true">
+              {Array.from({ length: 6 }, (_, index) => <span className={index === activeIndex ? 'active' : ''} key={index} />)}
+            </span>
+          </span>
         </div>
         <BurgerInfo burger={burger} />
         <div className="tap-hint" aria-hidden="true">
@@ -19,10 +26,7 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
           </svg>
         </div>
         <TrayTouchZone enabled={isInteractive} onDrag={onTrayDrag} onDragEnd={onTrayDragEnd} onTap={onBurgerTap} onStep={onTrayStep} />
-        <p className="rotate-prompt"><i /><span className="rotate-copy-desktop">TEPSİYİ KAYDIR / BURGERE DOKUN</span><span className="rotate-copy-mobile">TEPSİYİ KAYDIR</span></p>
-        <div className="tray-markers" aria-hidden="true">
-          {Array.from({ length: 6 }, (_, index) => <span className={index === activeIndex ? 'active' : ''} key={index} />)}
-        </div>
+        <p className={`rotate-prompt${isLastBurger ? ' is-final' : ''}`}><i /><span className="rotate-copy-desktop">{isLastBurger ? 'AŞAĞI KAYDIR' : 'TEPSİYİ KAYDIR / BURGERE DOKUN'}</span><span className="rotate-copy-mobile">{isLastBurger ? 'AŞAĞI KAYDIR' : 'TEPSİYİ KAYDIR'}</span></p>
       </div>
     </section>
   )
