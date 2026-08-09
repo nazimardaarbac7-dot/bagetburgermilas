@@ -15,6 +15,18 @@ const burgerPhotoPaths = [
 
 const handTexturePath = '/assets/interaction/hand-grab.png'
 const drumstickTexturePath = '/assets/interaction/drumstick-confetti.png'
+const DRUMSTICKS_PER_BURST = 12
+const MAX_CONCURRENT_BURSTS = 6
+const MAX_DRUMSTICK_INSTANCES = DRUMSTICKS_PER_BURST * MAX_CONCURRENT_BURSTS
+
+const burgerBurstOutlines = [
+  { radiusX: 1.13, radiusY: 0.74, centerY: 0.68, angleOffset: 0.02 },
+  { radiusX: 1.22, radiusY: 0.7, centerY: 0.68, angleOffset: 0.1 },
+  { radiusX: 1.49, radiusY: 0.56, centerY: 0.68, angleOffset: -0.05 },
+  { radiusX: 1.18, radiusY: 0.79, centerY: 0.7, angleOffset: 0.07 },
+  { radiusX: 1.29, radiusY: 0.85, centerY: 0.68, angleOffset: -0.09 },
+  { radiusX: 1.2, radiusY: 0.77, centerY: 0.7, angleOffset: 0.04 },
+]
 
 burgerPhotoPaths.forEach((path) => useTexture.preload(path))
 useTexture.preload(handTexturePath)
@@ -187,13 +199,13 @@ function HandPickup({ scrollProgress }) {
 
 function DrumstickBurst({ index, interactionPulse }) {
   const burst = useRef()
-  const material = useRef()
   const lastToken = useRef(0)
-  const elapsed = useRef(2)
+  const activeBursts = useRef([])
   const texture = useTexture(drumstickTexturePath)
   const dummy = useMemo(() => new THREE.Object3D(), [])
-  const particles = useMemo(() => Array.from({ length: 12 }, (_, particleIndex) => ({
-    angle: (particleIndex / 12) * Math.PI * 2 + (particleIndex % 3) * 0.12,
+  const outline = burgerBurstOutlines[index] ?? burgerBurstOutlines[0]
+  const particles = useMemo(() => Array.from({ length: DRUMSTICKS_PER_BURST }, (_, particleIndex) => ({
+    angle: (particleIndex / DRUMSTICKS_PER_BURST) * Math.PI * 2 + (particleIndex % 3) * 0.12,
     speed: 2.15 + (particleIndex % 4) * 0.24,
     scale: 0.42 + (particleIndex % 3) * 0.055,
     spin: (particleIndex % 2 ? 1 : -1) * (2.8 + (particleIndex % 5) * 0.55),
@@ -204,47 +216,68 @@ function DrumstickBurst({ index, interactionPulse }) {
     texture.colorSpace = THREE.SRGBColorSpace
     texture.anisotropy = 4
     texture.needsUpdate = true
+    if (burst.current) {
+      burst.current.count = 0
+      burst.current.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
+    }
   }, [texture])
 
   useFrame((state, delta) => {
-    if (!burst.current || !material.current || !interactionPulse) return
+    if (!burst.current || !interactionPulse) return
     const interaction = interactionPulse.current
     if (interaction.index === index && interaction.token !== lastToken.current) {
       lastToken.current = interaction.token
-      elapsed.current = 0
+      activeBursts.current = activeBursts.current.filter((item) => item.elapsed < 1.15)
+      if (activeBursts.current.length >= MAX_CONCURRENT_BURSTS) activeBursts.current.shift()
+      activeBursts.current.push({
+        elapsed: 0,
+        phase: interaction.token * 0.47,
+      })
       burst.current.visible = true
     }
     if (!burst.current.visible) return
 
-    elapsed.current += Math.min(delta, 1 / 24)
-    const progress = Math.min(1, elapsed.current / 1.15)
-    const pop = THREE.MathUtils.smootherstep(progress, 0, 0.12)
-    const fade = 1 - THREE.MathUtils.smoothstep(progress, 0.56, 1)
-    const gravity = progress * progress * 1.65
+    const frameDelta = Math.min(delta, 1 / 24)
+    activeBursts.current.forEach((item) => { item.elapsed += frameDelta })
+    activeBursts.current = activeBursts.current.filter((item) => item.elapsed < 1.15)
 
-    particles.forEach((particle, particleIndex) => {
-      const distance = progress * particle.speed
-      dummy.position.set(
-        Math.cos(particle.angle) * distance,
-        0.2 + Math.sin(particle.angle) * distance * 0.74 + progress * 0.92 - gravity,
-        1.1 + (particleIndex % 3) * 0.035,
-      )
-      dummy.rotation.set(0, 0, particle.rotation + particle.spin * progress)
-      const scale = particle.scale * pop * (1 - progress * 0.22)
-      dummy.scale.setScalar(scale)
-      dummy.updateMatrix()
-      burst.current.setMatrixAt(particleIndex, dummy.matrix)
+    let instanceIndex = 0
+    activeBursts.current.forEach((item, burstIndex) => {
+      const progress = Math.min(1, item.elapsed / 1.15)
+      const pop = THREE.MathUtils.smootherstep(progress, 0, 0.1)
+      const shrink = 1 - THREE.MathUtils.smoothstep(progress, 0.68, 1)
+      const gravity = progress * progress * 1.65
+
+      particles.forEach((particle, particleIndex) => {
+        const angle = particle.angle + outline.angleOffset + item.phase
+        const distance = progress * particle.speed
+        const directionX = Math.cos(angle)
+        const directionY = Math.sin(angle)
+        dummy.position.set(
+          directionX * outline.radiusX + directionX * distance,
+          outline.centerY + directionY * outline.radiusY + directionY * distance * 0.74 + progress * 0.92 - gravity,
+          1.1 + (particleIndex % 3) * 0.035 + burstIndex * 0.008,
+        )
+        dummy.rotation.set(0, 0, particle.rotation + item.phase + particle.spin * progress)
+        dummy.scale.setScalar(particle.scale * pop * shrink)
+        dummy.updateMatrix()
+        burst.current.setMatrixAt(instanceIndex, dummy.matrix)
+        instanceIndex += 1
+      })
     })
+    burst.current.count = instanceIndex
     burst.current.instanceMatrix.needsUpdate = true
-    material.current.opacity = fade
 
-    if (progress >= 1) burst.current.visible = false
+    if (activeBursts.current.length === 0) {
+      burst.current.count = 0
+      burst.current.visible = false
+    }
   })
 
   return (
-    <instancedMesh ref={burst} args={[null, null, 12]} visible={false} frustumCulled={false} renderOrder={6}>
+    <instancedMesh ref={burst} args={[null, null, MAX_DRUMSTICK_INSTANCES]} visible={false} frustumCulled={false} renderOrder={6}>
       <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial ref={material} map={texture} transparent opacity={0} alphaTest={0.02} depthWrite={false} toneMapped={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial map={texture} transparent alphaTest={0.02} depthWrite={false} toneMapped={false} side={THREE.DoubleSide} />
     </instancedMesh>
   )
 }

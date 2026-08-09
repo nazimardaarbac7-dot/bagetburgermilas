@@ -376,3 +376,10 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Burger bilgi alanı aktifken burgere dokunmak/tıklamak, burger çevresinden 12 tavuk bagetinin konfeti gibi çıktığı yaklaşık `1.15s` süren bir etkileşim başlatır.
 - Bagetler performans için 12 ayrı draw call yerine tek `instancedMesh` ile render edilir.
 - Baget sprite'ı kullanıcının verdiği fotoğraftan hazırlanmış şeffaf `public/assets/interaction/drumstick-confetti.png` dosyasıdır.
+
+## 18. 9 Ağustos 2026 — burger hattından çıkan üst üste efektler
+
+- Bagetler artık sabit merkezden başlamaz. Altı burgerin her biri için ayrı `radiusX`, `radiusY`, `centerY` ve açı ofseti tanımlanmıştır; parçacıklar ürünün kendi dış hattından dışarı doğru çıkar.
+- Tavuk Burger yatay ve daha basık, Karışık Burger daha yüksek/geniş gibi ürün biçimleri ayrı ayrı hesaba katılır.
+- Her dokunma bağımsız bir patlama oluşturur. Devam eden patlama yeni dokunmada sıfırlanmaz veya durdurulmaz; eşzamanlı patlamalar aynı `instancedMesh` içinde üst üste render edilir.
+- Mobil güvenlik sınırı altı eşzamanlı patlamadır (`72` baget instance). Tamamlanan patlamalar bağımsız temizlenir ve diğerleri devam eder.
