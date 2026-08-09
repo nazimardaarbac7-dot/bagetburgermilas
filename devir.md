@@ -360,3 +360,11 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Mobil 375×844 yerel testte hero, hero → tepsi, analog burger rotasyonu, son burger → Milas ve Milas → son burger geri dönüşü doğrulandı; konsolda warning/error yoktu.
 - Environment haritası mobilde kapalı kaldığı için tepsinin yüksek metalness değerleri siyaha yakın görünmemelidir; mobil tepsi malzemeleri daha açık metalik gri/kahverengi ve daha düşük metalness değerleri kullanır.
 - Mobil yatay tepsi sürükleme katsayısı `2.35` yerine `3.15` oldu. Bir burgerlik hareket yaklaşık `%25` daha kısa parmak mesafesiyle tamamlanır; doğal dikey scroll ve final el geçişi mesafeleri değişmez.
+
+## 16. 9 Ağustos 2026 — Tavuk Burger ve açılış kampanyası
+
+- Cheeseburger'dan sonra üçüncü sıraya `Tavuk Burger` eklendi; fiyatı tam menü verisiyle aynı şekilde `220 TL`dir.
+- Tepsi artık altı ürünlüdür; sayaçlar ve işaretçiler `06` olarak güncellendi. Baldıcanlı Burger altıncı ve son ürün olduğu için el/final geçiş hedefi değişmedi.
+- Tavuk Burger görseli kullanıcının verdiği ürün fotoğrafından şeffaf kesim olarak `public/assets/burgers/tavuk-burger-cutout.png` dosyasına hazırlandı.
+- Her yeni sayfa açılışında telefon siparişlerine `%5 indirim` görseli kapatılabilir popup olarak açılır.
+- Mobil tam menü altındaki Getir sipariş butonu `286px` azami genişlik ve `44px` yüksekliğe küçültüldü.

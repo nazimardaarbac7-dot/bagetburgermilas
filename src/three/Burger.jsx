@@ -7,6 +7,7 @@ import { getHandLiftProgress, getHandPickupProgress } from '../utils/scrollProgr
 const burgerPhotoPaths = [
   '/assets/burgers/hamburger-classic-cutout.png',
   '/assets/burgers/cheeseburger-cutout.png',
+  '/assets/burgers/tavuk-burger-cutout.png',
   '/assets/burgers/koz-burger-cutout.png',
   '/assets/burgers/karisik-burger-cutout.png',
   '/assets/burgers/baldicanli-burger-cutout.png',

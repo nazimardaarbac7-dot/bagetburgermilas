@@ -8,13 +8,13 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
       <div className="showcase-panel">
         <div className="showcase-topline">
           <span className="selector-label">BURGERİNİ SEÇ</span>
-          <span className="progress-count">0{activeIndex + 1} — 05</span>
+          <span className="progress-count">0{activeIndex + 1} — 06</span>
         </div>
         <BurgerInfo burger={burger} />
         <TrayTouchZone enabled={isInteractive} onDrag={onTrayDrag} onDragEnd={onTrayDragEnd} onTap={onBurgerTap} />
         <p className="rotate-prompt"><i /><span className="rotate-copy-desktop">TEPSİYİ DÖNDÜRMEK İÇİN KAYDIR</span><span className="rotate-copy-mobile">KAYDIR / TEPSİYİ SÜRÜKLE</span></p>
         <div className="tray-markers" aria-hidden="true">
-          {Array.from({ length: 5 }, (_, index) => <span className={index === activeIndex ? 'active' : ''} key={index} />)}
+          {Array.from({ length: 6 }, (_, index) => <span className={index === activeIndex ? 'active' : ''} key={index} />)}
         </div>
       </div>
     </section>

@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Navbar from './components/Navbar'
 import MenuOverlay from './components/MenuOverlay'
+import DiscountPopup from './components/DiscountPopup'
 import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
@@ -62,6 +63,7 @@ export default function App() {
   const [sceneReady, setSceneReady] = useState(false)
   const [navbarOnYellow, setNavbarOnYellow] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [discountOpen, setDiscountOpen] = useState(true)
 
   const openMenu = useCallback(() => setMenuOpen(true), [])
   const closeMenu = useCallback(() => setMenuOpen(false), [])
@@ -577,6 +579,7 @@ export default function App() {
       <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} />
       <MilasSection onOpenMenu={openMenu} />
       <MenuOverlay open={menuOpen} onClose={closeMenu} />
+      <DiscountPopup open={discountOpen} onClose={() => setDiscountOpen(false)} />
     </main>
   )
 }

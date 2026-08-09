@@ -16,8 +16,16 @@ export const burgers = [
     accent: '#f2a42b',
   },
   {
-    id: 'koz-burger',
+    id: 'tavuk-burger',
     number: '03',
+    name: ['TAVUK', 'BURGER'],
+    ingredients: ['KENDİMİZE ÖZGÜ PANELENMİŞ TAVUK PARÇACIKLARI', 'DOMATES', 'TURŞU', 'TAVUK BURGER İÇİN ÖZEL SOSUMUZ'],
+    price: '220',
+    accent: '#de860b',
+  },
+  {
+    id: 'koz-burger',
+    number: '04',
     name: ['KÖZ', 'BURGER'],
     ingredients: ['BURGER EKMEĞİNE', 'EL YAPIMI BURGER KÖFTESİ', 'KÖZLENMİŞ BİBER', 'TURŞU', 'ÖZEL SOS', 'MAYONEZ'],
     price: '230',
@@ -25,7 +33,7 @@ export const burgers = [
   },
   {
     id: 'karisik-burger',
-    number: '04',
+    number: '05',
     name: ['KARIŞIK', 'BURGER'],
     ingredients: ['BURGER EKMEĞİNE', 'EL YAPIMI BURGER KÖFTESİ', 'TURŞU', 'ÖZEL SOS', 'MAYONEZ', 'SUCUK', 'SALAM', 'CHEDDAR PEYNİRİ', 'YUMURTA'],
     price: '290',
@@ -33,7 +41,7 @@ export const burgers = [
   },
   {
     id: 'baldicanli-burger',
-    number: '05',
+    number: '06',
     name: ['BALDICANLI', 'BURGER'],
     ingredients: ['BURGER EKMEĞİNE', 'EL YAPIMI BURGER KÖFTESİ', 'KÖZLENMİŞ PATLICAN', 'TURŞU', 'ÖZEL SOS', 'MAYONEZ'],
     price: '230',
