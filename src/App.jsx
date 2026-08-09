@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
 
 const ACTIVE_INDEX_HYSTERESIS = 0.08
-const HERO_TRANSITION_DURATION = 2.05
+const HERO_TRANSITION_DURATION = 2.35
 const HERO_COPY_EXIT_DURATION = 1.16
 
 function getStableBurgerIndex(rotationProgress, currentIndex) {
