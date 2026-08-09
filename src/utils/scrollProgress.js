@@ -3,7 +3,10 @@ export const MOBILE_TRAY_SETTLE_END = 0.075
 export const TRAY_ROTATION_END = 0.62
 export const FINAL_TRANSITION_START = TRAY_ROTATION_END
 
+const HAND_PICKUP_END = 0.323
+const HAND_REACH_END = HAND_PICKUP_END * 0.6
 const HAND_GRIP_END = 0.374
+const HAND_LIFT_END = 0.7004
 const POST_GRIP_SCROLL_SCALE = 0.8
 const GRIP_END_SEQUENCE_PROGRESS = FINAL_TRANSITION_START + HAND_GRIP_END * (1 - FINAL_TRANSITION_START)
 const SHOWCASE_SCROLL_SPAN_SCALE = GRIP_END_SEQUENCE_PROGRESS + (1 - GRIP_END_SEQUENCE_PROGRESS) * POST_GRIP_SCROLL_SCALE
@@ -31,12 +34,15 @@ export function getTrayProgressForBurger(index, burgerCount, isMobile = false) {
 }
 
 export function getHandPickupProgress(progress) {
-  const normalized = progress / 0.323
+  const normalized = progress / HAND_PICKUP_END
   return Math.min(1, Math.max(0, normalized))
 }
 
 export function getHandLiftProgress(progress) {
-  const normalized = (progress - HAND_GRIP_END) / 0.3264
+  // HandPickup visually reaches the burger at 60% of its pickup progress.
+  // Start lifting at that exact contact point so continued scrolling always
+  // produces visible movement instead of passing through a dead interval.
+  const normalized = (progress - HAND_REACH_END) / (HAND_LIFT_END - HAND_REACH_END)
   return Math.min(1, Math.max(0, normalized))
 }
 

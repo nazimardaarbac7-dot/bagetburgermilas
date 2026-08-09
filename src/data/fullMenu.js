@@ -40,7 +40,7 @@ export const menuCategories = [
       { name: 'Double Köz Burger', description: 'Burger ekmeğine, el yapımı double burger köftesi, közlenmiş biber, turşu, özel sos, mayonez', price: 320 },
       { name: 'Double Karışık Burger', description: 'Burger ekmeğine, el yapımı double burger köftesi, turşu, özel sos, mayonez, sucuk, salam, cheddar peyniri, yumurta', price: 390 },
       { name: 'Double Badılcanlı Burger', description: 'Burger ekmeğine, el yapımı double burger köftesi, közlenmiş patlıcan, turşu, özel sos, mayonez', price: 320 },
-      { name: 'Tavuk Burger', description: 'Kendimize özgü panelenmiş tavuk parçacıkları, domates, turşu ve tavukburger için özel sosumuz', price: 220 },
+      { name: 'Tavuk Burger', description: 'Kendimize özgü panelenmiş tavuk parçacıkları, domates, turşu ve tavuk burger için özel sosumuz', price: 220 },
     ],
   },
   {
@@ -73,8 +73,8 @@ export const menuCategories = [
     note: 'Soğuk içecekler ve klasik eşlikçiler.',
     items: [
       { name: 'Kola (330 ml)', price: 65 },
-      { name: 'Coca Cola (200 ml)', price: 40 },
-      { name: 'Coca Cola Zero Sugar (200 ml)', price: 40 },
+      { name: 'Coca-Cola (200 ml)', price: 40 },
+      { name: 'Coca-Cola Zero Sugar (200 ml)', price: 40 },
       { name: 'Fanta (200 ml)', price: 40 },
       { name: 'Sprite (200 ml)', price: 40 },
       { name: 'Fuse Tea Şeftali (330 ml)', price: 65 },
@@ -104,7 +104,7 @@ export const menuCategories = [
       { name: 'Hamburger & Köz Burger Menü', description: 'Hamburger, köz burger, patates kızartması ve 2 adet içecek ile', price: 595 },
       { name: "2'li Cheeseburger Menü", description: '2 adet cheeseburger, patates kızartması ve 2 adet içecek ile', price: 595 },
       { name: 'Cheeseburger & Köz Burger Menü', description: 'Cheeseburger, köz burger, patates kızartması ve 2 adet içecek ile', price: 595 },
-      { name: "2'li Közburger Menü", description: '2 adet köz burger, patates kızartması ve 2 adet içecek ile', price: 595 },
+      { name: "2'li Köz Burger Menü", description: '2 adet köz burger, patates kızartması ve 2 adet içecek ile', price: 595 },
     ],
   },
 ]

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { GETIR_MENU_URL, menuCategories } from '../data/fullMenu'
+import { isolateModal } from '../utils/modalIsolation'
 
 export default function MenuOverlay({ open, onClose }) {
   const [activeCategoryId, setActiveCategoryId] = useState(menuCategories[0].id)
@@ -14,6 +15,7 @@ export default function MenuOverlay({ open, onClose }) {
 
     const previousOverflow = document.body.style.overflow
     const previouslyFocused = document.activeElement
+    const restoreIsolation = isolateModal(dialogRef.current?.parentElement)
     document.body.style.overflow = 'hidden'
     setActiveCategoryId(menuCategories[0].id)
     contentRef.current?.scrollTo({ top: 0 })
@@ -44,6 +46,7 @@ export default function MenuOverlay({ open, onClose }) {
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = previousOverflow
+      restoreIsolation()
       previouslyFocused?.focus?.({ preventScroll: true })
     }
   }, [open, onClose])

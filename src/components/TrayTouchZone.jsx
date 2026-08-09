@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 
-export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap }) {
+export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap, onStep }) {
   const gesture = useRef(null)
   const suppressClick = useRef(false)
 
@@ -74,6 +74,12 @@ export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap }) {
     onTap()
   }
 
+  const handleKeyDown = (event) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+    event.preventDefault()
+    onStep(event.key === 'ArrowRight' ? 1 : -1)
+  }
+
   return (
     <button
       className="tray-touch-zone"
@@ -85,6 +91,7 @@ export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap }) {
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
     />
   )
 }

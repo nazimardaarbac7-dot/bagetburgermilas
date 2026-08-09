@@ -5,16 +5,16 @@ import * as THREE from 'three'
 import { getHandLiftProgress, getHandPickupProgress } from '../utils/scrollProgress'
 
 const burgerPhotoPaths = [
-  '/assets/burgers/hamburger-classic-cutout.png',
-  '/assets/burgers/cheeseburger-cutout.png',
-  '/assets/burgers/tavuk-burger-cutout.png',
-  '/assets/burgers/koz-burger-cutout.png',
-  '/assets/burgers/karisik-burger-cutout.png',
-  '/assets/burgers/baldicanli-burger-cutout.png',
+  '/assets/burgers/hamburger-classic-cutout.webp',
+  '/assets/burgers/cheeseburger-cutout.webp',
+  '/assets/burgers/tavuk-burger-cutout.webp',
+  '/assets/burgers/koz-burger-cutout.webp',
+  '/assets/burgers/karisik-burger-cutout.webp',
+  '/assets/burgers/baldicanli-burger-cutout.webp',
 ]
 
-const handTexturePath = '/assets/interaction/hand-grab.png'
-const drumstickTexturePath = '/assets/interaction/drumstick-confetti.png'
+const handTexturePath = '/assets/interaction/hand-grab.webp'
+const drumstickTexturePath = '/assets/interaction/drumstick-confetti.webp'
 const DRUMSTICKS_PER_BURST = 12
 const MAX_CONCURRENT_BURSTS = 6
 const MAX_DRUMSTICK_INSTANCES = DRUMSTICKS_PER_BURST * MAX_CONCURRENT_BURSTS
@@ -574,7 +574,7 @@ function HeroBurgerDepth({ mobileOptimized = false }) {
   )
 }
 
-export default function Burger({ index, activeIndex, isFloating = false, mobileOptimized = false, floatingScale = 0.72, pickupTarget = false, pickupProgress, finalTransitionProgress, sceneProgress, sceneEntryProgress, motionProgress, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
+export default function Burger({ index, activeIndex, isFloating = false, mobileOptimized = false, reducedMotion = false, floatingScale = 0.72, pickupTarget = false, pickupProgress, finalTransitionProgress, sceneProgress, sceneEntryProgress, motionProgress, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
   const group = useRef()
   const accentLight = useRef()
   const initialLightIntensity = useRef(index === activeIndex ? 2.15 : 0.25)
@@ -610,7 +610,7 @@ export default function Burger({ index, activeIndex, isFloating = false, mobileO
     group.current.scale.setScalar(nextScale)
     if (isFloating) {
       const heroMotion = motionProgress?.current ?? 0
-      const idleStrength = 1 - THREE.MathUtils.smootherstep(heroMotion, 0, 0.055)
+      const idleStrength = reducedMotion ? 0 : 1 - THREE.MathUtils.smootherstep(heroMotion, 0, 0.055)
       floatingTime.current += smoothDelta
       group.current.position.y = baseY + Math.sin(floatingTime.current * 0.8 + floatingPhase) * 0.23 * idleStrength
       group.current.rotation.y += smoothDelta * (0.14 + index * 0.012) * idleStrength

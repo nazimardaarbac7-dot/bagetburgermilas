@@ -1,0 +1,11 @@
+{
+  "name": "Baget Burger Milas",
+  "short_name": "Baget Burger",
+  "description": "Baget Burger Milas menüsü, sipariş ve iletişim bilgileri.",
+  "lang": "tr",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1d4042",
+  "theme_color": "#1d4042",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

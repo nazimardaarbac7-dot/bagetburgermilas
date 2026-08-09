@@ -1,12 +1,13 @@
 import React from 'react'
 
-export default function Navbar({ hiddenOnShowcase = false, onYellow = false }) {
+export default function Navbar({ onYellow = false, onOpenMenu, onNavigate }) {
   return (
-    <nav className={`navbar${hiddenOnShowcase ? ' is-showcase-hidden' : ''}${onYellow ? ' is-on-yellow' : ''}`} aria-label="Ana menü">
-      <a className="brand" href="#top" aria-label="Baget Burger ana sayfa">BAGET BURGER<span>®</span><small>MİLAS</small></a>
+    <nav className={`navbar${onYellow ? ' is-on-yellow' : ''}`} aria-label="Ana menü">
+      <a className="brand" href="#top" aria-label="Baget Burger ana sayfa" onClick={(event) => { event.preventDefault(); onNavigate('top') }}>BAGET BURGER<span>®</span><small>MİLAS</small></a>
       <div className="nav-links">
-        <a href="#tray">MENÜ</a>
-        <a href="#milas">MİLAS</a>
+        <button type="button" onClick={onOpenMenu}>MENÜ</button>
+        <button type="button" onClick={() => onNavigate('milas')}>MİLAS</button>
+        <a className="nav-call" href="tel:+905498232020">ARA</a>
       </div>
     </nav>
   )

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://baget-burger-milas.vercel.app/sitemap.xml

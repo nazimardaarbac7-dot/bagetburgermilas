@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import React, { Component, lazy, Suspense, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Navbar from './components/Navbar'
@@ -7,12 +7,30 @@ import DiscountPopup from './components/DiscountPopup'
 import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
-import Experience from './three/Experience'
 import { burgers } from './data/burgers'
 import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getTrayProgressForBurger, getTrayRotationProgress, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
+
+const Experience = lazy(() => import('./three/Experience'))
+
+class ExperienceBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { failed: false }
+  }
+
+  static getDerivedStateFromError() { return { failed: true } }
+
+  componentDidCatch() { this.props.onError() }
+
+  render() {
+    return this.state.failed
+      ? <div className="canvas-fallback" aria-hidden="true"><span>BAGET BURGER</span><small>MİLAS</small></div>
+      : this.props.children
+  }
+}
 
 const ACTIVE_INDEX_HYSTERESIS = 0.08
 const HERO_TRANSITION_DURATION = 2.35
@@ -50,6 +68,8 @@ export default function App() {
   const traySettledIndex = useRef(0)
   const adjustTrayProgress = useRef(null)
   const settleTrayProgress = useRef(null)
+  const stepTrayProgress = useRef(null)
+  const sectionNavigation = useRef(null)
   const heroPhase = useRef('hero')
   const burgerInteraction = useRef({ index: -1, token: 0 })
   const heroRef = useRef(null)
@@ -63,11 +83,18 @@ export default function App() {
   const [sceneReady, setSceneReady] = useState(false)
   const [navbarOnYellow, setNavbarOnYellow] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [discountOpen, setDiscountOpen] = useState(true)
+  const [discountOpen, setDiscountOpen] = useState(() => {
+    try { return sessionStorage.getItem('baget-discount-seen') !== '1' } catch { return true }
+  })
 
   const openMenu = useCallback(() => setMenuOpen(true), [])
   const closeMenu = useCallback(() => setMenuOpen(false), [])
   const handleSceneReady = useCallback(() => setSceneReady(true), [])
+  const closeDiscount = useCallback(() => {
+    try { sessionStorage.setItem('baget-discount-seen', '1') } catch { /* storage may be disabled */ }
+    setDiscountOpen(false)
+  }, [])
+  const handleNavigate = useCallback((target) => sectionNavigation.current?.(target), [])
 
   useLayoutEffect(() => {
     const media = gsap.matchMedia()
@@ -77,12 +104,14 @@ export default function App() {
     let traySnapTimer = null
     const context = gsap.context(() => {
       const mobileScene = window.matchMedia('(max-width: 720px)').matches
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const firstTrayProgress = mobileScene ? MOBILE_TRAY_SETTLE_END : TRAY_SETTLE_END
       const scrollingElement = document.scrollingElement ?? document.documentElement
       let scrollBehaviorLockDepth = 0
       let originalScrollBehavior = scrollingElement.style.scrollBehavior
       let heroScrollLocked = false
       let heroScrollAnchor = 0
+      let pendingNavigation = null
 
       const lockScrollBehavior = () => {
         if (scrollBehaviorLockDepth === 0) {
@@ -161,6 +190,11 @@ export default function App() {
             jumpToScroll(trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress))
           }
           releaseHeroScroll()
+          if (pendingNavigation === 'milas') {
+            pendingNavigation = null
+            const milasSection = document.getElementById('milas')
+            if (milasSection) jumpToScroll(milasSection.offsetTop + 1)
+          }
         },
         onReverseComplete: () => {
           heroPhase.current = 'hero'
@@ -203,6 +237,7 @@ export default function App() {
         duration: 0.46,
         ease: 'power2.out',
       }, 0)
+      if (reduceMotion) heroTimeline.timeScale(100)
 
       const mobileTray = mobileScene
       let trayPointerDragging = false
@@ -214,13 +249,11 @@ export default function App() {
         traySnapTween.current = null
       }
 
-      const snapTrayToNearest = () => {
+      const snapTrayToIndex = (requestedIndex) => {
         if (heroPhase.current !== 'tray' || finalTransitionProgress.current > 0.001) return
         const trayTrigger = trayTriggerRef.current
         if (!trayTrigger) return
-
-        const rotationProgress = getTrayRotationProgress(scrollProgress.current, mobileTray)
-        const targetIndex = Math.round(rotationProgress * (burgers.length - 1))
+        const targetIndex = Math.max(0, Math.min(burgers.length - 1, requestedIndex))
         const targetProgress = getTrayProgressForBurger(targetIndex, burgers.length, mobileTray)
         const targetScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(targetProgress)
         const distance = Math.abs(targetScroll - scrollingElement.scrollTop)
@@ -234,7 +267,7 @@ export default function App() {
         const snapMotion = { scroll: scrollingElement.scrollTop }
         traySnapTween.current = gsap.to(snapMotion, {
           scroll: targetScroll,
-          duration: Math.min(0.52, Math.max(0.28, distance / window.innerHeight * 0.34)),
+          duration: reduceMotion ? 0.01 : Math.min(0.52, Math.max(0.28, distance / window.innerHeight * 0.34)),
           ease: 'power2.out',
           onUpdate: () => {
             scrollingElement.scrollTop = snapMotion.scroll
@@ -246,6 +279,11 @@ export default function App() {
             setDisplayedBurger(targetIndex)
           },
         })
+      }
+
+      const snapTrayToNearest = () => {
+        const rotationProgress = getTrayRotationProgress(scrollProgress.current, mobileTray)
+        snapTrayToIndex(Math.round(rotationProgress * (burgers.length - 1)))
       }
 
       const scheduleTraySnap = () => {
@@ -273,6 +311,10 @@ export default function App() {
       settleTrayProgress.current = () => {
         trayPointerDragging = false
         snapTrayToNearest()
+      }
+      stepTrayProgress.current = (direction) => {
+        cancelTraySnap()
+        snapTrayToIndex(activeIndexValue.current + direction)
       }
 
       trayTriggerRef.current = ScrollTrigger.create({
@@ -347,6 +389,7 @@ export default function App() {
             releaseHeroScroll()
           },
         })
+        if (reduceMotion) heroReturnTween.timeScale(100)
 
         heroReturnTween.to(trayEntryMotion, {
           progress: 0,
@@ -379,6 +422,24 @@ export default function App() {
         }, HERO_RETURN_START + HERO_RETURN_DURATION - 0.38)
       }
 
+      sectionNavigation.current = (target) => {
+        if (target === 'milas') {
+          window.history.replaceState(null, '', '#milas')
+          if (heroPhase.current === 'hero') {
+            pendingNavigation = 'milas'
+            beginHeroTransition(true)
+          } else if (heroPhase.current === 'tray') {
+            const milasSection = document.getElementById('milas')
+            if (milasSection) jumpToScroll(milasSection.offsetTop + 1)
+          }
+          return
+        }
+        window.history.replaceState(null, '', '#top')
+        pendingNavigation = null
+        if (heroPhase.current === 'tray') beginHeroTransition(false)
+        else if (heroPhase.current === 'hero') jumpToScroll(0)
+      }
+
       const canReturnToHero = () => heroPhase.current === 'tray'
         && traySettledIndex.current === 0
         && !traySnapTween.current
@@ -392,6 +453,7 @@ export default function App() {
         return true
       }
       const handleHeroWheel = (event) => {
+        if (document.querySelector('.discount-popup, .menu-overlay.is-open')) return
         if (preventHeroMomentum(event)) return
         if (heroPhase.current === 'tray' && traySnapTween.current) cancelTraySnap()
         if (heroPhase.current === 'hero' && event.deltaY > 0) {
@@ -408,6 +470,7 @@ export default function App() {
         heroTouchStartY = event.touches.length === 1 ? event.touches[0].clientY : null
       }
       const handleHeroTouchMove = (event) => {
+        if (document.querySelector('.discount-popup, .menu-overlay.is-open')) return
         if (preventHeroMomentum(event)) return
         if (heroTouchStartY === null || event.touches.length !== 1) return
         const verticalDistance = heroTouchStartY - event.touches[0].clientY
@@ -468,8 +531,8 @@ export default function App() {
         autoAlpha: 1,
         y: 0,
         rotation: (index, element) => Number(element.dataset.rotation),
-        duration: 1.584,
-        stagger: 0.308,
+        duration: reduceMotion ? 0.01 : 1.584,
+        stagger: reduceMotion ? 0 : 0.308,
         ease: 'power3.out',
         scrollTrigger: {
           trigger: '#milas',
@@ -535,7 +598,7 @@ export default function App() {
         }, {
           autoAlpha: 1,
           y: 0,
-          duration: 1.15,
+          duration: reduceMotion ? 0.01 : 1.15,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: '.milas-copy',
@@ -555,6 +618,8 @@ export default function App() {
       cleanupHeroScroll()
       adjustTrayProgress.current = null
       settleTrayProgress.current = null
+      stepTrayProgress.current = null
+      sectionNavigation.current = null
       trayTriggerRef.current = null
       media.revert()
       context.revert()
@@ -563,6 +628,7 @@ export default function App() {
 
   const handleTrayDrag = (movementX) => adjustTrayProgress.current?.(movementX) === true
   const handleTrayDragEnd = () => settleTrayProgress.current?.()
+  const handleTrayStep = (direction) => stepTrayProgress.current?.(direction)
 
   const handleBurgerTap = () => {
     burgerInteraction.current = { index: activeIndex, token: burgerInteraction.current.token + 1 }
@@ -570,15 +636,20 @@ export default function App() {
 
   return (
     <main className={heroTransitioning ? 'is-hero-transitioning' : undefined}>
-      <Experience heroExitProgress={heroExitProgress} trayEntryProgress={trayEntryProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} burgerInteraction={burgerInteraction} onReady={handleSceneReady} />
-      <div className={`scene-curtain${sceneReady ? ' is-hidden' : ''}`} aria-hidden="true" />
+      <button className="skip-link" type="button" onClick={openMenu}>Doğrudan menüye geç</button>
+      <ExperienceBoundary onError={handleSceneReady}>
+        <Suspense fallback={null}>
+          <Experience heroExitProgress={heroExitProgress} trayEntryProgress={trayEntryProgress} scrollProgress={scrollProgress} finalTransitionProgress={finalTransitionProgress} activeIndex={activeIndex} burgerInteraction={burgerInteraction} onReady={handleSceneReady} paused={menuOpen || discountOpen} />
+        </Suspense>
+      </ExperienceBoundary>
+      <div className={`scene-curtain${sceneReady ? ' is-hidden' : ''}`} aria-hidden="true"><span>BAGET BURGER</span><i /></div>
       <div className="grain" />
-      <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} />
+      <Navbar onYellow={navbarOnYellow} onOpenMenu={openMenu} onNavigate={handleNavigate} />
       <Hero ref={heroRef} />
-      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} />
+      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
       <MilasSection onOpenMenu={openMenu} />
       <MenuOverlay open={menuOpen} onClose={closeMenu} />
-      <DiscountPopup open={discountOpen} onClose={() => setDiscountOpen(false)} />
+      <DiscountPopup open={discountOpen} onClose={closeDiscount} />
     </main>
   )
 }
