@@ -36,15 +36,10 @@ export default function MilasSection({ onOpenMenu }) {
             src="/assets/burgers/baldicanli-burger-bitten.webp"
             alt="Yarısı yenmiş Badılcanlı Burger"
           />
-          <button className="menu-cta" type="button" onClick={onOpenMenu}>
-            <span className="menu-cta-label">TÜM MENÜYÜ GÖR</span>
+          <button className="menu-cta" type="button" onClick={onOpenMenu} aria-label="Tüm menüyü gör">
             <span className="menu-cta-art" aria-hidden="true">
-              <img src="/assets/interaction/menu-drumstick.png" alt="" />
-              <i>
-                <svg viewBox="0 0 24 24" focusable="false">
-                  <path d="M7 17 17 7M9 7h8v8" />
-                </svg>
-              </i>
+              <img src="/assets/interaction/menu-drumstick-cutout.png" alt="" loading="lazy" decoding="async" />
+              <span className="menu-cta-label">TÜM MENÜ</span>
             </span>
           </button>
         </div>
