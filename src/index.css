@@ -39,8 +39,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
 .nav-links { display: flex; align-items: center; gap: 28px; font: 500 .63rem/1 'DM Mono', monospace; letter-spacing: .13em; }
 .nav-links a, .nav-links button { min-height: 44px; padding: 0 4px; border: 0; display: inline-flex; align-items: center; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; cursor: pointer; transition: color .25s ease; }
 .nav-links a:hover, .nav-links button:hover { color: #f2a42b; }
-.nav-call { padding-inline: 13px !important; border: 1px solid rgba(245,234,215,.4) !important; }
-.navbar.is-on-yellow .nav-call { border-color: rgba(24,61,63,.45) !important; }
+.nav-call { padding-inline: 13px !important; border: 0 !important; }
 
 .hero { min-height: 230svh; position: relative; z-index: 1; }
 .hero-stage { position: sticky; top: 0; height: 100svh; contain: paint; display: grid; place-items: center; overflow: hidden; }
@@ -85,11 +84,15 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
 .tap-hint { position: absolute; z-index: 3; left: calc(50% + clamp(74px, 8vw, 132px)); top: clamp(176px, 25vh, 252px); width: 96px; height: 64px; opacity: .62; pointer-events: none; transform: rotate(-4deg); transform-origin: center; }
 .tap-hint span { position: absolute; top: 0; right: 1px; color: #f2a42b; font: 500 .49rem/1 'DM Mono', monospace; letter-spacing: .16em; white-space: nowrap; }
 .tap-hint svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; stroke: rgba(245, 234, 215, .82); stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
-.rotate-prompt { position: absolute; z-index: 8; left: 50%; bottom: 31px; margin: 0; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; font: 500 .54rem/1 'DM Mono', monospace; letter-spacing: .13em; white-space: nowrap; color: rgba(245,234,215,.82); }
+.rotate-prompt { position: absolute; z-index: 8; left: 50%; bottom: 25px; margin: 0; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; font: 500 .54rem/1 'DM Mono', monospace; letter-spacing: .13em; white-space: nowrap; color: rgba(245,234,215,.82); }
 .rotate-prompt i { width: 22px; height: 10px; border-top: 1px solid #f2a42b; border-radius: 50%; position: relative; }
 .rotate-prompt i::after { content: '→'; position: absolute; right: -5px; top: -8px; color: #f2a42b; }
+.rotate-prompt:not(.is-final) i { animation: traySwipeArrow 1.25s ease-in-out infinite; }
+.rotate-prompt:not(.is-final) span { animation: traySwipeCopy 1.8s ease-in-out infinite; }
 .rotate-prompt.is-final i { width: 10px; height: 18px; border: 0; border-radius: 0; }
 .rotate-prompt.is-final i::after { content: '↓'; right: auto; left: 0; top: -4px; font-size: 1rem; animation: finalScrollArrow 1.2s ease-in-out infinite; }
+@keyframes traySwipeArrow { 0%, 100% { transform: translateX(-3px); opacity: .5; } 50% { transform: translateX(5px); opacity: 1; } }
+@keyframes traySwipeCopy { 0%, 100% { opacity: .68; } 50% { opacity: 1; } }
 @keyframes finalScrollArrow { 0%, 100% { transform: translateY(-2px); opacity: .55; } 50% { transform: translateY(4px); opacity: 1; } }
 .rotate-copy-mobile { display: none; }
 .tray-touch-zone { position: absolute; z-index: 2; inset: 20% 0 29%; width: 100%; padding: 0; border: 0; background: transparent; appearance: none; opacity: 0; pointer-events: none; }
@@ -105,10 +108,13 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
 .milas-copy { position: relative; z-index: 2; grid-column: 1; grid-row: 1; }
 .milas-section h2 { position: relative; z-index: 4; margin: 19px 0 0; max-width: 760px; font-family: 'Archivo Black', Impact, sans-serif; font-size: clamp(5.2rem, 10.4vw, 11.2rem); line-height: .73; letter-spacing: -.09em; }
 .bitten-burger { position: relative; z-index: 3; display: block; width: clamp(280px, 27vw, 390px); height: auto; margin: clamp(-300px, -21vw, -230px) -6% 0 auto; opacity: 0; visibility: hidden; transform: rotate(-7deg); transform-origin: 58% 55%; filter: drop-shadow(0 28px 30px rgba(24, 61, 63, .3)); pointer-events: none; user-select: none; will-change: transform, opacity; }
-.menu-cta { width: min(100%, 292px); min-height: 62px; margin-top: 47px; padding: 0 10px 0 23px; border: 0; display: flex; align-items: center; justify-content: space-between; background: #183d3f; color: #f5ead7; font: 600 .66rem/1 'DM Mono', monospace; letter-spacing: .13em; text-align: left; cursor: pointer; transition: transform .35s cubic-bezier(.16, 1, .3, 1), background .3s ease; }
-.menu-cta i { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: #f2a42b; color: #183d3f; font: normal 1.15rem/1 Manrope, sans-serif; transition: transform .35s cubic-bezier(.16, 1, .3, 1); }
+.menu-cta { width: 198px; min-height: 0; margin: 43px 0 0 22px; padding: 0; border: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; background: transparent; color: #183d3f; font: 700 .67rem/1 'DM Mono', monospace; letter-spacing: .13em; text-align: center; cursor: pointer; transform: rotate(-5deg); transform-origin: center; transition: transform .35s cubic-bezier(.16, 1, .3, 1); }
+.menu-cta-label { padding: 7px 10px 6px; border-bottom: 1px solid rgba(24,61,63,.55); white-space: nowrap; }
+.menu-cta-art { position: relative; display: block; width: 184px; aspect-ratio: 1; border: 2px solid #183d3f; border-radius: 50%; overflow: visible; background: #fff; box-shadow: 9px 12px 0 rgba(24,61,63,.16); }
+.menu-cta-art img { display: block; width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
+.menu-cta i { position: absolute; right: -8px; bottom: 8px; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: #183d3f; color: #f2a42b; font: normal 1.15rem/1 Manrope, sans-serif; transition: transform .35s cubic-bezier(.16, 1, .3, 1); }
 .menu-cta i svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: square; stroke-linejoin: miter; }
-.menu-cta:hover { transform: translateY(-4px); background: #245052; }
+.menu-cta:hover { transform: translateY(-6px) rotate(-2deg); }
 .menu-cta:hover i { transform: rotate(45deg); }
 .reviews-composition { position: relative; min-height: 555px; isolation: isolate; grid-column: 2; grid-row: 1; }
 .reviews-label { position: absolute; top: 0; left: 4%; width: 92%; margin: 0; padding-bottom: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(24,61,63,.4); font: 600 .55rem/1 'DM Mono', monospace; letter-spacing: .13em; }
@@ -242,7 +248,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
   .tap-hint { left: calc(50% + 72px); top: 36svh; width: 82px; height: 55px; opacity: .56; }
   .tap-hint span { font-size: .52rem; }
   .tap-hint svg { stroke-width: 1.2; }
-  .rotate-prompt { bottom: calc(16px + env(safe-area-inset-bottom)); font-size: .56rem; }
+  .rotate-prompt { bottom: calc(9px + env(safe-area-inset-bottom)); font-size: .56rem; }
   .rotate-copy-desktop { display: none; }
   .rotate-copy-mobile { display: inline; }
   .showcase.is-active .tray-touch-zone { inset: 0; pointer-events: auto; touch-action: pan-y; }
@@ -257,7 +263,8 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
   .milas-copy { order: 2; margin-top: 78px; }
   .milas-section h2 { font-size: clamp(4.6rem, 22vw, 8rem); }
   .bitten-burger { width: min(72vw, 270px); margin: -160px -18px 0 auto; transform: rotate(-7deg); }
-  .menu-cta { width: 100%; max-width: 340px; margin-top: 36px; }
+  .menu-cta { width: 184px; margin: 38px 0 0 18px; }
+  .menu-cta-art { width: 172px; }
   .reviews-composition { min-height: 535px; margin-top: 0; }
   .reviews-label { left: 0; width: 100%; }
   .review-card { width: min(44vw, 174px); padding: 16px; }
@@ -328,6 +335,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .scroll-cue i { animation: none; }
+  .rotate-prompt i, .rotate-prompt span, .rotate-prompt i::after { animation: none !important; }
   .review-card, .burger-info, .menu-cta, .menu-cta i { transition: none; }
   .menu-dialog, .menu-overlay-backdrop, .menu-product { transition: none; animation: none; opacity: 1; }
   .discount-popup-card { animation: none; }
