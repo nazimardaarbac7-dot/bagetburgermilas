@@ -19,6 +19,10 @@ const HERO_COPY_EXIT_DURATION = 1.16
 const TRAY_ENTRY_START = 1.08
 const TRAY_ENTRY_DURATION = 1.46
 const TRAY_INFO_REVEAL_PROGRESS = 0.72
+const TRAY_RETURN_START = 0.12
+const TRAY_RETURN_DURATION = 1.34
+const HERO_RETURN_START = 0.78
+const HERO_RETURN_DURATION = 1.28
 
 function getStableBurgerIndex(rotationProgress, currentIndex) {
   const position = rotationProgress * (burgers.length - 1)
@@ -69,6 +73,7 @@ export default function App() {
     const media = gsap.matchMedia()
     let cleanupHeroScroll = () => {}
     let cleanupHeroInput = () => {}
+    let heroReturnTween = null
     const context = gsap.context(() => {
       const mobileScene = window.matchMedia('(max-width: 720px)').matches
       const firstTrayProgress = mobileScene ? MOBILE_TRAY_SETTLE_END : TRAY_SETTLE_END
@@ -380,9 +385,73 @@ export default function App() {
         }
         setHeroTransitioning(true)
 
-        if (forward) heroTimeline.play()
-        else heroTimeline.reverse()
+        if (forward) {
+          heroTimeline.play()
+          return
+        }
+
+        setShowcaseVisibility(false, true)
+        heroReturnTween?.kill()
+        heroReturnTween = gsap.timeline({
+          onUpdate: () => {
+            if (heroScrollLocked) scrollingElement.scrollTop = heroScrollAnchor
+            heroExitProgress.current = heroMotion.progress
+            trayEntryProgress.current = trayEntryMotion.progress
+          },
+          onComplete: () => {
+            heroReturnTween = null
+            heroTimeline.pause(0)
+            heroPhase.current = 'hero'
+            setHeroTransitioning(false)
+            setShowcaseVisibility(false, false)
+            trayRequestedIndex.current = 0
+            traySettledIndex.current = 0
+            finalSceneRequested.current = false
+            finalTransitionProgress.current = 0
+            trayEntryProgress.current = 0
+            heroExitProgress.current = 0
+            setDisplayedBurger(0)
+            scrollProgress.current = 0
+            jumpToScroll(0)
+            releaseHeroScroll()
+          },
+        })
+
+        heroReturnTween.to(trayEntryMotion, {
+          progress: 0,
+          duration: TRAY_RETURN_DURATION,
+          ease: 'sine.inOut',
+        }, TRAY_RETURN_START)
+
+        heroReturnTween.to(heroMotion, {
+          progress: 0,
+          duration: HERO_RETURN_DURATION,
+          ease: 'power2.inOut',
+        }, HERO_RETURN_START)
+
+        heroReturnTween.to('.hero-copy', {
+          scale: 1,
+          opacity: 1,
+          yPercent: 0,
+          force3D: true,
+          duration: HERO_RETURN_DURATION,
+          ease: 'power2.inOut',
+        }, HERO_RETURN_START)
+
+        heroReturnTween.to('.scroll-cue', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.54,
+          ease: 'power2.out',
+        }, HERO_RETURN_START + HERO_RETURN_DURATION - 0.54)
       }
+
+      const canReturnToHero = () => heroPhase.current === 'tray'
+        && trayRequestedIndex.current === 0
+        && traySettledIndex.current === 0
+        && !traySnapTween.current
+        && !finalSceneTween.current
+        && finalTransitionProgress.current <= 0.001
 
       let heroTouchStartY = null
       const preventHeroMomentum = (event) => {
@@ -392,20 +461,32 @@ export default function App() {
       }
       const handleHeroWheel = (event) => {
         if (preventHeroMomentum(event)) return
-        if (heroPhase.current !== 'hero' || event.deltaY <= 0) return
-        if (event.cancelable) event.preventDefault()
-        beginHeroTransition(true)
+        if (heroPhase.current === 'hero' && event.deltaY > 0) {
+          if (event.cancelable) event.preventDefault()
+          beginHeroTransition(true)
+          return
+        }
+        if (event.deltaY < 0 && canReturnToHero()) {
+          if (event.cancelable) event.preventDefault()
+          beginHeroTransition(false)
+        }
       }
       const handleHeroTouchStart = (event) => {
         heroTouchStartY = event.touches.length === 1 ? event.touches[0].clientY : null
       }
       const handleHeroTouchMove = (event) => {
         if (preventHeroMomentum(event)) return
-        if (heroPhase.current !== 'hero' || heroTouchStartY === null || event.touches.length !== 1) return
-        const upwardDistance = heroTouchStartY - event.touches[0].clientY
-        if (upwardDistance < 4) return
-        if (event.cancelable) event.preventDefault()
-        beginHeroTransition(true)
+        if (heroTouchStartY === null || event.touches.length !== 1) return
+        const verticalDistance = heroTouchStartY - event.touches[0].clientY
+        if (heroPhase.current === 'hero' && verticalDistance >= 4) {
+          if (event.cancelable) event.preventDefault()
+          beginHeroTransition(true)
+          return
+        }
+        if (verticalDistance <= -4 && canReturnToHero()) {
+          if (event.cancelable) event.preventDefault()
+          beginHeroTransition(false)
+        }
       }
       const clearHeroTouch = () => {
         heroTouchStartY = null
@@ -536,6 +617,8 @@ export default function App() {
       traySnapTween.current = null
       finalSceneTween.current?.kill()
       finalSceneTween.current = null
+      heroReturnTween?.kill()
+      heroReturnTween = null
       cleanupHeroInput()
       cleanupHeroScroll()
       runFinalScene.current = null
