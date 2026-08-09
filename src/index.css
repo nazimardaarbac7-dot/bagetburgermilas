@@ -159,6 +159,7 @@ main { position: relative; isolation: isolate; }
 .menu-dialog-footer a i svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: square; stroke-linejoin: miter; }
 
 @media (max-width: 720px) {
+  .grain { opacity: .045; mix-blend-mode: normal; }
   .navbar { padding: calc(20px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 20px max(20px, env(safe-area-inset-left)); transition: opacity .22s ease, transform .22s ease, visibility 0s linear; }
   .navbar.is-showcase-hidden { opacity: 0; visibility: hidden; transform: translateY(-18px); pointer-events: none; transition: opacity .22s ease, transform .22s ease, visibility 0s linear .22s; }
   .nav-links { gap: 18px; font-size: .57rem; }
@@ -179,7 +180,15 @@ main { position: relative; isolation: isolate; }
   .progress-count { display: inline; }
   .burger-info { left: 20px; top: auto; bottom: 88px; width: calc(100% - 40px); transform: none; text-shadow: 0 2px 10px rgba(0,0,0,.28); }
   .burger-info-karisik-burger { bottom: 72px; }
-  @keyframes enterInfo { from { opacity: 0; transform: translateY(20px); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
+  @keyframes enterInfo { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  .showcase .showcase-topline,
+  .showcase .burger-info,
+  .showcase .rotate-prompt,
+  .showcase .tray-markers { transition-property: opacity; }
+  .showcase:not(.is-ready) .showcase-topline,
+  .showcase:not(.is-ready) .burger-info,
+  .showcase:not(.is-ready) .rotate-prompt,
+  .showcase:not(.is-ready) .tray-markers { filter: none; }
   .info-index { font-size: .54rem; margin-bottom: 12px; }
   .burger-info h2 { font-size: clamp(2.8rem, 11vw, 3.45rem); margin-bottom: 13px; }
   .burger-info-cheeseburger h2 { font-size: clamp(2.35rem, 9.8vw, 3rem); }

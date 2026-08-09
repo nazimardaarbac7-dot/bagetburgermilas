@@ -17,7 +17,7 @@ const mobileFloatingBurgers = [
   { position: [1.5, -1.95, -0.65], exit: [4.8, -3.9, -1.35], tilt: -0.16, yaw: -0.17, scale: 0.62 },
 ]
 
-export default function FloatingBurgers({ heroExitProgress }) {
+export default function FloatingBurgers({ heroExitProgress, mobileOptimized = false }) {
   const group = useRef()
   const burgerGroups = useRef([])
   const hidden = useRef(false)
@@ -73,7 +73,7 @@ export default function FloatingBurgers({ heroExitProgress }) {
           ref={(node) => { burgerGroups.current[index] = node }}
           position={burger.position}
         >
-          <Burger index={index} isFloating floatingScale={burger.scale * 1.15} motionProgress={heroExitProgress} position={[0, 0, 0]} accent="#de860b" />
+          <Burger index={index} isFloating mobileOptimized={mobileOptimized} floatingScale={burger.scale * 1.15} motionProgress={heroExitProgress} position={[0, 0, 0]} accent="#de860b" />
         </group>
       ))}
     </group>

@@ -446,7 +446,7 @@ function ClassicBurger({ withCheese = false, withRoastedPepper = false }) {
   )
 }
 
-function HeroBurgerDepth() {
+function HeroBurgerDepth({ mobileOptimized = false }) {
   const shadowTexture = useMemo(() => {
     const canvas = document.createElement('canvas')
     canvas.width = 128
@@ -467,13 +467,13 @@ function HeroBurgerDepth() {
         <circleGeometry args={[1, 48]} />
         <meshBasicMaterial map={shadowTexture} transparent opacity={0.78} depthWrite={false} toneMapped={false} />
       </mesh>
-      <pointLight color="#ffe0ad" intensity={3.2} distance={4.4} decay={2} position={[-1.45, 1.75, 2.3]} />
-      <pointLight color="#de860b" intensity={1.05} distance={3.6} decay={2} position={[1.35, -0.25, 1.5]} />
+      {!mobileOptimized && <pointLight color="#ffe0ad" intensity={3.2} distance={4.4} decay={2} position={[-1.45, 1.75, 2.3]} />}
+      {!mobileOptimized && <pointLight color="#de860b" intensity={1.05} distance={3.6} decay={2} position={[1.35, -0.25, 1.5]} />}
     </>
   )
 }
 
-export default function Burger({ index, activeIndex, isFloating = false, floatingScale = 0.72, pickupTarget = false, pickupProgress, finalTransitionProgress, sceneProgress, sceneEntryProgress, motionProgress, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
+export default function Burger({ index, activeIndex, isFloating = false, mobileOptimized = false, floatingScale = 0.72, pickupTarget = false, pickupProgress, finalTransitionProgress, sceneProgress, sceneEntryProgress, motionProgress, position = [0, 0, 0], facingAngle = 0, accent, interactionPulse }) {
   const group = useRef()
   const accentLight = useRef()
   const initialLightIntensity = useRef(index === activeIndex ? 2.15 : 0.25)
@@ -531,10 +531,10 @@ export default function Burger({ index, activeIndex, isFloating = false, floatin
       position={position}
       rotation={isFloating ? [0.12, index * 1.1, -0.08] : [0, facingAngle, 0]}
     >
-      {isFloating && <HeroBurgerDepth />}
+      {isFloating && <HeroBurgerDepth mobileOptimized={mobileOptimized} />}
       {pickupTarget && <HandPickup scrollProgress={pickupProgress} />}
-      {!isFloating ? <BurgerPhoto index={index} /> : <ClassicBurger withCheese />}
-      {!isFloating && <pointLight ref={accentLight} color={accent} intensity={initialLightIntensity.current} distance={3.2} position={[0, 2.2, 1.5]} />}
+      {!isFloating || mobileOptimized ? <BurgerPhoto index={index} /> : <ClassicBurger withCheese />}
+      {!isFloating && !mobileOptimized && <pointLight ref={accentLight} color={accent} intensity={initialLightIntensity.current} distance={3.2} position={[0, 2.2, 1.5]} />}
     </group>
   )
 }

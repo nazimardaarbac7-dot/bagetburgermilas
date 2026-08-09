@@ -349,3 +349,12 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Yukarı kaydırma aynı progress'i tersine çevirdiği için Milas → son burger dönüşünde ayrı dijital komut veya ters tween yoktur.
 - Geri dönüş sonunda burger tepsiye yerleşir, `05 — 05` bilgisi ve tepsi etkileşimi yeniden açılır.
 - Hero → tepsi girişinde tepsi render'a ekranın tamamen altında başlar (`Y`: mobil `-8.5`, masaüstü `-9.5`) ve fiziksel olarak aşağıdan gelir.
+
+## 15. 9 Ağustos 2026 — gerçek mobil performans yolu
+
+- BrowserStack ve gerçek mobil cihaz davranışı, masaüstü Chrome penceresini daraltarak yapılan kontrolden daha önemlidir.
+- `720px` ve altında ayrı bir hafif render yolu kullanılır; masaüstü görünümü değişmez.
+- Mobil hero kompozisyonu ve burgerlerin hareket rotaları korunur; köşe burgerleri ağır prosedürel çok parçalı modeller yerine mevcut şeffaf gerçek burger kesimleriyle render edilir.
+- Mobil Canvas DPR değeri `1` olur; antialias, WebGL gölgeleri, environment haritası, hero burger başına ek nokta ışıkları ve tepsi burgerlerinin beş ayrı vurgu ışığı kapatılır.
+- Mobilde tam ekran gren katmanının pahalı `screen` blend işlemi ve burger bilgi geçişlerindeki blur filtresi kaldırılır.
+- Mobil 375×844 yerel testte hero, hero → tepsi, analog burger rotasyonu, son burger → Milas ve Milas → son burger geri dönüşü doğrulandı; konsolda warning/error yoktu.
