@@ -41,8 +41,8 @@ export default function FloatingBurgers({ heroExitProgress }) {
       const item = burgerGroups.current[index]
       if (!item) return
 
-      const start = 0.018 + index * 0.022
-      const end = 0.66 + index * 0.035
+      const start = 0.015 + index * 0.018
+      const end = 0.92 + index * 0.018
       const normalizedExit = THREE.MathUtils.clamp((progress - start) / (end - start), 0, 1)
       const exitProgress = THREE.MathUtils.smootherstep(normalizedExit, 0, 1)
       const [baseX, baseY, baseZ] = burger.position

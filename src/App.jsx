@@ -16,13 +16,14 @@ ScrollTrigger.config({ ignoreMobileResize: true })
 const ACTIVE_INDEX_HYSTERESIS = 0.08
 const HERO_TRANSITION_DURATION = 2.35
 const HERO_COPY_EXIT_DURATION = 1.16
-const TRAY_ENTRY_START = 1.08
-const TRAY_ENTRY_DURATION = 1.46
+const TRAY_ENTRY_START = 1.48
+const TRAY_ENTRY_DURATION = 1.32
 const TRAY_INFO_REVEAL_PROGRESS = 0.72
-const TRAY_RETURN_DURATION = TRAY_ENTRY_DURATION
-const HERO_RETURN_START = TRAY_RETURN_DURATION
-const HERO_RETURN_DURATION = HERO_TRANSITION_DURATION
-const HERO_COPY_RETURN_START = HERO_RETURN_START + HERO_RETURN_DURATION - HERO_COPY_EXIT_DURATION
+const TRAY_RETURN_DURATION = 0.82
+const HERO_RETURN_START = 0.66
+const HERO_RETURN_DURATION = 1.62
+const HERO_COPY_RETURN_DURATION = 0.92
+const HERO_COPY_RETURN_START = HERO_RETURN_START + HERO_RETURN_DURATION - HERO_COPY_RETURN_DURATION
 
 function getStableBurgerIndex(rotationProgress, currentIndex) {
   const position = rotationProgress * (burgers.length - 1)
@@ -437,16 +438,16 @@ export default function App() {
           opacity: 1,
           yPercent: 0,
           force3D: true,
-          duration: HERO_COPY_EXIT_DURATION,
+          duration: HERO_COPY_RETURN_DURATION,
           ease: 'power2.inOut',
         }, HERO_COPY_RETURN_START)
 
         heroReturnTween.to('.scroll-cue', {
           autoAlpha: 1,
           y: 0,
-          duration: 0.46,
+          duration: 0.38,
           ease: 'power2.out',
-        }, HERO_RETURN_START + HERO_RETURN_DURATION - 0.46)
+        }, HERO_RETURN_START + HERO_RETURN_DURATION - 0.38)
       }
 
       const canReturnToHero = () => heroPhase.current === 'tray'
