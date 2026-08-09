@@ -18,14 +18,14 @@ export default function Tray({ heroExitProgress, scrollProgress, finalTransition
     const progress = scrollProgress.current
     const heroProgress = heroExitProgress.current
     const finalProgress = finalTransitionProgress.current
-    if (!entryVisible.current && (heroProgress >= 0.54 || progress > 0.0005)) entryVisible.current = true
+    if (!entryVisible.current && (heroProgress >= 0.47 || progress > 0.0005)) entryVisible.current = true
     if (entryVisible.current && heroProgress <= 0.54 && progress <= 0.0001) entryVisible.current = false
     if (finalHidden.current && finalProgress <= 0.97) finalHidden.current = false
     if (!finalHidden.current && finalProgress >= 0.9995) finalHidden.current = true
     trayVisual.current.visible = entryVisible.current && !finalHidden.current
     if (!trayVisual.current.visible) return
 
-    const heroHandoff = THREE.MathUtils.smootherstep(heroProgress, 0.54, 1)
+    const heroHandoff = THREE.MathUtils.smootherstep(heroProgress, 0.47, 1)
     const trayEntry = THREE.MathUtils.smootherstep(progress, 0, isMobile ? 0.055 : 0.09)
     const intro = Math.max(heroHandoff, trayEntry)
     const heroTransitionActive = heroProgress > 0.0001 && heroProgress < 0.9999

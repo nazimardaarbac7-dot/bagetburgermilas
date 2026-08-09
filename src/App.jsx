@@ -16,7 +16,7 @@ ScrollTrigger.config({ ignoreMobileResize: true })
 const ACTIVE_INDEX_HYSTERESIS = 0.08
 const HERO_TRANSITION_DURATION = 2.35
 const HERO_COPY_EXIT_DURATION = 1.16
-const HERO_TRAY_REVEAL_PROGRESS = 0.54
+const HERO_TRAY_REVEAL_PROGRESS = 0.47
 const HERO_INFO_REVEAL_PROGRESS = 0.87
 
 function getStableBurgerIndex(rotationProgress, currentIndex) {
