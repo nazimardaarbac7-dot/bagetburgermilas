@@ -97,6 +97,7 @@ export default function App() {
     let cleanupHeroInput = () => {}
     let heroReturnTween = null
     let traySnapTimer = null
+    let trayDisplayTimer = null
     let finalGateTimer = null
     let finalGateClampFrame = null
     const context = gsap.context(() => {
@@ -291,6 +292,8 @@ export default function App() {
       const cancelTraySnap = () => {
         if (traySnapTimer) window.clearTimeout(traySnapTimer)
         traySnapTimer = null
+        if (trayDisplayTimer) window.clearTimeout(trayDisplayTimer)
+        trayDisplayTimer = null
         traySnapTween.current?.kill()
         traySnapTween.current = null
       }
@@ -303,17 +306,30 @@ export default function App() {
         const targetProgress = getTrayProgressForBurger(targetIndex, burgers.length, mobileTray)
         const targetScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(targetProgress)
         const distance = Math.abs(targetScroll - scrollingElement.scrollTop)
-
-        if (distance < 1) {
+        const finishSnap = () => {
+          trayDisplayTimer = null
           traySettledIndex.current = targetIndex
           setDisplayedBurger(targetIndex)
+        }
+
+        if (distance < 1) {
+          if (mobileTray && activeIndexValue.current !== targetIndex) {
+            if (trayDisplayTimer) window.clearTimeout(trayDisplayTimer)
+            trayDisplayTimer = window.setTimeout(finishSnap, 90)
+          } else {
+            finishSnap()
+          }
           return
         }
 
         const snapMotion = { scroll: scrollingElement.scrollTop }
         traySnapTween.current = gsap.to(snapMotion, {
           scroll: targetScroll,
-          duration: reduceMotion ? 0.01 : Math.min(0.32, Math.max(0.16, distance / window.innerHeight * 0.22)),
+          duration: reduceMotion
+            ? 0.01
+            : mobileTray
+              ? Math.min(0.22, Math.max(0.12, distance / window.innerHeight * 0.15))
+              : Math.min(0.32, Math.max(0.16, distance / window.innerHeight * 0.22)),
           ease: 'power3.out',
           onUpdate: () => {
             scrollingElement.scrollTop = snapMotion.scroll
@@ -321,8 +337,11 @@ export default function App() {
           },
           onComplete: () => {
             traySnapTween.current = null
-            traySettledIndex.current = targetIndex
-            setDisplayedBurger(targetIndex)
+            if (mobileTray) {
+              trayDisplayTimer = window.setTimeout(finishSnap, 40)
+            } else {
+              finishSnap()
+            }
           },
         })
       }
@@ -339,11 +358,14 @@ export default function App() {
           traySnapTimer = null
           return
         }
-        if (traySnapTimer) return
+        if (traySnapTimer) {
+          if (!mobileTray) return
+          window.clearTimeout(traySnapTimer)
+        }
         traySnapTimer = window.setTimeout(() => {
           traySnapTimer = null
           snapTrayToNearest()
-        }, mobileScene ? 180 : 140)
+        }, mobileScene ? 70 : 140)
       }
 
       adjustTrayProgress.current = (movementX) => {
@@ -401,8 +423,10 @@ export default function App() {
             ? burgers.length - 1
             : getStableBurgerIndex(rotationProgress, activeIndexValue.current)
           const trayMenuActive = finalProgress <= 0.001 && sequenceProgress >= firstTrayProgress - 0.002
-          traySettledIndex.current = nextIndex
-          setDisplayedBurger(nextIndex)
+          if (!mobileTray || finalProgress > 0) {
+            traySettledIndex.current = nextIndex
+            setDisplayedBurger(nextIndex)
+          }
           setShowcaseVisibility(trayMenuActive, finalProgress < 0.995)
 
           if (finalProgress > 0) {
@@ -412,6 +436,9 @@ export default function App() {
           } else if (sequenceProgress >= FINAL_TRANSITION_START - 0.002) {
             if (traySnapTimer) window.clearTimeout(traySnapTimer)
             traySnapTimer = null
+            if (mobileTray && traySettledIndex.current !== burgers.length - 1 && !traySnapTween.current && !trayDisplayTimer) {
+              snapTrayToIndex(burgers.length - 1)
+            }
           } else if (!traySnapTween.current) {
             scheduleTraySnap()
           }
@@ -527,7 +554,7 @@ export default function App() {
       const handleHeroWheel = (event) => {
         if (document.querySelector('.discount-popup, .menu-overlay.is-open')) return
         if (preventHeroMomentum(event)) return
-        if (heroPhase.current === 'tray' && traySnapTween.current) cancelTraySnap()
+        if (heroPhase.current === 'tray' && (traySnapTween.current || trayDisplayTimer)) cancelTraySnap()
         if (heroPhase.current === 'tray' && event.deltaY > 0 && isAtFinalStop() && !finalGateOpen) {
           if (finalGateReady) {
             openFinalGate()
@@ -714,6 +741,7 @@ export default function App() {
     })
     return () => {
       if (traySnapTimer) window.clearTimeout(traySnapTimer)
+      if (trayDisplayTimer) window.clearTimeout(trayDisplayTimer)
       if (finalGateTimer) window.clearTimeout(finalGateTimer)
       if (finalGateClampFrame) window.cancelAnimationFrame(finalGateClampFrame)
       traySnapTween.current?.kill()

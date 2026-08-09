@@ -33,7 +33,7 @@ export default function Tray({ trayEntryProgress, scrollProgress, finalTransitio
     const targetRotation = -rotationProgress * (burgers.length - 1) * ((Math.PI * 2) / burgers.length)
     const targetScale = THREE.MathUtils.lerp(isMobile ? 0.72 : 0.68, 1, intro)
     const settleSpeed = isMobile ? 4.2 : 2.8
-    const rotationSpeed = isMobile ? 18 : 12
+    const rotationSpeed = isMobile ? 32 : 12
     const currentScale = heroTransitionActive
       ? targetScale
       : THREE.MathUtils.damp(trayVisual.current.scale.x, targetScale, settleSpeed, smoothDelta)
