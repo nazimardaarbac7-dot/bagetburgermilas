@@ -545,8 +545,12 @@ main {
   align-items: flex-end;
   justify-content: center;
   gap: 2px;
-  color: #183d3f;
   line-height: 1;
+}
+
+.restoran-badge-body .restoran-badge-currency,
+.restoran-badge-body .restoran-badge-price {
+  color: #183d3f;
 }
 
 .restoran-badge-currency {
