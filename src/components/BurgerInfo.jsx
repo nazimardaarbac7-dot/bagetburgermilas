@@ -8,7 +8,15 @@ export default function BurgerInfo({ burger }) {
       <ul>
         {burger.ingredients.map((ingredient) => <li key={ingredient}>{ingredient}</li>)}
       </ul>
-      <div className="price"><span>₺</span>{burger.price}</div>
+      <div className="price">
+        <span>₺</span>{burger.price}
+        <div className="restoran-badge" aria-label={`Restoranda ₺${Number(burger.price) - 30}`}>
+          <div className="restoran-badge-inner">
+            <div className="restoran-badge-label">RESTORANDA</div>
+            <div className="restoran-badge-price"><span>₺</span>{Number(burger.price) - 30}</div>
+          </div>
+        </div>
+      </div>
     </aside>
   )
 }
