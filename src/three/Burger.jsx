@@ -5,12 +5,12 @@ import * as THREE from 'three'
 import { getHandLiftProgress, getHandPickupProgress } from '../utils/scrollProgress'
 
 const burgerPhotoPaths = [
-  '/assets/burgers/hamburger-classic-cutout.webp',
-  '/assets/burgers/cheeseburger-cutout.webp',
-  '/assets/burgers/tavuk-burger-cutout.webp',
-  '/assets/burgers/koz-burger-cutout.webp',
-  '/assets/burgers/karisik-burger-cutout.webp',
-  '/assets/burgers/baldicanli-burger-cutout.webp',
+  '/assets/burgers/hamburger-classic-cutout.webp?v=hd-20260811',
+  '/assets/burgers/cheeseburger-cutout.webp?v=hd-20260811',
+  '/assets/burgers/tavuk-burger-cutout.webp?v=hd-20260811',
+  '/assets/burgers/koz-burger-cutout.webp?v=hd-20260811',
+  '/assets/burgers/karisik-burger-cutout.webp?v=hd-20260811',
+  '/assets/burgers/baldicanli-burger-cutout.webp?v=hd-20260811',
 ]
 
 // The renewed cutouts share the same HD canvas, center, and baseline. The
