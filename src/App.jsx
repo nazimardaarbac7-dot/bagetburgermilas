@@ -64,9 +64,11 @@ export default function App() {
   const activeIndexValue = useRef(0)
   const showcaseReadyValue = useRef(false)
   const showcaseActiveValue = useRef(false)
+  const finalSequenceActiveValue = useRef(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const [showcaseReady, setShowcaseReady] = useState(false)
   const [showcaseActive, setShowcaseActive] = useState(false)
+  const [finalSequenceActive, setFinalSequenceActive] = useState(false)
   const [heroTransitioning, setHeroTransitioning] = useState(false)
   const [sceneReady, setSceneReady] = useState(false)
   const [navbarOnYellow, setNavbarOnYellow] = useState(false)
@@ -151,6 +153,12 @@ export default function App() {
         if (activeIndexValue.current === index) return
         activeIndexValue.current = index
         setActiveIndex(index)
+      }
+
+      const setFinalSequenceVisibility = (active) => {
+        if (finalSequenceActiveValue.current === active) return
+        finalSequenceActiveValue.current = active
+        setFinalSequenceActive(active)
       }
 
       const jumpToScroll = (targetScroll) => {
@@ -422,6 +430,7 @@ export default function App() {
           scrollProgress.current = sequenceProgress
           const finalProgress = getFinalTransitionProgress(sequenceProgress)
           finalTransitionProgress.current = finalProgress
+          setFinalSequenceVisibility(finalProgress > 0.001)
           if (returnedToFinalStop) scheduleFinalGateReady()
           const rotationProgress = getTrayRotationProgress(sequenceProgress, mobileTray)
           const nextIndex = finalProgress > 0
@@ -455,6 +464,7 @@ export default function App() {
         heroPhase.current = 'transition'
         cancelTraySnap()
         finalTransitionProgress.current = 0
+        setFinalSequenceVisibility(false)
         heroScrollAnchor = forward ? 0 : window.scrollY
         if (forward && scrollingElement.scrollTop !== 0) scrollingElement.scrollTop = 0
         if (!heroScrollLocked) {
@@ -777,7 +787,7 @@ export default function App() {
   }
 
   return (
-    <main className={heroTransitioning ? 'is-hero-transitioning' : undefined}>
+    <main className={[heroTransitioning && 'is-hero-transitioning', showcaseActive && 'is-showcase-active', finalSequenceActive && 'is-final-sequence-active'].filter(Boolean).join(' ') || undefined}>
       <button className="skip-link" type="button" onClick={openMenu}>Doğrudan menüye geç</button>
       <ExperienceBoundary onError={handleSceneReady}>
         <Suspense fallback={null}>
@@ -788,7 +798,7 @@ export default function App() {
       <div className="grain" />
       <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} onOpenMenu={openMenu} onNavigate={handleNavigate} />
       <Hero ref={heroRef} />
-      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} mobileMinHeight={`${MOBILE_SHOWCASE_MIN_HEIGHT_SVH}svh`} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
+      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} finalSequenceActive={finalSequenceActive} mobileMinHeight={`${MOBILE_SHOWCASE_MIN_HEIGHT_SVH}svh`} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
       <MilasSection onOpenMenu={openMenu} />
       <MilasCallBar visible={navbarOnYellow && !menuOpen && !discountOpen} />
       <MenuOverlay open={menuOpen} onClose={closeMenu} />

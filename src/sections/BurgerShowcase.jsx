@@ -2,11 +2,12 @@ import React from 'react'
 import BurgerInfo from '../components/BurgerInfo'
 import TrayTouchZone from '../components/TrayTouchZone'
 
-export default function BurgerShowcase({ burger, activeIndex, isReady, isActive, isInteractive, mobileMinHeight, onTrayDrag, onTrayDragEnd, onBurgerTap, onTrayStep }) {
+export default function BurgerShowcase({ burger, activeIndex, isReady, isActive, isInteractive, finalSequenceActive, mobileMinHeight, onTrayDrag, onTrayDragEnd, onBurgerTap, onTrayStep }) {
   const isLastBurger = activeIndex === 5
+  const showMilasPreview = isLastBurger && !finalSequenceActive
 
   return (
-    <section id="tray" className={`showcase${isReady ? ' is-ready' : ''}${isActive ? ' is-active' : ''}`} style={{ '--mobile-showcase-min-height': mobileMinHeight }} aria-label="Burger menüsü">
+    <section id="tray" className={`showcase${isReady ? ' is-ready' : ''}${isActive ? ' is-active' : ''}${showMilasPreview ? ' has-milas-preview' : ''}`} style={{ '--mobile-showcase-min-height': mobileMinHeight }} aria-label="Burger menüsü">
       <div className="showcase-panel">
         <div className="showcase-topline">
           <span className="selector-label">BURGERİNİ SEÇ</span>
@@ -26,7 +27,14 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
           </svg>
         </div>
         <TrayTouchZone enabled={isInteractive} onDrag={onTrayDrag} onDragEnd={onTrayDragEnd} onTap={onBurgerTap} onStep={onTrayStep} />
-        <p className={`rotate-prompt${isLastBurger ? ' is-final' : ''}`}><i /><span className="rotate-copy-desktop">AŞAĞI KAYDIR</span><span className="rotate-copy-mobile">{isLastBurger ? 'AŞAĞI KAYDIR' : 'TEPSİYİ KAYDIR'}</span></p>
+        {!showMilasPreview && <p className={`rotate-prompt${isLastBurger ? ' is-final' : ''}`}><i /><span className="rotate-copy-desktop">AŞAĞI KAYDIR</span><span className="rotate-copy-mobile">{isLastBurger ? 'AŞAĞI KAYDIR' : 'TEPSİYİ KAYDIR'}</span></p>}
+        {showMilasPreview && (
+          <div className="milas-preview" aria-label="Made in Milas bölümüne ilerlemek için aşağı kaydırın">
+            <strong>MADE IN MILAS</strong>
+            <span>AŞAĞI KAYDIR</span>
+            <i aria-hidden="true">↑</i>
+          </div>
+        )}
       </div>
     </section>
   )

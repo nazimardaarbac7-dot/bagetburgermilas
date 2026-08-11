@@ -79,10 +79,10 @@ test('ilerleme fonksiyonları güvenli aralıkta kalır', () => {
 })
 
 test('short intentional tray swipe advances one burger in its direction', () => {
-  assert.equal(getTraySwipeDirection(-28), 1)
-  assert.equal(getTraySwipeDirection(28), -1)
-  assert.equal(getTraySwipeDirection(-27), 0)
-  assert.equal(getTraySwipeDirection(27), 0)
+  assert.equal(getTraySwipeDirection(-20), 1)
+  assert.equal(getTraySwipeDirection(20), -1)
+  assert.equal(getTraySwipeDirection(-19), 0)
+  assert.equal(getTraySwipeDirection(19), 0)
   assert.equal(getTraySwipeDirection(null), 0)
 })
 
@@ -93,7 +93,7 @@ test('yatay tepsi hassasiyeti dikey scroll mesafesinden bağımsız kalır', () 
   const longSensitivity = getTrayDragScrollSensitivity(longSpan, viewportHeight)
   const shortSensitivity = getTrayDragScrollSensitivity(shortSpan, viewportHeight)
 
-  assert.ok(Math.abs(longSensitivity - 5) < 1e-12)
-  assert.ok(Math.abs(shortSensitivity - 1.25) < 1e-12)
+  assert.ok(Math.abs(longSensitivity - 6) < 1e-12)
+  assert.ok(Math.abs(shortSensitivity - 1.5) < 1e-12)
   assert.ok(Math.abs(longSensitivity / longSpan - shortSensitivity / shortSpan) < 1e-12)
 })
