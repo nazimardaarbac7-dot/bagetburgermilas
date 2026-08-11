@@ -15,7 +15,7 @@ const burgerPhotoPaths = [
 
 // Match each cutout's perceived on-screen area to the mixed burger reference.
 // Wide, low products need more scale than tall products on the shared plane.
-const burgerPhotoScales = [1.04, 1.02, 1.25, 1.08, 1, 1.05]
+const burgerPhotoScales = [1.07, 1.02, 1.25, 1.08, 1, 1.05]
 
 const handTexturePath = '/assets/interaction/hand-grab.webp'
 const drumstickTexturePath = '/assets/interaction/drumstick-confetti.webp'

@@ -32,15 +32,17 @@ class ExperienceBoundary extends Component {
   }
 }
 
-const HERO_TRANSITION_DURATION = 2.35
-const HERO_COPY_EXIT_DURATION = 1.16
-const TRAY_ENTRY_START = 1.16
-const TRAY_ENTRY_DURATION = 1.64
+const HERO_TRANSITION_SPEED = 1.2
+const heroTransitionTime = (seconds) => seconds / HERO_TRANSITION_SPEED
+const HERO_TRANSITION_DURATION = heroTransitionTime(2.35)
+const HERO_COPY_EXIT_DURATION = heroTransitionTime(1.16)
+const TRAY_ENTRY_START = heroTransitionTime(1.16)
+const TRAY_ENTRY_DURATION = heroTransitionTime(1.64)
 const TRAY_INFO_REVEAL_PROGRESS = 0.72
-const TRAY_RETURN_DURATION = 0.82
-const HERO_RETURN_START = 0.66
-const HERO_RETURN_DURATION = 1.62
-const HERO_COPY_RETURN_DURATION = 0.92
+const TRAY_RETURN_DURATION = heroTransitionTime(0.82)
+const HERO_RETURN_START = heroTransitionTime(0.66)
+const HERO_RETURN_DURATION = heroTransitionTime(1.62)
+const HERO_COPY_RETURN_DURATION = heroTransitionTime(0.92)
 const HERO_COPY_RETURN_START = HERO_RETURN_START + HERO_RETURN_DURATION - HERO_COPY_RETURN_DURATION
 
 export default function App() {
@@ -278,7 +280,7 @@ export default function App() {
       heroTimeline.to('.scroll-cue', {
         autoAlpha: 0,
         y: -12,
-        duration: 0.46,
+        duration: heroTransitionTime(0.46),
         ease: 'power2.out',
       }, 0)
       if (reduceMotion) heroTimeline.timeScale(100)
@@ -509,9 +511,9 @@ export default function App() {
         heroReturnTween.to('.scroll-cue', {
           autoAlpha: 1,
           y: 0,
-          duration: 0.38,
+          duration: heroTransitionTime(0.38),
           ease: 'power2.out',
-        }, HERO_RETURN_START + HERO_RETURN_DURATION - 0.38)
+        }, HERO_RETURN_START + HERO_RETURN_DURATION - heroTransitionTime(0.38))
       }
 
       sectionNavigation.current = (target) => {
