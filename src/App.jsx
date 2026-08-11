@@ -8,7 +8,7 @@ import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
 import { burgers } from './data/burgers'
-import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getTrayProgressForBurger, getTrayRotationProgress, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
+import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayProgressForBurger, getTrayRotationProgress, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
@@ -32,7 +32,6 @@ class ExperienceBoundary extends Component {
   }
 }
 
-const ACTIVE_INDEX_HYSTERESIS = 0.08
 const HERO_TRANSITION_DURATION = 2.35
 const HERO_COPY_EXIT_DURATION = 1.16
 const TRAY_ENTRY_START = 1.16
@@ -43,20 +42,6 @@ const HERO_RETURN_START = 0.66
 const HERO_RETURN_DURATION = 1.62
 const HERO_COPY_RETURN_DURATION = 0.92
 const HERO_COPY_RETURN_START = HERO_RETURN_START + HERO_RETURN_DURATION - HERO_COPY_RETURN_DURATION
-
-function getStableBurgerIndex(rotationProgress, currentIndex) {
-  const position = rotationProgress * (burgers.length - 1)
-  let nextIndex = currentIndex
-
-  while (nextIndex < burgers.length - 1 && position >= nextIndex + 0.5 + ACTIVE_INDEX_HYSTERESIS) {
-    nextIndex += 1
-  }
-  while (nextIndex > 0 && position <= nextIndex - 0.5 - ACTIVE_INDEX_HYSTERESIS) {
-    nextIndex -= 1
-  }
-
-  return nextIndex
-}
 
 export default function App() {
   const heroExitProgress = useRef(0)
@@ -371,7 +356,7 @@ export default function App() {
         if (!trayTrigger) return false
         const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress, mobileTray)
         const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START, mobileTray)
-        const dragSensitivity = mobileTray ? 4.4 : 3.15
+        const dragSensitivity = mobileTray ? 4.4 : 5
         const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * dragSensitivity))
         jumpToScroll(targetScroll)
         return true
@@ -417,11 +402,11 @@ export default function App() {
           const rotationProgress = getTrayRotationProgress(sequenceProgress, mobileTray)
           const nextIndex = finalProgress > 0
             ? burgers.length - 1
-            : getStableBurgerIndex(rotationProgress, activeIndexValue.current)
+            : getStableBurgerIndex(rotationProgress, activeIndexValue.current, burgers.length)
           const trayMenuActive = finalProgress <= 0.001 && sequenceProgress >= firstTrayProgress - 0.002
+          setDisplayedBurger(nextIndex)
           if (finalProgress > 0) {
             traySettledIndex.current = nextIndex
-            setDisplayedBurger(nextIndex)
           }
           setShowcaseVisibility(trayMenuActive, finalProgress < 0.995)
 

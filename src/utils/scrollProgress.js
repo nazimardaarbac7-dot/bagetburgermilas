@@ -2,6 +2,7 @@ export const TRAY_SETTLE_END = 0.17
 export const MOBILE_TRAY_SETTLE_END = 0.075
 export const TRAY_ROTATION_END = 0.62
 export const FINAL_TRANSITION_START = TRAY_ROTATION_END
+const ACTIVE_INDEX_HYSTERESIS = 0.08
 
 const HAND_PICKUP_END = 0.323
 const HAND_REACH_END = HAND_PICKUP_END * 0.6
@@ -43,6 +44,21 @@ export function getTrayProgressForBurger(index, burgerCount, isMobile = false) {
   const rotationProgress = safeIndex / (safeCount - 1)
   const firstRotationStart = getFirstRotationStart(isMobile)
   return firstRotationStart + rotationProgress * (TRAY_ROTATION_END - firstRotationStart)
+}
+
+export function getStableBurgerIndex(rotationProgress, currentIndex, burgerCount = 6) {
+  const safeCount = Math.max(2, burgerCount)
+  const position = Math.min(1, Math.max(0, rotationProgress)) * (safeCount - 1)
+  let nextIndex = Math.max(0, Math.min(safeCount - 1, currentIndex))
+
+  while (nextIndex < safeCount - 1 && position >= nextIndex + 0.5 + ACTIVE_INDEX_HYSTERESIS) {
+    nextIndex += 1
+  }
+  while (nextIndex > 0 && position <= nextIndex - 0.5 - ACTIVE_INDEX_HYSTERESIS) {
+    nextIndex -= 1
+  }
+
+  return nextIndex
 }
 
 export function getHandPickupProgress(progress) {

@@ -9,6 +9,7 @@ import {
   getHandLiftProgress,
   getRawProgressForSequenceProgress,
   getSequenceProgress,
+  getStableBurgerIndex,
   getTrayProgressForBurger,
   getTrayRotationProgress,
 } from '../src/utils/scrollProgress.js'
@@ -57,6 +58,14 @@ test('burger durakları tepsi dönüşüyle aynı indekse karşılık gelir', ()
       assert.ok(Math.abs(getTrayRotationProgress(progress, isMobile) - index / 5) < 1e-10)
     }
   }
+})
+
+test('aktif burger merkez eşiği geçildiğinde anında ve kararlı biçimde güncellenir', () => {
+  assert.equal(getStableBurgerIndex(0.11, 0, 6), 0)
+  assert.equal(getStableBurgerIndex(0.12, 0, 6), 1)
+  assert.equal(getStableBurgerIndex(0.29, 1, 6), 1)
+  assert.equal(getStableBurgerIndex(0.32, 1, 6), 2)
+  assert.equal(getStableBurgerIndex(1, 4, 6), 5)
 })
 
 test('ilerleme fonksiyonları güvenli aralıkta kalır', () => {

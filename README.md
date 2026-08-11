@@ -51,9 +51,9 @@ Bu yaklaşım burger ve tepsi kenarlarını yeni telefonlarda netleştirirken es
 |---:|---|---:|
 | 01 | Hamburger | 220 TL |
 | 02 | Cheeseburger | 230 TL |
-| 03 | Tavuk Burger | 220 TL |
+| 03 | Tavuk Burger | 210 TL |
 | 04 | Köz Burger | 230 TL |
-| 05 | Karışık Burger | 290 TL |
+| 05 | Karışık Burger | 330 TL |
 | 06 | Badılcanlı Burger | 230 TL |
 
 Ürün adları, içerikleri ve fiyatları `src/data/burgers.js` dosyasından yönetilir. Tam menü verileri ise `src/data/fullMenu.js` içindedir.
