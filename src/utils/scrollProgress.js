@@ -3,6 +3,7 @@ export const MOBILE_TRAY_SETTLE_END = 0.075
 export const TRAY_ROTATION_END = 0.62
 export const FINAL_TRANSITION_START = TRAY_ROTATION_END
 const ACTIVE_INDEX_HYSTERESIS = 0.08
+export const TRAY_SWIPE_STEP_THRESHOLD = 28
 
 const HAND_PICKUP_END = 0.323
 const HAND_REACH_END = HAND_PICKUP_END * 0.6
@@ -60,6 +61,11 @@ export function getStableBurgerIndex(rotationProgress, currentIndex, burgerCount
   }
 
   return nextIndex
+}
+
+export function getTraySwipeDirection(deltaX, threshold = TRAY_SWIPE_STEP_THRESHOLD) {
+  if (!Number.isFinite(deltaX) || Math.abs(deltaX) < threshold) return 0
+  return deltaX < 0 ? 1 : -1
 }
 
 export function getHandPickupProgress(progress) {

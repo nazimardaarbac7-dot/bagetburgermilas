@@ -51,8 +51,9 @@ export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap, onSte
     if (!current || current.pointerId !== event.pointerId) return
 
     if (current.axis === 'horizontal') {
-      suppressClick.current = Math.abs(event.clientX - current.startX) > 10
-      onDragEnd()
+      const totalMovementX = event.clientX - current.startX
+      suppressClick.current = Math.abs(totalMovementX) > 10
+      onDragEnd(totalMovementX)
     }
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -62,7 +63,7 @@ export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap, onSte
   }
 
   const handlePointerCancel = () => {
-    if (gesture.current?.axis === 'horizontal') onDragEnd()
+    if (gesture.current?.axis === 'horizontal') onDragEnd(null)
     resetGesture()
   }
 

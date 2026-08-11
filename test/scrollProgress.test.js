@@ -12,6 +12,7 @@ import {
   getStableBurgerIndex,
   getTrayProgressForBurger,
   getTrayRotationProgress,
+  getTraySwipeDirection,
 } from '../src/utils/scrollProgress.js'
 
 test('el geçişi son burger durağında boşluk bırakmadan başlar', () => {
@@ -74,4 +75,12 @@ test('ilerleme fonksiyonları güvenli aralıkta kalır', () => {
   assert.equal(getSequenceProgress(2), 1)
   assert.equal(getHandLiftProgress(-1), 0)
   assert.equal(getHandLiftProgress(2), 1)
+})
+
+test('short intentional tray swipe advances one burger in its direction', () => {
+  assert.equal(getTraySwipeDirection(-28), 1)
+  assert.equal(getTraySwipeDirection(28), -1)
+  assert.equal(getTraySwipeDirection(-27), 0)
+  assert.equal(getTraySwipeDirection(27), 0)
+  assert.equal(getTraySwipeDirection(null), 0)
 })

@@ -9,7 +9,7 @@ import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
 import { burgers } from './data/burgers'
-import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayProgressForBurger, getTrayRotationProgress, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
+import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayProgressForBurger, getTrayRotationProgress, getTraySwipeDirection, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
@@ -371,14 +371,19 @@ export default function App() {
         if (!trayTrigger) return false
         const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress, mobileTray)
         const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START, mobileTray)
-        const dragSensitivity = mobileTray ? 4.4 : 5
+        const dragSensitivity = 5
         const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * dragSensitivity))
         jumpToScroll(targetScroll)
         return true
       }
 
-      settleTrayProgress.current = () => {
+      settleTrayProgress.current = (totalMovementX) => {
         trayPointerDragging = false
+        const swipeDirection = getTraySwipeDirection(totalMovementX)
+        if (swipeDirection !== 0) {
+          snapTrayToIndex(traySettledIndex.current + swipeDirection)
+          return
+        }
         snapTrayToNearest()
       }
       stepTrayProgress.current = (direction) => {
@@ -760,7 +765,7 @@ export default function App() {
   }, [])
 
   const handleTrayDrag = (movementX) => adjustTrayProgress.current?.(movementX) === true
-  const handleTrayDragEnd = () => settleTrayProgress.current?.()
+  const handleTrayDragEnd = (totalMovementX) => settleTrayProgress.current?.(totalMovementX)
   const handleTrayStep = (direction) => stepTrayProgress.current?.(direction)
 
   const handleBurgerTap = () => {
