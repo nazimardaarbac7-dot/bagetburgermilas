@@ -141,7 +141,10 @@ function BurgerPhoto({ index }) {
 
   useLayoutEffect(() => {
     texture.colorSpace = THREE.SRGBColorSpace
-    texture.anisotropy = 8
+    texture.generateMipmaps = true
+    texture.minFilter = THREE.LinearMipmapNearestFilter
+    texture.magFilter = THREE.LinearFilter
+    texture.anisotropy = 16
     texture.needsUpdate = true
   }, [texture])
 

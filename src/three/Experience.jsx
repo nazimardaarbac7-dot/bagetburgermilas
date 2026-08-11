@@ -8,13 +8,19 @@ import Tray from './Tray'
 function getMobileRenderProfile() {
   const memory = navigator.deviceMemory
   const cores = navigator.hardwareConcurrency
+  const devicePixelRatio = window.devicePixelRatio || 1
   const constrainedDevice = (Number.isFinite(memory) && memory <= 2)
     || (Number.isFinite(cores) && cores <= 4)
 
-  if (constrainedDevice) return { dpr: 1, antialias: false }
+  if (constrainedDevice) {
+    return {
+      dpr: Math.min(Math.max(devicePixelRatio, 1.5), 1.75),
+      antialias: true,
+    }
+  }
 
   return {
-    dpr: Math.min(Math.max(window.devicePixelRatio || 1, 1), 1.3),
+    dpr: Math.min(Math.max(devicePixelRatio, 1.5), 2),
     antialias: true,
   }
 }
