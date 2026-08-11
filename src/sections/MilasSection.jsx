@@ -49,7 +49,6 @@ export default function MilasSection({ onOpenMenu }) {
         <a href="tel:+905498232020">0549 823 20 20</a>
         <a className="directions" href={GOOGLE_MAPS_URL} target="_blank" rel="noreferrer">YOL TARİFİ <span>↗</span></a>
       </div>
-      <p className="footer-note">İYİ YEMEK, TAVİZ YOK <span>✦</span> İYİ YEMEK, TAVİZ YOK</p>
     </section>
   )
 }

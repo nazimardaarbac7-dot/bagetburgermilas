@@ -32,7 +32,7 @@ class ExperienceBoundary extends Component {
   }
 }
 
-const HERO_TRANSITION_SPEED = 1.2
+const HERO_TRANSITION_SPEED = 1.2 * 1.15
 const heroTransitionTime = (seconds) => seconds / HERO_TRANSITION_SPEED
 const HERO_TRANSITION_DURATION = heroTransitionTime(2.35)
 const HERO_COPY_EXIT_DURATION = heroTransitionTime(1.16)

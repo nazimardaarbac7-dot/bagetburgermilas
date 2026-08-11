@@ -26,7 +26,7 @@ const MAX_DRUMSTICK_INSTANCES = DRUMSTICKS_PER_BURST * MAX_CONCURRENT_BURSTS
 const burgerBurstOutlines = [
   { radiusX: 1.13, radiusY: 0.74, centerY: 0.68, angleOffset: 0.02 },
   { radiusX: 1.22, radiusY: 0.7, centerY: 0.68, angleOffset: 0.1 },
-  { radiusX: 1.49, radiusY: 0.56, centerY: 0.68, angleOffset: -0.05 },
+  { radiusX: 1.49, radiusY: 0.61, centerY: 0.16, angleOffset: -0.05 },
   { radiusX: 1.18, radiusY: 0.79, centerY: 0.7, angleOffset: 0.07 },
   { radiusX: 1.29, radiusY: 0.85, centerY: 0.68, angleOffset: -0.09 },
   { radiusX: 1.2, radiusY: 0.77, centerY: 0.7, angleOffset: 0.04 },
