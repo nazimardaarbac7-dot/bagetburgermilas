@@ -4,7 +4,7 @@ Baget Burger Milas için geliştirilmiş, mobil öncelikli ve etkileşimli resto
 
 Proje; klasik bir restoran sayfası yerine markayı güçlü bir görsel hikâyeyle tanıtır. Kullanıcı açılış ekranından burger tepsisine geçer, altı ürünü dönen tepsi üzerinde inceler, son burgerde el animasyonuyla final bölümüne ulaşır ve tam menüyü açabilir.
 
-- Canlı site: [baget-burger-milas.vercel.app](https://baget-burger-milas.vercel.app/)
+- Canlı site: [bagetburgermilas.com.tr](https://bagetburgermilas.com.tr/)
 - Kaynak kod: [GitHub deposu](https://github.com/nazimardaarbac7-dot/bagetburgermilas)
 - İşletme: Baget Burger, Milas / Muğla
 - Telefon: [0549 823 20 20](tel:+905498232020)
@@ -70,7 +70,7 @@ Bu yaklaşım burger ve tepsi kenarlarını yeni telefonlarda netleştirirken es
 - GSAP
 - GSAP ScrollTrigger
 - Node.js yerleşik test çalıştırıcısı
-- Vercel
+- Cloudflare Workers ve Workers Builds
 
 ## Proje yapısı
 
@@ -98,8 +98,9 @@ BagetBurger/
 │   └── scrollProgress.test.js
 ├── index.html
 ├── package.json
-├── vercel.json
-└── vite.config.js
+├── vite.config.js
+├── worker.js                   # HTTPS yönlendirmesi ve statik asset sunumu
+└── wrangler.jsonc             # Cloudflare Worker ve dist asset yapılandırması
 ```
 
 ## Önemli dosyalar
@@ -214,16 +215,26 @@ Burger görsellerinde şeffaf arka planlı WebP tercih edilmelidir. Dosya adı d
 
 ## Yayınlama
 
-Site Vercel üzerinde yayınlanır. `main` dalına gönderilen doğrulanmış değişiklikler üretim dağıtımını tetikler.
+Site Cloudflare Workers üzerinde yayınlanır. Cloudflare Workers Builds, GitHub deposunun `main` dalını izler ve her push sonrasında üretim build/deploy sürecini otomatik başlatır.
 
 Yayın öncesi temel sıra:
 
 1. `npm run check`
 2. Değişiklikleri gözden geçirme
 3. `main` dalına gönderme
-4. Canlı sitede yeni asset sürümünü ve mobil akışı doğrulama
+4. Cloudflare Workers Builds sonucunun başarılı olduğunu doğrulama
+5. [bagetburgermilas.com.tr](https://bagetburgermilas.com.tr/) üzerinde yeni asset sürümünü ve mobil akışı kontrol etme
 
-`vercel.json` dosyası içerik güvenliği, izin politikaları ve statik asset önbellekleme başlıklarını tanımlar.
+Cloudflare build ayarları:
+
+- Worker adı: `bagetburgermilas`
+- Production branch: `main`
+- Build komutu: `npm run build`
+- Deploy komutu: `npx wrangler deploy`
+- Root directory: `/`
+- Build çıktısı: `dist/`
+
+`wrangler.jsonc`, Worker giriş dosyasını ve `dist/` altındaki statik asset bağlamasını tanımlar. `worker.js` HTTP isteklerini HTTPS'e yönlendirir ve istekleri statik asset bağlamasına iletir.
 
 ## İşletme bilgileri
 

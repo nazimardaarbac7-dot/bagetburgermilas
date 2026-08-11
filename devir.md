@@ -10,7 +10,7 @@ Bu dosya yeni Codex/ChatGPT context'i için ana devir kaynağıdır.
 - Teknoloji: React 19, Vite 7, Three.js, React Three Fiber, Drei, GSAP / ScrollTrigger
 - Aktif dal: `main`
 - GitHub: `https://github.com/nazimardaarbac7-dot/bagetburgermilas`
-- Canlı adres: `https://baget-burger-milas.vercel.app`
+- Canlı adres: `https://bagetburgermilas.com.tr`
 - Son onaylanan commit: `3d79189 Fine tune tray entrance speed`
 - Devir dosyası oluşturulmadan önce çalışma ağacı temizdi.
 
@@ -299,7 +299,7 @@ Hero dijital girişinde özellikle doğrulanacak:
 - ilk burger adı `HAMBURGER`
 - touch zone aktif
 
-Deploy sonrası aynı kontroller `https://baget-burger-milas.vercel.app` üzerinde yapılmalıdır.
+Deploy sonrası aynı kontroller `https://bagetburgermilas.com.tr` üzerinde yapılmalıdır.
 
 ## 12. Git ve deploy çalışma şekli
 
@@ -308,9 +308,11 @@ Deploy sonrası aynı kontroller `https://baget-burger-milas.vercel.app` üzerin
 - Önce `git status` ve `git diff` kontrol et.
 - Değişikliği build ve tarayıcı testinden sonra commit et.
 - `main` dalına push et.
-- Vercel production deploy yap.
-- Stabil alias değişmemeli:
-  - `https://baget-burger-milas.vercel.app`
+- Cloudflare Workers Builds sonucunun başarılı olduğunu doğrula.
+- Cloudflare build ayarları `npm run build` ve `npx wrangler deploy` komutlarını kullanmalıdır.
+- Worker adı `wrangler.jsonc` ile aynı şekilde `bagetburgermilas` olmalıdır.
+- Canlı adres değişmemeli:
+  - `https://bagetburgermilas.com.tr`
 
 Yakın commit geçmişi:
 
