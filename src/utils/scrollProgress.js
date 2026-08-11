@@ -24,8 +24,11 @@ const VIEWPORT_TRIGGER_PADDING_SVH = 100
 const MOBILE_SCROLL_SENSITIVITY = 1.06 * 1.2 / 0.9 / 0.85 / 0.75 / 0.8 / 0.8 / 0.75
 const MOBILE_BASE_TRIGGER_SPAN_SVH = MOBILE_BASE_SHOWCASE_MIN_HEIGHT_SVH + VIEWPORT_TRIGGER_PADDING_SVH
 const MOBILE_TRIGGER_SPAN_SCALE = GRIP_END_RAW_PROGRESS + (1 - GRIP_END_RAW_PROGRESS) * MOBILE_POST_GRIP_DISTANCE_SCALE
+const MOBILE_REFERENCE_TRIGGER_SPAN_SVH = MOBILE_BASE_TRIGGER_SPAN_SVH * MOBILE_TRIGGER_SPAN_SCALE / 1.06
 const MOBILE_GRIP_END_RAW_PROGRESS = GRIP_END_RAW_PROGRESS / MOBILE_TRIGGER_SPAN_SCALE
 export const MOBILE_SHOWCASE_MIN_HEIGHT_SVH = MOBILE_BASE_TRIGGER_SPAN_SVH * MOBILE_TRIGGER_SPAN_SCALE / MOBILE_SCROLL_SENSITIVITY - VIEWPORT_TRIGGER_PADDING_SVH
+const DESKTOP_REFERENCE_TRIGGER_SPAN_VH = 820
+const BASE_TRAY_DRAG_SENSITIVITY = 5
 
 const DESKTOP_FIRST_ROTATION_START = TRAY_SETTLE_END
 const MOBILE_FIRST_ROTATION_START = MOBILE_TRAY_SETTLE_END
@@ -66,6 +69,14 @@ export function getStableBurgerIndex(rotationProgress, currentIndex, burgerCount
 export function getTraySwipeDirection(deltaX, threshold = TRAY_SWIPE_STEP_THRESHOLD) {
   if (!Number.isFinite(deltaX) || Math.abs(deltaX) < threshold) return 0
   return deltaX < 0 ? 1 : -1
+}
+
+export function getTrayDragScrollSensitivity(triggerSpan, viewportHeight, isMobile = false) {
+  if (!Number.isFinite(triggerSpan) || triggerSpan <= 0) return 0
+  const safeViewportHeight = Number.isFinite(viewportHeight) && viewportHeight > 0 ? viewportHeight : 1
+  const referenceSpanVh = isMobile ? MOBILE_REFERENCE_TRIGGER_SPAN_SVH : DESKTOP_REFERENCE_TRIGGER_SPAN_VH
+  const referenceSpan = safeViewportHeight * referenceSpanVh / 100
+  return BASE_TRAY_DRAG_SENSITIVITY * triggerSpan / referenceSpan
 }
 
 export function getHandPickupProgress(progress) {

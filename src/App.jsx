@@ -9,7 +9,7 @@ import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
 import { burgers } from './data/burgers'
-import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayProgressForBurger, getTrayRotationProgress, getTraySwipeDirection, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
+import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayDragScrollSensitivity, getTrayProgressForBurger, getTrayRotationProgress, getTraySwipeDirection, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
@@ -371,7 +371,11 @@ export default function App() {
         if (!trayTrigger) return false
         const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress, mobileTray)
         const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START, mobileTray)
-        const dragSensitivity = 5
+        const dragSensitivity = getTrayDragScrollSensitivity(
+          trayTrigger.end - trayTrigger.start,
+          window.innerHeight,
+          mobileTray,
+        )
         const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * dragSensitivity))
         jumpToScroll(targetScroll)
         return true
