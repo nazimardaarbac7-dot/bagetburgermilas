@@ -55,7 +55,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
 .scroll-cue i { width: 1px; height: 34px; background: #de860b; animation: scrollLine 1.9s ease-in-out infinite; transform-origin: top; }
 @keyframes scrollLine { 0%, 100% { transform: scaleY(.25); opacity: .3; } 50% { transform: scaleY(1); opacity: 1; } }
 
-.showcase { min-height: 600vh; position: relative; z-index: 2; }
+.showcase { min-height: 540vh; position: relative; z-index: 2; }
 .showcase-panel { height: 100svh; position: sticky; top: 0; pointer-events: none; }
 .showcase .showcase-topline,
 .showcase .burger-info,

@@ -37,10 +37,10 @@ test('ham ve sahne ilerlemesi birbirinin tersidir', () => {
   }
 })
 
-test('mobil akış yüzde 27,2 daha hassastır ve el ile Milas ortak finali kısa kalır', () => {
+test('mobil akış kısaltılmış mesafeyi korur ve el ile Milas ortak finali kısa kalır', () => {
   const previousMobileTriggerSpan = 760 + 100
   const mobileTriggerSpan = MOBILE_SHOWCASE_MIN_HEIGHT_SVH + 100
-  const sensitivity = 1.06 * 1.2
+  const sensitivity = 1.06 * 1.2 / 0.9
   const previousGripRaw = getRawProgressForSequenceProgress(GRIP_END_SEQUENCE_PROGRESS)
   const mobileGripRaw = getRawProgressForSequenceProgress(GRIP_END_SEQUENCE_PROGRESS, true)
   const previousPreGripDistance = previousMobileTriggerSpan * previousGripRaw
