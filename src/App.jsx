@@ -1,4 +1,4 @@
-import React, { Component, lazy, Suspense, useCallback, useLayoutEffect, useRef, useState } from 'react'
+import React, { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Navbar from './components/Navbar'
@@ -75,6 +75,12 @@ export default function App() {
   const handleSceneReady = useCallback(() => setSceneReady(true), [])
   const closeDiscount = useCallback(() => setDiscountOpen(false), [])
   const handleNavigate = useCallback((target) => sectionNavigation.current?.(target), [])
+
+  useEffect(() => {
+    if (window.location.hash !== '#milas') return undefined
+    const timer = window.setTimeout(() => handleNavigate('milas'), 0)
+    return () => window.clearTimeout(timer)
+  }, [handleNavigate])
 
   useLayoutEffect(() => {
     const media = gsap.matchMedia()
@@ -193,6 +199,13 @@ export default function App() {
         finalGateOpen = true
       }
 
+      const jumpToMilas = () => {
+        const milasSection = document.getElementById('milas')
+        if (!milasSection) return
+        openFinalGate()
+        jumpToScroll(milasSection.offsetTop + 1)
+      }
+
       const heroMotion = { progress: 0 }
       const trayEntryMotion = { progress: 0 }
       const heroTimeline = gsap.timeline({
@@ -223,8 +236,7 @@ export default function App() {
           releaseHeroScroll()
           if (pendingNavigation === 'milas') {
             pendingNavigation = null
-            const milasSection = document.getElementById('milas')
-            if (milasSection) jumpToScroll(milasSection.offsetTop + 1)
+            jumpToMilas()
           }
         },
         onReverseComplete: () => {
@@ -509,8 +521,7 @@ export default function App() {
             pendingNavigation = 'milas'
             beginHeroTransition(true)
           } else if (heroPhase.current === 'tray') {
-            const milasSection = document.getElementById('milas')
-            if (milasSection) jumpToScroll(milasSection.offsetTop + 1)
+            jumpToMilas()
           }
           return
         }
