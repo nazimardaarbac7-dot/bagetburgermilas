@@ -11,13 +11,12 @@ export default function BurgerInfo({ burger }) {
         {burger.ingredients.map((ingredient) => <li key={ingredient}>{ingredient}</li>)}
       </ul>
       <div className="price-row">
-        <div className="price"><span>₺</span>{burger.price}</div>
-        <div className="restaurant-price-badge" role="note" aria-label={`Restoranda ${restaurantPrice} TL, normal fiyat ${burger.price} TL`}>
+        <div className="restaurant-price" role="note" aria-label={`Restoranda ${restaurantPrice} TL, normal fiyat ${burger.price} TL`}>
           <span className="restaurant-price-label" aria-hidden="true">RESTORANDA</span>
-          <span className="restaurant-price-values" aria-hidden="true">
-            <del>₺{burger.price}</del>
-            <strong>₺{restaurantPrice}</strong>
-          </span>
+          <div className="price-comparison" aria-hidden="true">
+            <div className="price"><span>₺</span>{restaurantPrice}</div>
+            <del className="original-price">₺{burger.price}</del>
+          </div>
         </div>
       </div>
     </aside>
