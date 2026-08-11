@@ -17,6 +17,10 @@ const burgerPhotoPaths = [
 // Wide, low products need more scale than tall products on the shared plane.
 const burgerPhotoScales = [1.07, 1.02, 1.25, 1.08, 1, 1.05]
 
+// Keep the visible alpha bounds centered after each cutout's individual zoom.
+// The source canvases share a size, but their transparent top/bottom padding differs.
+const burgerPhotoCenterY = [0.692, 0.654, 1.136, 0.75, 0.616, 0.628]
+
 const handTexturePath = '/assets/interaction/hand-grab.webp'
 const drumstickTexturePath = '/assets/interaction/drumstick-confetti.webp'
 const DRUMSTICKS_PER_BURST = 12
@@ -26,7 +30,7 @@ const MAX_DRUMSTICK_INSTANCES = DRUMSTICKS_PER_BURST * MAX_CONCURRENT_BURSTS
 const burgerBurstOutlines = [
   { radiusX: 1.13, radiusY: 0.74, centerY: 0.68, angleOffset: 0.02 },
   { radiusX: 1.22, radiusY: 0.7, centerY: 0.68, angleOffset: 0.1 },
-  { radiusX: 1.49, radiusY: 0.61, centerY: 0.16, angleOffset: -0.05 },
+  { radiusX: 1.49, radiusY: 0.61, centerY: 0.65, angleOffset: -0.05 },
   { radiusX: 1.18, radiusY: 0.79, centerY: 0.7, angleOffset: 0.07 },
   { radiusX: 1.29, radiusY: 0.85, centerY: 0.68, angleOffset: -0.09 },
   { radiusX: 1.2, radiusY: 0.77, centerY: 0.7, angleOffset: 0.04 },
@@ -138,6 +142,7 @@ function ClassicBunSpeckles() {
 function BurgerPhoto({ index }) {
   const texture = useTexture(burgerPhotoPaths[index])
   const photoScale = burgerPhotoScales[index] ?? 1
+  const photoCenterY = burgerPhotoCenterY[index] ?? 0.65
 
   useLayoutEffect(() => {
     texture.colorSpace = THREE.SRGBColorSpace
@@ -149,7 +154,7 @@ function BurgerPhoto({ index }) {
   }, [texture])
 
   return (
-    <mesh position={[0, 0.65, 0.72]} scale={photoScale} renderOrder={2} castShadow>
+    <mesh position={[0, photoCenterY, 0.72]} scale={photoScale} renderOrder={2} castShadow>
       <planeGeometry args={[2.52, 1.895]} />
       <meshBasicMaterial
         map={texture}
