@@ -13,10 +13,9 @@ const burgerPhotoPaths = [
   '/assets/burgers/baldicanli-burger-cutout.webp',
 ]
 
-// Cutout files have different amounts of transparent padding. These values
-// normalize their visible footprint on the shared plane without changing the
-// tray or active-burger scale.
-const burgerPhotoScales = [1, 1, 1.22, 1.04, 1.12, 1.05]
+// The renewed burger cutouts share the same canvas, visible width, center, and
+// baseline. Legacy assets keep their existing compensation values.
+const burgerPhotoScales = [1, 1, 1.22, 1, 1, 1.05]
 
 const handTexturePath = '/assets/interaction/hand-grab.webp'
 const drumstickTexturePath = '/assets/interaction/drumstick-confetti.webp'
