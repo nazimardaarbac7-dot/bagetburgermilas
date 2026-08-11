@@ -13,9 +13,9 @@ const burgerPhotoPaths = [
   '/assets/burgers/baldicanli-burger-cutout.webp',
 ]
 
-// The renewed burger cutouts share the same canvas, visible width, center, and
-// baseline. Legacy assets keep their existing compensation values.
-const burgerPhotoScales = [1, 1, 1.22, 1, 1, 1.05]
+// The renewed cutouts share the same HD canvas, center, and baseline. The
+// naturally taller eggplant burger needs a small width compensation.
+const burgerPhotoScales = [1, 1, 1, 1, 1, 1.08]
 
 const handTexturePath = '/assets/interaction/hand-grab.webp'
 const drumstickTexturePath = '/assets/interaction/drumstick-confetti.webp'
