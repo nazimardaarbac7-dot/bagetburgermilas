@@ -520,6 +520,10 @@ export default function App() {
           if (heroPhase.current === 'hero') {
             pendingNavigation = 'milas'
             beginHeroTransition(true)
+            heroTimeline.progress(1).pause()
+          } else if (heroPhase.current === 'transition') {
+            pendingNavigation = 'milas'
+            heroTimeline.progress(1).pause()
           } else if (heroPhase.current === 'tray') {
             jumpToMilas()
           }
