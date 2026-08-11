@@ -171,7 +171,7 @@ Veriler `src/data/burgers.js` içindedir.
   - “Milasta hamburger yiyeceksen başka adres aramaya gerek yok.”
 - “Tüm Menüyü Gör” gerçek tam menü overlay'ini açar.
 - Menü tek akışta aşağı kayar; kategori seçmek zorunlu değildir.
-- Getir sipariş bağlantısı ve yön ikonları emoji değil SVG/çizgi ikon olarak kalmalıdır.
+- Yemeksepeti sipariş bağlantısı ve yön ikonları emoji değil SVG/çizgi ikon olarak kalmalıdır.
 
 ## 7. Son bölümün mevcut davranışı
 
@@ -369,7 +369,7 @@ Bu bölüm, yukarıdaki dijital tepsi ve dijital final geçişi notlarının yer
 - Tepsi artık altı ürünlüdür; sayaçlar ve işaretçiler `06` olarak güncellendi. Baldıcanlı Burger altıncı ve son ürün olduğu için el/final geçiş hedefi değişmedi.
 - Tavuk Burger görseli kullanıcının verdiği ürün fotoğrafından şeffaf kesim olarak `public/assets/burgers/tavuk-burger-cutout.png` dosyasına hazırlandı.
 - Her yeni sayfa açılışında telefon siparişlerine `%5 indirim` görseli kapatılabilir popup olarak açılır.
-- Mobil tam menü altındaki Getir sipariş butonu `286px` azami genişlik ve `44px` yüksekliğe küçültüldü.
+- Mobil tam menü altındaki Yemeksepeti sipariş butonu `286px` azami genişlik ve `44px` yüksekliğe küçültüldü.
 
 ## 17. 9 Ağustos 2026 — modern popup ve baget konfeti
 

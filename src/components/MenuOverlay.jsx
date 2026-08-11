@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { GETIR_MENU_URL, menuCategories } from '../data/fullMenu'
+import { YEMEKSEPETI_MENU_URL, menuCategories } from '../data/fullMenu'
 import { isolateModal } from '../utils/modalIsolation'
 
 export default function MenuOverlay({ open, onClose }) {
@@ -151,8 +151,8 @@ export default function MenuOverlay({ open, onClose }) {
 
         <footer className="menu-dialog-footer">
           <p>GÜNCEL STOK VE SİPARİŞ İÇİN</p>
-          <a href={GETIR_MENU_URL} target="_blank" rel="noreferrer" aria-label="Getir'den sipariş ver">
-            <span>GETİR</span>
+          <a href={YEMEKSEPETI_MENU_URL} target="_blank" rel="noreferrer" aria-label="Yemeksepeti'nden sipariş ver">
+            <span>YEMEK<br />SEPETİ</span>
             <i aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
                 <path d="M7 17 17 7M9 7h8v8" />

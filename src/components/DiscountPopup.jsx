@@ -57,7 +57,11 @@ export default function DiscountPopup({ open, onClose }) {
           <a className="discount-popup-call" href="tel:+905498232020">
             <span>HEMEN ARA</span>
             <strong>0549 823 20 20</strong>
-            <i aria-hidden="true">↗</i>
+            <i aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M7 17 17 7M9 7h8v8" />
+              </svg>
+            </i>
           </a>
           <button className="discount-popup-later" type="button" onClick={onClose}>ŞİMDİLİK DEĞİL</button>
         </div>

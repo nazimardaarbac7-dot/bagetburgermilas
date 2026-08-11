@@ -1,4 +1,4 @@
-export const GETIR_MENU_URL = 'https://getir.com/yemek/restoran/baget-burger-milas-ismet-pasa-mah-milas-mugla/'
+export const YEMEKSEPETI_MENU_URL = 'https://yemek.go.link/e54Ud'
 
 export const menuCategories = [
   {

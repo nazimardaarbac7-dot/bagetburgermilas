@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Navbar from './components/Navbar'
 import MenuOverlay from './components/MenuOverlay'
 import DiscountPopup from './components/DiscountPopup'
+import MilasCallBar from './components/MilasCallBar'
 import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
@@ -780,6 +781,7 @@ export default function App() {
       <Hero ref={heroRef} />
       <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} mobileMinHeight={`${MOBILE_SHOWCASE_MIN_HEIGHT_SVH}svh`} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
       <MilasSection onOpenMenu={openMenu} />
+      <MilasCallBar visible={navbarOnYellow && !menuOpen && !discountOpen} />
       <MenuOverlay open={menuOpen} onClose={closeMenu} />
       <DiscountPopup open={discountOpen} onClose={closeDiscount} />
     </main>

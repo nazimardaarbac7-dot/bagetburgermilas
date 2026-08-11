@@ -17,7 +17,7 @@ Proje; klasik bir restoran sayfası yerine markayı güçlü bir görsel hikâye
 4. **Otomatik merkezleme:** Her hareketten sonra sistem en yakın burgeri merkeze çeker. Ürün bilgileri yalnızca merkezleme tamamlanınca değişir.
 5. **Son burger:** “Aşağı Kaydır” yönlendirmesiyle el sahneye girer ve Badılcanlı Burger'i alır.
 6. **Made in Milas:** Müşteri yorumları, işletme bilgileri, yol tarifi ve tam menü butonu gösterilir.
-7. **Tam menü:** Kategoriler tek bir erişilebilir menü penceresinde listelenir ve Getir bağlantısı sunulur.
+7. **Tam menü:** Kategoriler tek bir erişilebilir menü penceresinde listelenir ve Yemeksepeti bağlantısı sunulur.
 
 ## Öne çıkan özellikler
 
@@ -29,7 +29,7 @@ Proje; klasik bir restoran sayfası yerine markayı güçlü bir görsel hikâye
 - Son burger için el ve kaldırma animasyonu
 - Burger dokunma/tıklama geri bildirimi
 - Telefon siparişlerinde sürekli `%5` indirim duyurusu
-- Tam menü penceresi ve Getir sipariş bağlantısı
+- Tam menü penceresi ve Yemeksepeti sipariş bağlantısı
 - Google Maps yol tarifi ve müşteri yorumları
 - Erişilebilir modal yapısı, odak kilidi ve `Escape` ile kapatma
 - SEO dosyaları, sosyal paylaşım görseli ve güvenlik başlıkları
@@ -113,7 +113,7 @@ BagetBurger/
 | `src/three/Burger.jsx` | Burger görselleri, dokunma efekti, el ve baget animasyonları |
 | `src/three/CameraRig.jsx` | Hero–tepsi–final kamera hareketleri |
 | `src/utils/scrollProgress.js` | Scroll ve sahne ilerleme hesapları |
-| `src/components/MenuOverlay.jsx` | Tam menü penceresi ve Getir sipariş butonu |
+| `src/components/MenuOverlay.jsx` | Tam menü penceresi ve Yemeksepeti sipariş butonu |
 | `src/components/DiscountPopup.jsx` | Telefon siparişi indirim duyurusu |
 | `src/index.css` | Tüm responsive yerleşim ve görsel stil |
 
@@ -192,7 +192,7 @@ Burger sırası tepsideki görsel sırasıyla eşleştiği için nesnelerin dizi
 - Ürün adları
 - Açıklamalar
 - Fiyatlar
-- Getir restoran bağlantısı
+- Yemeksepeti restoran bağlantısı
 
 ### Görseller
 
