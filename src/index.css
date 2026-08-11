@@ -80,7 +80,7 @@ main { position: relative; isolation: isolate; overflow-x: clip; }
 .burger-info-cheeseburger h2 { font-size: clamp(2.35rem, 4.3vw, 4.6rem); }
 .burger-info h2 span { display: block; }
 .burger-info ul { padding: 0; margin: 0; list-style: none; font: 500 clamp(.62rem, .72vw, .78rem)/1.9 'DM Mono', monospace; letter-spacing: .08em; color: rgba(245,234,215,.88); }
-.price-row { --restaurant-badge-offset-x: -35px; width: 100%; margin-top: 22px; display: flex; align-items: flex-end; gap: 14px; }
+.price-row { --restaurant-badge-offset-x: -70px; width: 100%; margin-top: 22px; display: flex; align-items: flex-end; gap: 14px; }
 .price { color: #f5ead7; font-family: 'Archivo Black', Impact, sans-serif; font-size: clamp(2.75rem, 3.5vw, 4rem); line-height: .8; letter-spacing: -.07em; white-space: nowrap; }
 .price span { color: #f2a42b; font: 500 .37em/1 'DM Mono', monospace; vertical-align: top; padding-right: .18em; }
 .restaurant-price-badge { width: 110px; margin-left: auto; padding: 9px 12px 10px; background: #f5ead7; color: #183d3f; border-top: 4px solid #f2a42b; text-align: right; text-shadow: none; transform: translateX(var(--restaurant-badge-offset-x)); }
