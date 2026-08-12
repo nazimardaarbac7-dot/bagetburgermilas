@@ -80,6 +80,21 @@ export function getTraySwipeDirection(deltaX, threshold = TRAY_SWIPE_STEP_THRESH
   return deltaX < 0 ? 1 : -1
 }
 
+export function getTrayGestureAxis(deltaX, deltaY, currentAxis = null) {
+  if (currentAxis) return currentAxis
+  if (!Number.isFinite(deltaX) || !Number.isFinite(deltaY)) return null
+
+  const absX = Math.abs(deltaX)
+  const absY = Math.abs(deltaY)
+  if (Math.hypot(deltaX, deltaY) < 8) return null
+
+  // Horizontal tray intent gets priority. Ambiguous diagonal movement stays
+  // undecided instead of being mistaken for vertical page scrolling.
+  if (absX >= 8 && absX >= absY * 0.7) return 'horizontal'
+  if (absY >= 14 && absY >= absX * 1.6) return 'vertical'
+  return null
+}
+
 export function getTrayDragScrollSensitivity(triggerSpan, viewportHeight, isMobile = false) {
   if (!Number.isFinite(triggerSpan) || triggerSpan <= 0) return 0
   const safeViewportHeight = Number.isFinite(viewportHeight) && viewportHeight > 0 ? viewportHeight : 1

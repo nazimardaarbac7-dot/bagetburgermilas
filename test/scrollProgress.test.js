@@ -11,6 +11,7 @@ import {
   getSequenceProgress,
   getStableBurgerIndex,
   getTrayDragScrollSensitivity,
+  getTrayGestureAxis,
   getTrayProgressForBurger,
   getTrayRotationProgress,
   getTraySwipeDirection,
@@ -79,6 +80,15 @@ test('short intentional tray swipe advances one burger in its direction', () => 
   assert.equal(getTraySwipeDirection(-19), 0)
   assert.equal(getTraySwipeDirection(19), 0)
   assert.equal(getTraySwipeDirection(null), 0)
+})
+
+test('tray gesture keeps horizontal and vertical intent separate', () => {
+  assert.equal(getTrayGestureAxis(6, 3), null)
+  assert.equal(getTrayGestureAxis(18, 12), 'horizontal')
+  assert.equal(getTrayGestureAxis(12, 18), null)
+  assert.equal(getTrayGestureAxis(8, 15), 'vertical')
+  assert.equal(getTrayGestureAxis(0, 30, 'horizontal'), 'horizontal')
+  assert.equal(getTrayGestureAxis(30, 0, 'vertical'), 'vertical')
 })
 
 test('analog yatay tepsi hassasiyeti dikey scroll uzunluğundan bağımsızdır', () => {

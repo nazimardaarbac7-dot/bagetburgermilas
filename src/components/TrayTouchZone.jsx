@@ -1,4 +1,5 @@
 import React, { useRef } from 'react'
+import { getTrayGestureAxis } from '../utils/scrollProgress'
 
 export default function TrayTouchZone({ enabled, onGestureStart, onGestureMove, onGestureEnd, onTap, onStep }) {
   const gesture = useRef(null)
@@ -28,16 +29,14 @@ export default function TrayTouchZone({ enabled, onGestureStart, onGestureMove, 
     const deltaX = event.clientX - current.startX
     const deltaY = event.clientY - current.startY
 
-    const absX = Math.abs(deltaX)
-    const absY = Math.abs(deltaY)
-
-    if (!current.axis && Math.hypot(deltaX, deltaY) > 7) {
-      if (absX >= absY * 0.85) {
-        current.axis = 'horizontal'
+    if (!current.axis) {
+      const axis = getTrayGestureAxis(deltaX, deltaY)
+      if (axis === 'horizontal') {
+        current.axis = axis
         current.accepted = onGestureStart() !== false
         event.currentTarget.setPointerCapture(event.pointerId)
-      } else if (absY > 14 && absY > absX * 1.25) {
-        current.axis = 'vertical'
+      } else if (axis === 'vertical') {
+        current.axis = axis
       }
     }
 

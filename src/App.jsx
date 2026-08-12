@@ -9,7 +9,7 @@ import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
 import { burgers } from './data/burgers'
-import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayDragScrollSensitivity, getTrayProgressForBurger, getTrayRotationProgress, getTraySwipeDirection, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
+import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayDragScrollSensitivity, getTrayGestureAxis, getTrayProgressForBurger, getTrayRotationProgress, getTraySwipeDirection, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
@@ -622,11 +622,7 @@ export default function App() {
         if (heroTouchStartX === null || heroTouchStartY === null || event.touches.length !== 1) return
         const horizontalDistance = event.touches[0].clientX - heroTouchStartX
         const verticalDistance = heroTouchStartY - event.touches[0].clientY
-        if (!heroTouchAxis && Math.hypot(horizontalDistance, verticalDistance) > 7) {
-          heroTouchAxis = Math.abs(horizontalDistance) >= Math.abs(verticalDistance) * 0.85
-            ? 'horizontal'
-            : 'vertical'
-        }
+        heroTouchAxis = getTrayGestureAxis(horizontalDistance, verticalDistance, heroTouchAxis)
         if (heroTouchAxis !== 'vertical') return
         if (heroPhase.current === 'tray' && verticalDistance >= 4 && !finalGateOpen) {
           if (touchStartedAtFinalStop) {
