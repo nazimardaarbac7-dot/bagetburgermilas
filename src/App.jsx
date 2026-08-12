@@ -9,7 +9,7 @@ import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
 import { burgers } from './data/burgers'
-import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayProgressForBurger, getTrayRotationProgress, getTraySwipeDirection, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
+import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayDragScrollSensitivity, getTrayProgressForBurger, getTrayRotationProgress, getTraySwipeDirection, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
@@ -33,7 +33,7 @@ class ExperienceBoundary extends Component {
   }
 }
 
-const HERO_TRANSITION_SPEED = 1.2 * 1.15 * 1.2 * 1.15 * 1.1
+const HERO_TRANSITION_SPEED = 1.2 * 1.15 * 1.2 * 1.15 * 1.1 * 1.1
 const heroTransitionTime = (seconds) => seconds / HERO_TRANSITION_SPEED
 const HERO_TRANSITION_DURATION = heroTransitionTime(2.35)
 const HERO_COPY_EXIT_DURATION = heroTransitionTime(1.16)
@@ -55,6 +55,7 @@ export default function App() {
   const traySnapTween = useRef(null)
   const traySettledIndex = useRef(0)
   const beginTrayGesture = useRef(null)
+  const adjustTrayProgress = useRef(null)
   const settleTrayProgress = useRef(null)
   const stepTrayProgress = useRef(null)
   const sectionNavigation = useRef(null)
@@ -383,15 +384,31 @@ export default function App() {
         return true
       }
 
+      adjustTrayProgress.current = (movementX) => {
+        if (!trayPointerDragging || !Number.isFinite(movementX)) return false
+        const trayTrigger = trayTriggerRef.current
+        if (!trayTrigger) return false
+        const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress, mobileTray)
+        const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START, mobileTray)
+        const dragSensitivity = getTrayDragScrollSensitivity(
+          trayTrigger.end - trayTrigger.start,
+          window.innerHeight,
+          mobileTray,
+        )
+        const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * dragSensitivity))
+        jumpToScroll(targetScroll)
+        return true
+      }
+
       settleTrayProgress.current = (totalMovementX) => {
         if (!trayPointerDragging) return
         trayPointerDragging = false
         const swipeDirection = getTraySwipeDirection(totalMovementX)
         if (swipeDirection !== 0) {
-          snapTrayToIndex(trayGestureStartIndex + swipeDirection, true)
+          snapTrayToIndex(trayGestureStartIndex + swipeDirection)
           return
         }
-        snapTrayToIndex(trayGestureStartIndex, true)
+        snapTrayToIndex(trayGestureStartIndex)
       }
       stepTrayProgress.current = (direction) => {
         cancelTraySnap()
@@ -558,7 +575,9 @@ export default function App() {
         && finalTransitionProgress.current <= 0.001
         && Math.abs(scrollProgress.current - firstTrayProgress) < 0.002
 
+      let heroTouchStartX = null
       let heroTouchStartY = null
+      let heroTouchAxis = null
       const preventHeroMomentum = (event) => {
         if (heroPhase.current !== 'transition' || !heroScrollLocked) return false
         if (event.cancelable) event.preventDefault()
@@ -590,15 +609,24 @@ export default function App() {
       }
       const handleHeroTouchStart = (event) => {
         touchActive = event.touches.length === 1
+        heroTouchStartX = event.touches.length === 1 ? event.touches[0].clientX : null
         heroTouchStartY = event.touches.length === 1 ? event.touches[0].clientY : null
+        heroTouchAxis = null
         touchStartedAtFinalStop = touchActive && isAtFinalStop()
         if (touchStartedAtFinalStop) clearFinalGateTimer()
       }
       const handleHeroTouchMove = (event) => {
         if (document.querySelector('.discount-popup, .menu-overlay.is-open')) return
         if (preventHeroMomentum(event)) return
-        if (heroTouchStartY === null || event.touches.length !== 1) return
+        if (heroTouchStartX === null || heroTouchStartY === null || event.touches.length !== 1) return
+        const horizontalDistance = event.touches[0].clientX - heroTouchStartX
         const verticalDistance = heroTouchStartY - event.touches[0].clientY
+        if (!heroTouchAxis && Math.hypot(horizontalDistance, verticalDistance) > 7) {
+          heroTouchAxis = Math.abs(horizontalDistance) >= Math.abs(verticalDistance) * 0.85
+            ? 'horizontal'
+            : 'vertical'
+        }
+        if (heroTouchAxis !== 'vertical') return
         if (heroPhase.current === 'tray' && verticalDistance >= 4 && !finalGateOpen) {
           if (touchStartedAtFinalStop) {
             openFinalGate()
@@ -623,7 +651,9 @@ export default function App() {
       const clearHeroTouch = () => {
         touchActive = false
         touchStartedAtFinalStop = false
+        heroTouchStartX = null
         heroTouchStartY = null
+        heroTouchAxis = null
         if (isAtFinalStop() && !finalGateOpen) {
           scheduleFinalGateReady()
         } else if (heroPhase.current === 'tray' && finalTransitionProgress.current <= 0.001) {
@@ -765,6 +795,7 @@ export default function App() {
       cleanupHeroInput()
       cleanupHeroScroll()
       beginTrayGesture.current = null
+      adjustTrayProgress.current = null
       settleTrayProgress.current = null
       stepTrayProgress.current = null
       sectionNavigation.current = null
@@ -775,6 +806,7 @@ export default function App() {
   }, [])
 
   const handleTrayGestureStart = () => beginTrayGesture.current?.() === true
+  const handleTrayGestureMove = (movementX) => adjustTrayProgress.current?.(movementX) === true
   const handleTrayGestureEnd = (totalMovementX) => settleTrayProgress.current?.(totalMovementX)
   const handleTrayStep = (direction) => stepTrayProgress.current?.(direction)
 
@@ -794,7 +826,7 @@ export default function App() {
       <div className="grain" />
       <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} onOpenMenu={openMenu} onNavigate={handleNavigate} />
       <Hero ref={heroRef} />
-      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} finalSequenceActive={finalSequenceActive} mobileMinHeight={`${MOBILE_SHOWCASE_MIN_HEIGHT_SVH}svh`} onTrayGestureStart={handleTrayGestureStart} onTrayGestureEnd={handleTrayGestureEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
+      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} finalSequenceActive={finalSequenceActive} mobileMinHeight={`${MOBILE_SHOWCASE_MIN_HEIGHT_SVH}svh`} onTrayGestureStart={handleTrayGestureStart} onTrayGestureMove={handleTrayGestureMove} onTrayGestureEnd={handleTrayGestureEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
       <MilasSection onOpenMenu={openMenu} />
       <MilasCallBar visible={navbarOnYellow && !menuOpen && !discountOpen} />
       <MenuOverlay open={menuOpen} onClose={closeMenu} />

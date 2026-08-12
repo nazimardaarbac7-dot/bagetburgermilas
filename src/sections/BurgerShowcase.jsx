@@ -2,7 +2,7 @@ import React from 'react'
 import BurgerInfo from '../components/BurgerInfo'
 import TrayTouchZone from '../components/TrayTouchZone'
 
-export default function BurgerShowcase({ burger, activeIndex, isReady, isActive, isInteractive, finalSequenceActive, mobileMinHeight, onTrayGestureStart, onTrayGestureEnd, onBurgerTap, onTrayStep }) {
+export default function BurgerShowcase({ burger, activeIndex, isReady, isActive, isInteractive, finalSequenceActive, mobileMinHeight, onTrayGestureStart, onTrayGestureMove, onTrayGestureEnd, onBurgerTap, onTrayStep }) {
   const isLastBurger = activeIndex === 5
   const showMilasPreview = isLastBurger && !finalSequenceActive
 
@@ -26,7 +26,7 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
             <path d="m13 49 1-12M13 49l12-1" />
           </svg>
         </div>
-        <TrayTouchZone enabled={isInteractive} onGestureStart={onTrayGestureStart} onGestureEnd={onTrayGestureEnd} onTap={onBurgerTap} onStep={onTrayStep} />
+        <TrayTouchZone enabled={isInteractive} onGestureStart={onTrayGestureStart} onGestureMove={onTrayGestureMove} onGestureEnd={onTrayGestureEnd} onTap={onBurgerTap} onStep={onTrayStep} />
         {!showMilasPreview && <p className={`rotate-prompt${isLastBurger ? ' is-final' : ''}`}><i /><span className="rotate-copy-desktop">AŞAĞI KAYDIR</span><span className="rotate-copy-mobile">{isLastBurger ? 'AŞAĞI KAYDIR' : 'TEPSİYİ KAYDIR'}</span></p>}
         {showMilasPreview && (
           <div className="milas-preview" aria-label="Made in Milas bölümüne ilerlemek için yukarı kaydırın">

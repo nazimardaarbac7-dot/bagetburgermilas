@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 
-export default function TrayTouchZone({ enabled, onGestureStart, onGestureEnd, onTap, onStep }) {
+export default function TrayTouchZone({ enabled, onGestureStart, onGestureMove, onGestureEnd, onTap, onStep }) {
   const gesture = useRef(null)
   const suppressClick = useRef(false)
 
@@ -15,6 +15,7 @@ export default function TrayTouchZone({ enabled, onGestureStart, onGestureEnd, o
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
+      lastX: event.clientX,
       axis: null,
       accepted: false,
     }
@@ -42,6 +43,8 @@ export default function TrayTouchZone({ enabled, onGestureStart, onGestureEnd, o
 
     if (current.axis !== 'horizontal') return
     event.preventDefault()
+    if (current.accepted) onGestureMove(event.clientX - current.lastX)
+    current.lastX = event.clientX
   }
 
   const handlePointerUp = (event) => {
