@@ -41,8 +41,10 @@ test('ham ve sahne ilerlemesi birbirinin tersidir', () => {
 test('mobil burger mesafesi kısa kalırken Milas finaline ayrı kaydırma alanı ayrılır', () => {
   const mobileTriggerSpan = MOBILE_SHOWCASE_MIN_HEIGHT_SVH + 100
   const finalStopRaw = getRawProgressForSequenceProgress(FINAL_TRANSITION_START, true)
+  const burgerDistance = mobileTriggerSpan * finalStopRaw
   const finalDistance = mobileTriggerSpan * (1 - finalStopRaw)
 
+  assert.ok(burgerDistance > 140)
   assert.ok(Math.abs(finalDistance - 92) < 1e-10)
   assert.ok(MOBILE_SHOWCASE_MIN_HEIGHT_SVH > 100)
 })
