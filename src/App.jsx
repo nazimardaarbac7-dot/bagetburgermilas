@@ -45,6 +45,7 @@ const HERO_RETURN_START = heroTransitionTime(0.66)
 const HERO_RETURN_DURATION = heroTransitionTime(1.62)
 const HERO_COPY_RETURN_DURATION = heroTransitionTime(0.92)
 const HERO_COPY_RETURN_START = HERO_RETURN_START + HERO_RETURN_DURATION - HERO_COPY_RETURN_DURATION
+const TRAY_SNAP_SPEED = 1.2
 
 export default function App() {
   const heroExitProgress = useRef(0)
@@ -337,11 +338,11 @@ export default function App() {
           scroll: targetScroll,
           duration: reduceMotion
             ? 0.01
-            : fixedStepDuration
+            : (fixedStepDuration
               ? mobileTray ? 0.22 : 0.26
-            : mobileTray
-              ? Math.min(0.22, Math.max(0.12, distance / window.innerHeight * 0.15))
-              : Math.min(0.24, Math.max(0.13, distance / window.innerHeight * 0.17)),
+              : mobileTray
+                ? Math.min(0.22, Math.max(0.12, distance / window.innerHeight * 0.15))
+                : Math.min(0.24, Math.max(0.13, distance / window.innerHeight * 0.17))) / TRAY_SNAP_SPEED,
           ease: 'power3.out',
           onUpdate: () => {
             scrollingElement.scrollTop = snapMotion.scroll
