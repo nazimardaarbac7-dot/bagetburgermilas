@@ -299,7 +299,8 @@ main.is-showcase-active:not(.is-final-sequence-active) .milas-section { visibili
   .milas-preview span { margin-left: auto; font-size: .45rem; }
   .rotate-copy-desktop { display: none; }
   .rotate-copy-mobile { display: inline; }
-  .showcase.is-active .tray-touch-zone { inset: 0; pointer-events: auto; touch-action: pan-y; }
+  .showcase.is-active .tray-touch-zone { inset: 0; pointer-events: auto; touch-action: none; }
+  .showcase.is-active.is-last-burger .tray-touch-zone { touch-action: pan-y; }
   .progress-status { display: block; position: relative; text-align: right; }
   .tray-markers { right: 0; top: calc(100% + 12px); bottom: auto; }
   .tray-markers span { width: 13px; }
