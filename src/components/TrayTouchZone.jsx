@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 
-export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap, onStep }) {
+export default function TrayTouchZone({ enabled, onGestureStart, onGestureEnd, onTap, onStep }) {
   const gesture = useRef(null)
   const suppressClick = useRef(false)
 
@@ -15,8 +15,8 @@ export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap, onSte
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      lastX: event.clientX,
       axis: null,
+      accepted: false,
     }
   }
 
@@ -33,6 +33,7 @@ export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap, onSte
     if (!current.axis && Math.hypot(deltaX, deltaY) > 7) {
       if (absX >= absY * 0.85) {
         current.axis = 'horizontal'
+        current.accepted = onGestureStart() !== false
         event.currentTarget.setPointerCapture(event.pointerId)
       } else if (absY > 14 && absY > absX * 1.25) {
         current.axis = 'vertical'
@@ -41,9 +42,6 @@ export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap, onSte
 
     if (current.axis !== 'horizontal') return
     event.preventDefault()
-    const movementX = event.clientX - current.lastX
-    current.lastX = event.clientX
-    onDrag(movementX)
   }
 
   const handlePointerUp = (event) => {
@@ -53,7 +51,7 @@ export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap, onSte
     if (current.axis === 'horizontal') {
       const totalMovementX = event.clientX - current.startX
       suppressClick.current = Math.abs(totalMovementX) > 10
-      onDragEnd(totalMovementX)
+      if (current.accepted) onGestureEnd(totalMovementX)
     }
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -63,7 +61,7 @@ export default function TrayTouchZone({ enabled, onDrag, onDragEnd, onTap, onSte
   }
 
   const handlePointerCancel = () => {
-    if (gesture.current?.axis === 'horizontal') onDragEnd(null)
+    if (gesture.current?.axis === 'horizontal' && gesture.current.accepted) onGestureEnd(null)
     resetGesture()
   }
 

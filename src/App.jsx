@@ -9,7 +9,7 @@ import Hero from './sections/Hero'
 import BurgerShowcase from './sections/BurgerShowcase'
 import MilasSection from './sections/MilasSection'
 import { burgers } from './data/burgers'
-import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayDragScrollSensitivity, getTrayProgressForBurger, getTrayRotationProgress, getTraySwipeDirection, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
+import { FINAL_TRANSITION_START, getFinalTransitionProgress, getRawProgressForSequenceProgress, getSequenceProgress, getStableBurgerIndex, getTrayProgressForBurger, getTrayRotationProgress, getTraySwipeDirection, MOBILE_SHOWCASE_MIN_HEIGHT_SVH, MOBILE_TRAY_SETTLE_END, TRAY_SETTLE_END } from './utils/scrollProgress'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
@@ -54,7 +54,7 @@ export default function App() {
   const trayTriggerRef = useRef(null)
   const traySnapTween = useRef(null)
   const traySettledIndex = useRef(0)
-  const adjustTrayProgress = useRef(null)
+  const beginTrayGesture = useRef(null)
   const settleTrayProgress = useRef(null)
   const stepTrayProgress = useRef(null)
   const sectionNavigation = useRef(null)
@@ -296,6 +296,7 @@ export default function App() {
 
       const mobileTray = mobileScene
       let trayPointerDragging = false
+      let trayGestureStartIndex = 0
 
       const cancelTraySnap = () => {
         if (traySnapTimer) window.clearTimeout(traySnapTimer)
@@ -306,7 +307,7 @@ export default function App() {
         traySnapTween.current = null
       }
 
-      const snapTrayToIndex = (requestedIndex) => {
+      const snapTrayToIndex = (requestedIndex, fixedStepDuration = false) => {
         if (heroPhase.current !== 'tray' || finalTransitionProgress.current > 0.001) return
         const trayTrigger = trayTriggerRef.current
         if (!trayTrigger) return
@@ -335,6 +336,8 @@ export default function App() {
           scroll: targetScroll,
           duration: reduceMotion
             ? 0.01
+            : fixedStepDuration
+              ? mobileTray ? 0.22 : 0.26
             : mobileTray
               ? Math.min(0.22, Math.max(0.12, distance / window.innerHeight * 0.15))
               : Math.min(0.24, Math.max(0.13, distance / window.innerHeight * 0.17)),
@@ -371,32 +374,24 @@ export default function App() {
         }, mobileScene ? 70 : 90)
       }
 
-      adjustTrayProgress.current = (movementX) => {
+      beginTrayGesture.current = () => {
         if (heroPhase.current !== 'tray' || finalTransitionProgress.current > 0.001) return false
+        if (traySnapTween.current || trayDisplayTimer) return false
         cancelTraySnap()
         trayPointerDragging = true
-        const trayTrigger = trayTriggerRef.current
-        if (!trayTrigger) return false
-        const minScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(firstTrayProgress, mobileTray)
-        const maxScroll = trayTrigger.start + (trayTrigger.end - trayTrigger.start) * getRawProgressForSequenceProgress(FINAL_TRANSITION_START, mobileTray)
-        const dragSensitivity = getTrayDragScrollSensitivity(
-          trayTrigger.end - trayTrigger.start,
-          window.innerHeight,
-          mobileTray,
-        )
-        const targetScroll = Math.max(minScroll, Math.min(maxScroll, scrollingElement.scrollTop - movementX * dragSensitivity))
-        jumpToScroll(targetScroll)
+        trayGestureStartIndex = traySettledIndex.current
         return true
       }
 
       settleTrayProgress.current = (totalMovementX) => {
+        if (!trayPointerDragging) return
         trayPointerDragging = false
         const swipeDirection = getTraySwipeDirection(totalMovementX)
         if (swipeDirection !== 0) {
-          snapTrayToIndex(traySettledIndex.current + swipeDirection)
+          snapTrayToIndex(trayGestureStartIndex + swipeDirection, true)
           return
         }
-        snapTrayToNearest()
+        snapTrayToIndex(trayGestureStartIndex, true)
       }
       stepTrayProgress.current = (direction) => {
         cancelTraySnap()
@@ -769,7 +764,7 @@ export default function App() {
       heroReturnTween = null
       cleanupHeroInput()
       cleanupHeroScroll()
-      adjustTrayProgress.current = null
+      beginTrayGesture.current = null
       settleTrayProgress.current = null
       stepTrayProgress.current = null
       sectionNavigation.current = null
@@ -779,8 +774,8 @@ export default function App() {
     }
   }, [])
 
-  const handleTrayDrag = (movementX) => adjustTrayProgress.current?.(movementX) === true
-  const handleTrayDragEnd = (totalMovementX) => settleTrayProgress.current?.(totalMovementX)
+  const handleTrayGestureStart = () => beginTrayGesture.current?.() === true
+  const handleTrayGestureEnd = (totalMovementX) => settleTrayProgress.current?.(totalMovementX)
   const handleTrayStep = (direction) => stepTrayProgress.current?.(direction)
 
   const handleBurgerTap = () => {
@@ -799,7 +794,7 @@ export default function App() {
       <div className="grain" />
       <Navbar hiddenOnShowcase={showcaseActive} onYellow={navbarOnYellow} onOpenMenu={openMenu} onNavigate={handleNavigate} />
       <Hero ref={heroRef} />
-      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} finalSequenceActive={finalSequenceActive} mobileMinHeight={`${MOBILE_SHOWCASE_MIN_HEIGHT_SVH}svh`} onTrayDrag={handleTrayDrag} onTrayDragEnd={handleTrayDragEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
+      <BurgerShowcase burger={burgers[activeIndex]} activeIndex={activeIndex} isReady={showcaseReady} isActive={showcaseActive} isInteractive={showcaseReady && showcaseActive && !heroTransitioning && !menuOpen && !discountOpen} finalSequenceActive={finalSequenceActive} mobileMinHeight={`${MOBILE_SHOWCASE_MIN_HEIGHT_SVH}svh`} onTrayGestureStart={handleTrayGestureStart} onTrayGestureEnd={handleTrayGestureEnd} onBurgerTap={handleBurgerTap} onTrayStep={handleTrayStep} />
       <MilasSection onOpenMenu={openMenu} />
       <MilasCallBar visible={navbarOnYellow && !menuOpen && !discountOpen} />
       <MenuOverlay open={menuOpen} onClose={closeMenu} />

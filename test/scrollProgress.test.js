@@ -10,7 +10,6 @@ import {
   getRawProgressForSequenceProgress,
   getSequenceProgress,
   getStableBurgerIndex,
-  getTrayDragScrollSensitivity,
   getTrayProgressForBurger,
   getTrayRotationProgress,
   getTraySwipeDirection,
@@ -79,16 +78,4 @@ test('short intentional tray swipe advances one burger in its direction', () => 
   assert.equal(getTraySwipeDirection(-19), 0)
   assert.equal(getTraySwipeDirection(19), 0)
   assert.equal(getTraySwipeDirection(null), 0)
-})
-
-test('yatay tepsi hassasiyeti dikey scroll mesafesinden bağımsız kalır', () => {
-  const viewportHeight = 800
-  const longSpan = viewportHeight * 8.2
-  const shortSpan = longSpan * 0.25
-  const longSensitivity = getTrayDragScrollSensitivity(longSpan, viewportHeight)
-  const shortSensitivity = getTrayDragScrollSensitivity(shortSpan, viewportHeight)
-
-  assert.ok(Math.abs(longSensitivity - 6) < 1e-12)
-  assert.ok(Math.abs(shortSensitivity - 1.5) < 1e-12)
-  assert.ok(Math.abs(longSensitivity / longSpan - shortSensitivity / shortSpan) < 1e-12)
 })
