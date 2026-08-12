@@ -606,14 +606,6 @@ export default function App() {
         if (event.deltaY < 0 && canReturnToHero()) {
           if (event.cancelable) event.preventDefault()
           beginHeroTransition(false)
-          return
-        }
-        // Tepside burger değişimi dikey scroll ile tetiklenmesin; burgerler
-        // arasında geçiş yalnızca yana kaydırma (sürükleme) ile yapılsın.
-        // Son burgerden final sahneye geçiş ve Hero'ya dönüş yukarıdaki
-        // özel durumlarla zaten yönetiliyor, bu blok onları etkilemez.
-        if (heroPhase.current === 'tray' && !finalGateOpen) {
-          if (event.cancelable) event.preventDefault()
         }
       }
       const handleHeroTouchStart = (event) => {
