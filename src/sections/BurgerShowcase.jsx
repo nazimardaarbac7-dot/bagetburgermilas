@@ -29,9 +29,9 @@ export default function BurgerShowcase({ burger, activeIndex, isReady, isActive,
         <TrayTouchZone enabled={isInteractive} onDrag={onTrayDrag} onDragEnd={onTrayDragEnd} onTap={onBurgerTap} onStep={onTrayStep} />
         {!showMilasPreview && <p className={`rotate-prompt${isLastBurger ? ' is-final' : ''}`}><i /><span className="rotate-copy-desktop">AŞAĞI KAYDIR</span><span className="rotate-copy-mobile">{isLastBurger ? 'AŞAĞI KAYDIR' : 'TEPSİYİ KAYDIR'}</span></p>}
         {showMilasPreview && (
-          <div className="milas-preview" aria-label="Made in Milas bölümüne ilerlemek için aşağı kaydırın">
+          <div className="milas-preview" aria-label="Made in Milas bölümüne ilerlemek için yukarı kaydırın">
             <strong>MADE IN MILAS</strong>
-            <span>AŞAĞI KAYDIR</span>
+            <span>YUKARI KAYDIR</span>
             <i aria-hidden="true">↑</i>
           </div>
         )}

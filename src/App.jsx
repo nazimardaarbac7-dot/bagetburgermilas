@@ -632,6 +632,7 @@ export default function App() {
         if (isAtFinalStop() && !finalGateOpen) {
           scheduleFinalGateReady()
         } else if (heroPhase.current === 'tray' && finalTransitionProgress.current <= 0.001) {
+          if (traySnapTween.current || trayDisplayTimer) return
           cancelTraySnap()
           window.requestAnimationFrame(snapTrayToNearest)
         }

@@ -26,7 +26,13 @@ const MOBILE_BASE_TRIGGER_SPAN_SVH = MOBILE_BASE_SHOWCASE_MIN_HEIGHT_SVH + VIEWP
 const MOBILE_TRIGGER_SPAN_SCALE = GRIP_END_RAW_PROGRESS + (1 - GRIP_END_RAW_PROGRESS) * MOBILE_POST_GRIP_DISTANCE_SCALE
 const MOBILE_REFERENCE_TRIGGER_SPAN_SVH = MOBILE_BASE_TRIGGER_SPAN_SVH * MOBILE_TRIGGER_SPAN_SCALE / 1.06
 const MOBILE_GRIP_END_RAW_PROGRESS = GRIP_END_RAW_PROGRESS / MOBILE_TRIGGER_SPAN_SCALE
-export const MOBILE_SHOWCASE_MIN_HEIGHT_SVH = MOBILE_BASE_TRIGGER_SPAN_SVH * MOBILE_TRIGGER_SPAN_SCALE / MOBILE_SCROLL_SENSITIVITY - VIEWPORT_TRIGGER_PADDING_SVH
+const MOBILE_COMPACT_TRIGGER_SPAN_SVH = MOBILE_BASE_TRIGGER_SPAN_SVH * MOBILE_TRIGGER_SPAN_SCALE / MOBILE_SCROLL_SENSITIVITY
+const MOBILE_BASE_FINAL_STOP_RAW_PROGRESS = FINAL_TRANSITION_START * MOBILE_GRIP_END_RAW_PROGRESS / GRIP_END_SEQUENCE_PROGRESS
+const MOBILE_PRE_FINAL_SCROLL_DISTANCE_SVH = MOBILE_COMPACT_TRIGGER_SPAN_SVH * MOBILE_BASE_FINAL_STOP_RAW_PROGRESS
+const MOBILE_FINAL_SCROLL_DISTANCE_SVH = 92
+const MOBILE_TRIGGER_SPAN_SVH = MOBILE_PRE_FINAL_SCROLL_DISTANCE_SVH + MOBILE_FINAL_SCROLL_DISTANCE_SVH
+const MOBILE_FINAL_STOP_RAW_PROGRESS = MOBILE_PRE_FINAL_SCROLL_DISTANCE_SVH / MOBILE_TRIGGER_SPAN_SVH
+export const MOBILE_SHOWCASE_MIN_HEIGHT_SVH = MOBILE_TRIGGER_SPAN_SVH - VIEWPORT_TRIGGER_PADDING_SVH
 const DESKTOP_REFERENCE_TRIGGER_SPAN_VH = 820
 const BASE_TRAY_DRAG_SENSITIVITY = 6
 
@@ -97,9 +103,7 @@ export function getFinalTransitionProgress(progress) {
   return Math.min(1, Math.max(0, normalized))
 }
 
-// Mobile shortens only the coupled hand-lift and Milas transition after the
-// grip. Its adjusted breakpoint keeps every pre-grip distance unchanged.
-export function getSequenceProgress(rawProgress, isMobile = false) {
+function getBaseSequenceProgress(rawProgress, isMobile = false) {
   const clamped = Math.min(1, Math.max(0, rawProgress))
   const gripEndRawProgress = isMobile ? MOBILE_GRIP_END_RAW_PROGRESS : GRIP_END_RAW_PROGRESS
   if (clamped <= gripEndRawProgress) return clamped * (GRIP_END_SEQUENCE_PROGRESS / gripEndRawProgress)
@@ -108,11 +112,39 @@ export function getSequenceProgress(rawProgress, isMobile = false) {
   return GRIP_END_SEQUENCE_PROGRESS + postGripProgress * (1 - GRIP_END_SEQUENCE_PROGRESS)
 }
 
-export function getRawProgressForSequenceProgress(sequenceProgress, isMobile = false) {
+function getBaseRawProgressForSequenceProgress(sequenceProgress, isMobile = false) {
   const clamped = Math.min(1, Math.max(0, sequenceProgress))
   const gripEndRawProgress = isMobile ? MOBILE_GRIP_END_RAW_PROGRESS : GRIP_END_RAW_PROGRESS
   if (clamped <= GRIP_END_SEQUENCE_PROGRESS) return clamped * (gripEndRawProgress / GRIP_END_SEQUENCE_PROGRESS)
 
   const postGripProgress = (clamped - GRIP_END_SEQUENCE_PROGRESS) / (1 - GRIP_END_SEQUENCE_PROGRESS)
   return gripEndRawProgress + postGripProgress * (1 - gripEndRawProgress)
+}
+
+// Mobile keeps the compact burger-selection distance, but reserves a separate
+// near-viewport scroll distance for the hand and Milas finale.
+export function getSequenceProgress(rawProgress, isMobile = false) {
+  const clamped = Math.min(1, Math.max(0, rawProgress))
+  if (!isMobile) return getBaseSequenceProgress(clamped)
+
+  const baseRawProgress = clamped <= MOBILE_FINAL_STOP_RAW_PROGRESS
+    ? clamped * MOBILE_BASE_FINAL_STOP_RAW_PROGRESS / MOBILE_FINAL_STOP_RAW_PROGRESS
+    : MOBILE_BASE_FINAL_STOP_RAW_PROGRESS
+      + (clamped - MOBILE_FINAL_STOP_RAW_PROGRESS)
+        * (1 - MOBILE_BASE_FINAL_STOP_RAW_PROGRESS)
+        / (1 - MOBILE_FINAL_STOP_RAW_PROGRESS)
+  return getBaseSequenceProgress(baseRawProgress, true)
+}
+
+export function getRawProgressForSequenceProgress(sequenceProgress, isMobile = false) {
+  const clamped = Math.min(1, Math.max(0, sequenceProgress))
+  const baseRawProgress = getBaseRawProgressForSequenceProgress(clamped, isMobile)
+  if (!isMobile) return baseRawProgress
+
+  return baseRawProgress <= MOBILE_BASE_FINAL_STOP_RAW_PROGRESS
+    ? baseRawProgress * MOBILE_FINAL_STOP_RAW_PROGRESS / MOBILE_BASE_FINAL_STOP_RAW_PROGRESS
+    : MOBILE_FINAL_STOP_RAW_PROGRESS
+      + (baseRawProgress - MOBILE_BASE_FINAL_STOP_RAW_PROGRESS)
+        * (1 - MOBILE_FINAL_STOP_RAW_PROGRESS)
+        / (1 - MOBILE_BASE_FINAL_STOP_RAW_PROGRESS)
 }

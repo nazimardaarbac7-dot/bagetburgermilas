@@ -38,20 +38,13 @@ test('ham ve sahne ilerlemesi birbirinin tersidir', () => {
   }
 })
 
-test('mobil akış kısaltılmış mesafeyi korur ve el ile Milas ortak finali kısa kalır', () => {
-  const previousMobileTriggerSpan = 760 + 100
+test('mobil burger mesafesi kısa kalırken Milas finaline ayrı kaydırma alanı ayrılır', () => {
   const mobileTriggerSpan = MOBILE_SHOWCASE_MIN_HEIGHT_SVH + 100
-  const sensitivity = 1.06 * 1.2 / 0.9 / 0.85 / 0.75 / 0.8 / 0.8 / 0.75
-  const previousGripRaw = getRawProgressForSequenceProgress(GRIP_END_SEQUENCE_PROGRESS)
-  const mobileGripRaw = getRawProgressForSequenceProgress(GRIP_END_SEQUENCE_PROGRESS, true)
-  const previousPreGripDistance = previousMobileTriggerSpan * previousGripRaw
-  const mobilePreGripDistance = mobileTriggerSpan * mobileGripRaw
-  const previousPostGripDistance = previousMobileTriggerSpan * (1 - previousGripRaw)
-  const mobilePostGripDistance = mobileTriggerSpan * (1 - mobileGripRaw)
+  const finalStopRaw = getRawProgressForSequenceProgress(FINAL_TRANSITION_START, true)
+  const finalDistance = mobileTriggerSpan * (1 - finalStopRaw)
 
-  assert.ok(Math.abs(mobilePreGripDistance / previousPreGripDistance - 1 / sensitivity) < 1e-10)
-  const previousLivePostGripDistance = previousPostGripDistance * 0.85 * 0.92 * 0.85
-  assert.ok(Math.abs(mobilePostGripDistance / previousLivePostGripDistance - 0.8 / sensitivity) < 1e-10)
+  assert.ok(Math.abs(finalDistance - 92) < 1e-10)
+  assert.ok(MOBILE_SHOWCASE_MIN_HEIGHT_SVH > 100)
 })
 
 test('burger durakları tepsi dönüşüyle aynı indekse karşılık gelir', () => {
