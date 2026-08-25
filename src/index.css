@@ -112,7 +112,9 @@ main.is-showcase-active:not(.is-final-sequence-active) .milas-section { visibili
 .tray-markers span.active { width: 42px; background: #de860b; }
 
 @media (min-width: 721px) {
+  .showcase.is-active .showcase-panel { position: fixed; inset: 0; height: 100svh; }
   .burger-info { top: 22.5%; transform: none; animation-name: enterInfoDesktop; }
+  main .milas-call-bar { display: none; }
   .tap-hint { left: calc(50% + 156px); top: 48%; opacity: .72; }
   .tray-touch-zone { inset: 18% 0; }
   .showcase.is-active .tray-touch-zone { pointer-events: auto; cursor: grab; }
