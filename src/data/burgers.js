@@ -20,7 +20,7 @@ export const burgers = [
     number: '03',
     name: ['TAVUK', 'BURGER'],
     ingredients: ['KENDİMİZE ÖZGÜ PANELENMİŞ TAVUK PARÇACIKLARI', 'DOMATES', 'TURŞU', 'TAVUK BURGER İÇİN ÖZEL SOSUMUZ'],
-    price: '210',
+    price: '200',
     accent: '#de860b',
   },
   {
